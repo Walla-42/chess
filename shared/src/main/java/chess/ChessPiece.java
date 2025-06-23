@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import chess.chessMoveCalculators.*;
+
 
 /**
  * Represents a single chess piece
@@ -54,7 +56,13 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         // might need separate calculators for each piece type -> Look up how to build classes for each.
         return switch (Type) {
-            case Bishop -> bishopChessMoveCalculator.getMoves(); //no idea how to write this switch case-> need to look up.
-        }
+//            case KING ->;
+//            case QUEEN->;
+//            case KNIGHT->;
+//            case ROOK->;
+//            case PAWN->;
+            case BISHOP -> bishopChessMoveCalculator.getMoves();
+            default -> throw new RuntimeException("Unable to fetch chess piece moves");
+        };
     }
 }

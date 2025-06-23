@@ -51,30 +51,21 @@ java -jar client/target/client-jar-with-dependencies.jar
 ♕ 240 Chess Client: chess.ChessPiece@7852e922
 ```
 
-## Things to do:
+## Things to Do – Phase 0
 
-### Phase 0:
+| **Move Calculators** | **Move Tests**        | **Board Tests**       |
+|----------------------|-----------------------|------------------------|
+| [ ] Rook             | [ ] ChessPieceTests   | [x] ChessBoardTests    |
+| [ ] Bishop           | [ ] ChessMoveTests    | [x] ChessPositionTests |
+| [ ] Knight           | [ ] BishopMoveTests   |                        |
+| [ ] King             | [ ] KingMoveTests     |                        |
+| [ ] Queen            | [ ] KnightMoveTests   |                        |
+| [ ] Pawn             | [ ] PawnMoveTests     |                        |
+|                      | [ ] QueenMoveTests    |                        |
+|                      | [ ] RookMoveTests     |                        |
 
-- [ ] Make Move Calculators:
-  - [ ] Rook
-  - [ ] Bishop
-  - [ ] Knight
-  - [ ] King
-  - [ ] Queen
-  - [ ] Pawn
 
-- [ ] Pass Move Tests:
-  - [ ] ChessPieceTests
-  - [ ] ChessMoveTests
-  - [ ] BishopMoveTests
-  - [ ] KingMoveTests
-  - [ ] KnightMoveTests
-  - [ ] PawnMoveTests
-  - [ ] QueenMoveTests
-  - [ ] RookMoveTests
 
-- [x] Pass Board Tests:
-  - [x] ChessBoardTests
-  - [x] ChessPositionTests
+
 
     

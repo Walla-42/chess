@@ -24,6 +24,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
 
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
+//                System.out.println(new ChessPosition(row,col));
                 Assertions.assertNull(
                         board.getPiece(new ChessPosition(row, col)),
                         "Immediately upon construction, a ChessBoard should be empty."
@@ -58,6 +59,9 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
 
         var actualBoard = new ChessBoard();
         actualBoard.resetBoard();
+
+        System.out.println(expectedBoard);
+        System.out.println(actualBoard);
 
         Assertions.assertEquals(expectedBoard, actualBoard, "Reset board did not create the correct board");
     }

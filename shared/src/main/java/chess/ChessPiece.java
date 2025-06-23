@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
+
 import chess.chessMoveCalculators.*;
 
 
@@ -64,5 +66,41 @@ public class ChessPiece {
             case BISHOP -> bishopChessMoveCalculator.getMoves();
             default -> throw new RuntimeException("Unable to fetch chess piece moves");
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return Color == that.Color && Type == that.Type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Color, Type);
+    }
+
+    @Override
+    public String toString() {
+        char typeSymbol;
+        switch (Type){
+            case KING -> typeSymbol = 'K';
+            case QUEEN-> typeSymbol = 'Q';
+            case KNIGHT-> typeSymbol = 'N';
+            case ROOK-> typeSymbol = 'R';
+            case PAWN-> typeSymbol = 'P';
+            case BISHOP -> typeSymbol = 'B';
+            default -> throw new RuntimeException("Unexpected piece on gameboard");
+        }
+
+        String stringValue;
+        if (Color == ChessGame.TeamColor.WHITE){
+            stringValue = String.valueOf(typeSymbol);
+        } else {
+            stringValue = String.valueOf(Character.toLowerCase(typeSymbol));
+        }
+        return stringValue;
     }
 }

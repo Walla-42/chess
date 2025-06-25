@@ -42,6 +42,17 @@ public class ChessBoard {
     }
 
     /**
+     * checks to see if a movement position is on the board
+     *
+     * @param row the row a piece is trying to move
+     * @param col the column a piece is trying to move
+     * @return true if position is on the board and false otherwise
+     */
+    public boolean isInBounds(int row, int col){
+        return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */

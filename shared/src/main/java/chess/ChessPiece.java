@@ -14,12 +14,12 @@ import chess.chessMoveCalculators.*;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor Color;
-    private final PieceType Type;
+    private final ChessGame.TeamColor color;
+    private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.Color = pieceColor;
-        this.Type = type;
+    public ChessPiece(ChessGame.TeamColor TeamColor, ChessPiece.PieceType PieceType) {
+        this.color = TeamColor;
+        this.type = PieceType;
     }
 
     /**
@@ -38,14 +38,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return Color;
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return Type;
+        return type;
     }
 
     /**
@@ -57,15 +57,15 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         // might need separate calculators for each piece type -> Look up how to build classes for each.
-        return switch (Type) {
-//            case KING ->;
-//            case QUEEN->;
-//            case KNIGHT->;
-//            case ROOK->;
-//            case PAWN->;
-            case BISHOP -> bishopChessMoveCalculator.getMoves();
-            default -> throw new RuntimeException("Unable to fetch chess piece moves");
+        PieceMovesCalculator calculator = switch (type) {
+            case KING -> new KingChessMoveCalculator();
+            case QUEEN-> new QueenChessMoveCalculator();
+            case KNIGHT-> new KnightChessMoveCalculator();
+            case ROOK-> new RookChessMoveCalculator();
+            case PAWN-> new PawnChessMoveCalculator();
+            case BISHOP -> new BishopChessMoveCalculator();
         };
+        return calculator.pieceMoves(board, myPosition);
     }
 
     @Override
@@ -74,18 +74,18 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return Color == that.Color && Type == that.Type;
+        return color == that.color && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Color, Type);
+        return Objects.hash(color, type);
     }
 
     @Override
     public String toString() {
         char typeSymbol;
-        switch (Type){
+        switch (type){
             case KING -> typeSymbol = 'K';
             case QUEEN-> typeSymbol = 'Q';
             case KNIGHT-> typeSymbol = 'N';
@@ -96,7 +96,7 @@ public class ChessPiece {
         }
 
         String stringValue;
-        if (Color == ChessGame.TeamColor.WHITE){
+        if (color == ChessGame.TeamColor.WHITE){
             stringValue = String.valueOf(typeSymbol);
         } else {
             stringValue = String.valueOf(Character.toLowerCase(typeSymbol));

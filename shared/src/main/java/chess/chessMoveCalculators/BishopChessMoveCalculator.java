@@ -8,7 +8,7 @@ import java.util.List;
 
 public class BishopChessMoveCalculator implements PieceMovesCalculator{
 
-    private static final int[][] pieceMoves = {{-1,1}, {1,1}, {1,-1}, {-1,-1}};
+    private static final int[][] allowedMoves = {{-1,1}, {1,1}, {1,-1}, {-1,-1}};
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
@@ -17,7 +17,7 @@ public class BishopChessMoveCalculator implements PieceMovesCalculator{
 
         ChessGame.TeamColor team = piece.getTeamColor();
 
-        for (int[] movementDir: pieceMoves){
+        for (int[] movementDir: allowedMoves){
             int row = myPosition.getRow() + movementDir[0];
             int col = myPosition.getColumn() + movementDir[1];
 

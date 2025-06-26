@@ -1,5 +1,8 @@
 package chess.chessMoveCalculators;
 
+/**
+ * class extension of the SharedCalculatorLogic class returning the allowed direction for the Queen chess piece
+ */
 public class QueenChessMoveCalculator extends SharedCalculatorLogic{
     @Override
     public int [][] allowedDirectionalMoves(){

@@ -1,5 +1,8 @@
 package chess.chessMoveCalculators;
 
+/**
+ * class extension of the SharedCalculatorLogic class returning the allowed direction for the Knight chess piece
+ */
 public class KnightChessMoveCalculator extends SharedCalculatorLogic{
     @Override
     public int [][] allowedFixedMoves(){

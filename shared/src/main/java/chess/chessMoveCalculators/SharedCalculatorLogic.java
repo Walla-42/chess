@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Class built to house the shared move calculator logic for all pieces on the chessboard except the pawn.
+ */
 public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
 
     public int[][] allowedDirectionalMoves(){
@@ -16,7 +19,17 @@ public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
         return null;
     }
 
-
+    /**
+     * Implements the base code shared by all piece calculators. Has two parts - fixed moves and directional moves.
+     * fixed moves are functional moves shared by King, and Knights. Directional moves are functional moves shared by
+     * Queen, Bishop, and Rook, where pieces can move over long linear distances. Depending on what set of move
+     * parameters are returned determines the calculator function used.
+     *
+     * @param board chessboard
+     * @param myPosition  position of chess piece on chessboard
+     * @return collection of chess moves calculated by the chess piece calculator
+     *
+     */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
         List<ChessMove> moves = new ArrayList<>();
         ChessPiece piece = board.getPiece(myPosition);
@@ -41,7 +54,7 @@ public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
                         moves.add(new ChessMove(myPosition, newPiecePosition));
                         break;
                     } else {
-                        break; // target position is occupied by piece of same team color
+                        break;
                     }
 
                     row += movementDir[0];

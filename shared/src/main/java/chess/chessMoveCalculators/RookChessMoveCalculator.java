@@ -1,5 +1,8 @@
 package chess.chessMoveCalculators;
 
+/**
+ * class extension of the SharedCalculatorLogic class returning the allowed direction for the Rook chess piece
+ */
 public class RookChessMoveCalculator extends SharedCalculatorLogic{
     @Override
     public int [][] allowedDirectionalMoves(){

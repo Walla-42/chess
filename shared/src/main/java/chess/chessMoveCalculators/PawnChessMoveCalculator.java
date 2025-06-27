@@ -7,15 +7,18 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+
+/**
+ * Pawn Move Logic class. Used for calculating possible moves on the gameBoard. Implements PieceMovesCalculator Template.
+ */
 public class PawnChessMoveCalculator implements PieceMovesCalculator {
 
     /**
-     * if pawn is at starting position then it can move forward 2
-     * if pawn is not at starting position then it can move forward 1
-     * if there is a target in the diagonals {1,1} or {1,-1} then there is a valid move
+     * method for calculating the moves available to a pawn on the gameBoard
      *
-     * if team == white then promotionRow = 8 else promotinoRow = 1
-     * if team == white then the startRow = 2 else startRow = 7
+     * @param board gameBoard in which the pieces are located
+     * @param myPosition position of the targeted gamePiece on the gameBoard
+     * @return HashSet of all possible moves called moves
      */
     public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> moves = new HashSet<>();
@@ -50,9 +53,8 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
 
         }
 
-        int[] attackColumns = {1, -1};
         // diagonal attack moves
-
+        int[] attackColumns = {1, -1};
         for (int column : attackColumns) {
             if (board.isInBounds(row + moveDirection, myPosition.getColumn() + column)) {
                 ChessPosition newChessPosition = new ChessPosition(row + moveDirection, myPosition.getColumn() + column);
@@ -68,10 +70,13 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
 
     public void addPromotions(ChessPosition currPosition, ChessPosition newPosition, int promotionRow, HashSet<ChessMove> ChessMoves) {
         if (newPosition.getRow() == promotionRow) {
-            ChessPiece.PieceType[] promotions = new ChessPiece.PieceType[]{ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP};
+            ChessPiece.PieceType[] promotions = new ChessPiece.PieceType[]{ChessPiece.PieceType.ROOK,
+                    ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP};
+
             for (ChessPiece.PieceType chessPiece : promotions) {
                 ChessMoves.add(new ChessMove(currPosition, newPosition, chessPiece));
             }
+
         } else {
             ChessMoves.add(new ChessMove(currPosition, newPosition));
         }

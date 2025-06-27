@@ -4,6 +4,7 @@ import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class PawnChessMoveCalculator implements PieceMovesCalculator {
@@ -16,8 +17,8 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
      * if team == white then promotionRow = 8 else promotinoRow = 1
      * if team == white then the startRow = 2 else startRow = 7
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        List<ChessMove> moves = new ArrayList<>();
+    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> moves = new HashSet<>();
 
         ChessPiece piece = board.getPiece(myPosition);
         if (piece == null) return moves;
@@ -65,7 +66,7 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
         return moves;
     }
 
-    public void addPromotions(ChessPosition currPosition, ChessPosition newPosition, int promotionRow, List<ChessMove> ChessMoves) {
+    public void addPromotions(ChessPosition currPosition, ChessPosition newPosition, int promotionRow, HashSet<ChessMove> ChessMoves) {
         if (newPosition.getRow() == promotionRow) {
             ChessPiece.PieceType[] promotions = new ChessPiece.PieceType[]{ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP};
             for (ChessPiece.PieceType chessPiece : promotions) {

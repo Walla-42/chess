@@ -4,6 +4,7 @@ import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -30,8 +31,8 @@ public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
      * @return collection of chess moves calculated by the chess piece calculator
      *
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
-        List<ChessMove> moves = new ArrayList<>();
+    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
+        HashSet<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(myPosition);
         if (piece == null) return moves;
 

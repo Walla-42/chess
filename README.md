@@ -51,21 +51,47 @@ java -jar client/target/client-jar-with-dependencies.jar
 ♕ 240 Chess Client: chess.ChessPiece@7852e922
 ```
 
-## Things to Do – Phase 0
+## Things to Do – Phase 0 : Chess Moves
 
 | **Move Calculators** | **Move Tests**        | **Board Tests**       |
 |----------------------|-----------------------|------------------------|
-| [ ] Rook             | [ ] ChessPieceTests   | [x] ChessBoardTests    |
-| [ ] Bishop           | [ ] ChessMoveTests    | [x] ChessPositionTests |
-| [ ] Knight           | [ ] BishopMoveTests   |                        |
-| [ ] King             | [ ] KingMoveTests     |                        |
-| [ ] Queen            | [ ] KnightMoveTests   |                        |
-| [ ] Pawn             | [ ] PawnMoveTests     |                        |
-|                      | [ ] QueenMoveTests    |                        |
-|                      | [ ] RookMoveTests     |                        |
+| [x] Rook             | [x] ChessPieceTests   | [x] ChessBoardTests    |
+| [x] Bishop           | [x] ChessMoveTests    | [x] ChessPositionTests |
+| [x] Knight           | [x] BishopMoveTests   |                        |
+| [x] King             | [x] KingMoveTests     |                        |
+| [x] Queen            | [x] KnightMoveTests   |                        |
+| [x] Pawn             | [x] PawnMoveTests     |                        |
+|                      | [x] QueenMoveTests    |                        |
+|                      | [x] RookMoveTests     |                        |
 
 
+## Things to Do – Phase 1 : Chess Game
 
+**Game Rules Tests**
+- [ ] ChessGameTests
+- [ ] FullGameTest 
+- [ ] GameStatusTest  
+- [ ] MakeMOveTests    
+- [ ] ValidMovesTest
 
+**Extra Credit Tests**
+- [ ] EnPassantTests
+- [ ] CastlingTests 
+ 
 
+## Things to Do – Phase 2 : Chess Design
+- [ ] Design chess server / Complete sequence diagram of chess server
+
+## Things to Do – Phase 3 : Chess Web API
+- [ ] StandardAPITests
+
+## Things to Do - Phase 4 : Chess Database
+- [ ] DatabaseTests
+
+## Things to Do - Phase 5 : Chess Pregame
+- [ ] ServerFacadeTests
+
+## Things to Do - Phase 6 : Gameplay
+- [ ] TestFactory
+- [ ] WebSocketTests
     

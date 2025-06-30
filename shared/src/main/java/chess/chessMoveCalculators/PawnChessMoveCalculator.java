@@ -11,6 +11,7 @@ import java.util.List;
  * Pawn Move Logic class. Used for calculating possible moves on the gameBoard. Implements PieceMovesCalculator Template.
  */
 public class PawnChessMoveCalculator implements PieceMovesCalculator {
+
     /**
      * method for calculating the moves available to a pawn on the gameBoard
      *

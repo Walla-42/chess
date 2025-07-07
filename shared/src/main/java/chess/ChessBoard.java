@@ -24,6 +24,25 @@ public class ChessBoard {
     }
 
     /**
+     * copy constructor for ChessBoard Object
+     *
+     * @param board gameboard that is to be copied
+     */
+    public ChessBoard(ChessBoard board) {
+        this.gameBoard = new ChessPiece[8][8];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.gameBoard[row][col];
+                if (piece != null) {
+                    this.gameBoard[row][col] = new ChessPiece(piece);
+                } else {
+                    this.gameBoard[row][col] = null;
+                }
+            }
+        }
+    }
+
+    /**
      * Adds a chess piece to the chessboard
      *
      * @param position where to add the piece to
@@ -58,7 +77,7 @@ public class ChessBoard {
     /**
      * A function for determining the available moves of all pieces of the opponent
      *
-     * @param teamColor color of the team current team
+     * @param enemyColor color of the team current team
      * @return availableMoves array of available moves of the opposite team.
      */
     public static Collection<ChessMove> availableTeamMoves(ChessGame.TeamColor enemyColor, ChessBoard board){

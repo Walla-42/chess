@@ -23,6 +23,16 @@ public class ChessPiece {
     }
 
     /**
+     * Copy constructor for ChessPiece
+     *
+     * @param piece Piece that is being copied
+     */
+    public ChessPiece(ChessPiece piece){
+        this.color = piece.getTeamColor();
+        this.type = piece.getPieceType();
+    }
+
+    /**
      * The various different chess piece options
      */
     public enum PieceType {

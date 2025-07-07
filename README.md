@@ -68,11 +68,11 @@ java -jar client/target/client-jar-with-dependencies.jar
 ## Things to Do – Phase 1 : Chess Game
 
 **Game Rules Tests**
-- [ ] ChessGameTests
-- [ ] FullGameTest 
-- [ ] GameStatusTest  
+- [x] ChessGameTests
+- [x] FullGameTest 
+- [x] GameStatusTest  
 - [x] MakeMOveTests    
-- [ ] ValidMovesTest
+- [x] ValidMovesTest
 
 **Extra Credit Tests**
 - [ ] EnPassantTests

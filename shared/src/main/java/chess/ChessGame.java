@@ -67,11 +67,13 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.startPosition;
         ChessPosition end = move.endPosition;
+        ChessGame.TeamColor turn = getTeamTurn();
         ChessBoard chessBoard = getBoard();
         ChessPiece piece = chessBoard.getPiece(start);
-        if (piece == null) throw new InvalidMoveException();
+        if (piece == null) throw new InvalidMoveException("Must select a valid piece");
 
         ChessGame.TeamColor team = piece.getTeamColor();
+        if (team != teamTurn) throw new InvalidMoveException("Not Your Turn");
         Collection<ChessMove> validMoves = validMoves(start);
 
         // make move
@@ -89,7 +91,7 @@ public class ChessGame {
             // Update Team Turn
             updateTurn();
         } else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("That move is not allowed for this piece.");
         }
     }
 

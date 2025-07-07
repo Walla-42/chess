@@ -71,7 +71,7 @@ java -jar client/target/client-jar-with-dependencies.jar
 - [ ] ChessGameTests
 - [ ] FullGameTest 
 - [ ] GameStatusTest  
-- [ ] MakeMOveTests    
+- [x] MakeMOveTests    
 - [ ] ValidMovesTest
 
 **Extra Credit Tests**

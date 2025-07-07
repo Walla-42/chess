@@ -16,6 +16,39 @@ public class ChessGame {
     private ChessGame.TeamColor teamTurn;
     private ChessBoard gameBoard;
 
+    private boolean cantEscapeCheck(TeamColor teamColor){
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition fromPos = new ChessPosition(row, col);
+                ChessPiece piece = gameBoard.getPiece(fromPos);
+
+                if (piece == null || piece.getTeamColor() != teamColor) {
+                    continue;
+                }
+
+                Collection<ChessMove> moves = validMoves(fromPos);
+                for (ChessMove move : moves) {
+                    ChessBoard boardCopy = new ChessBoard(gameBoard);
+
+                    ChessPiece movedPiece = piece;
+                    if (move.promotionPiece != null) {
+                        movedPiece = new ChessPiece(teamColor, move.promotionPiece);
+                    }
+                    boardCopy.addPiece(move.getEndPosition(), movedPiece);
+                    boardCopy.addPiece(fromPos, null);
+
+                    ChessGame testGame = new ChessGame();
+                    testGame.setBoard(boardCopy);
+
+                    if (!testGame.isInCheck(teamColor)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     public ChessGame() {
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
@@ -146,40 +179,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
-            return false;
-        }
-
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition fromPos = new ChessPosition(row, col);
-                ChessPiece piece = gameBoard.getPiece(fromPos);
-
-                if (piece == null || piece.getTeamColor() != teamColor) {
-                    continue;
-                }
-
-                Collection<ChessMove> moves = validMoves(fromPos);
-                for (ChessMove move : moves) {
-                    ChessBoard boardCopy = new ChessBoard(gameBoard);
-
-                    ChessPiece movedPiece = piece;
-                    if (move.promotionPiece != null) {
-                        movedPiece = new ChessPiece(teamColor, move.promotionPiece);
-                    }
-                    boardCopy.addPiece(move.getEndPosition(), movedPiece);
-                    boardCopy.addPiece(fromPos, null);
-
-                    ChessGame testGame = new ChessGame();
-                    testGame.setBoard(boardCopy);
-
-                    if (!testGame.isInCheck(teamColor)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return (isInCheck(teamColor) && cantEscapeCheck(teamColor));
     }
 
 
@@ -191,42 +191,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            return false;
-        }
-
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition fromPos = new ChessPosition(row, col);
-                ChessPiece piece = gameBoard.getPiece(fromPos);
-
-                if (piece == null || piece.getTeamColor() != teamColor) {
-                    continue;
-                }
-
-                Collection<ChessMove> moves = validMoves(fromPos);
-
-                for (ChessMove move : moves) {
-                    ChessBoard boardCopy = new ChessBoard(gameBoard);
-
-                    ChessPiece movedPiece = piece;
-                    if (move.promotionPiece != null) {
-                        movedPiece = new ChessPiece(teamColor, move.promotionPiece);
-                    }
-
-                    boardCopy.addPiece(move.getEndPosition(), movedPiece);
-                    boardCopy.addPiece(fromPos, null);
-
-                    ChessGame testGame = new ChessGame();
-                    testGame.setBoard(boardCopy);
-
-                    if (!testGame.isInCheck(teamColor)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return (!isInCheck(teamColor) && cantEscapeCheck(teamColor));
     }
 
     /**

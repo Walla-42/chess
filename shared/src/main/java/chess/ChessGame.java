@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
+import static chess.ChessBoard.availableTeamMoves;
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -53,16 +55,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = gameBoard.getPiece(startPosition);
         ChessGame.TeamColor team = piece.getTeamColor();
-        Collection<ChessMove> validMove = piece.pieceMoves(gameBoard, startPosition);
-
-        if (isInCheck(team)){
-            if (piece.getPieceType() != ChessPiece.PieceType.KING) {
-                validMove.clear();
-            }
-            return validMove;
-        } else {
-            return validMove;
-        }
+        return piece.pieceMoves(gameBoard, startPosition);
     }
 
     /**
@@ -82,7 +75,11 @@ public class ChessGame {
         Collection<ChessMove> validMoves = validMoves(start);
 
         // make move
-        if (validMoves.contains(move)){
+        if (isInCheck(team)){
+            throw new InvalidMoveException("King is in Check");
+
+        } else if (validMoves.contains(move)){
+
             if (move.promotionPiece != null){
                  piece = new ChessPiece(team, move.promotionPiece);
             }
@@ -96,6 +93,9 @@ public class ChessGame {
         }
     }
 
+    /**
+     * A function for updating the current team
+     */
     public void updateTurn(){
         if (getTeamTurn() == TeamColor.BLACK){
             setTeamTurn(TeamColor.WHITE);
@@ -104,25 +104,25 @@ public class ChessGame {
         }
     }
 
-    public Collection<ChessMove> availableTeamMoves(TeamColor teamColor){
-        Collection<ChessMove> availableMoves = new HashSet<>();
-        for (int i = 1; i <= 8; i++){
-            for (int j = 1; j <= 8; j++){
-                ChessPosition newPosition = new ChessPosition(i, j);
-                ChessPiece piece = gameBoard.getPiece(newPosition);
-                availableMoves.addAll(piece.pieceMoves(gameBoard, newPosition));
-            }
-        }
-        return availableMoves;
-    }
     /**
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheck(TeamColor teamColor){
+
+        ChessPosition kingPosition = ChessBoard.findKing(teamColor, gameBoard);
+        TeamColor enemy = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+        Collection<ChessMove> availableEnemyMoves = availableTeamMoves(enemy, gameBoard);
+        for (ChessMove chessMove : availableEnemyMoves){
+            ChessPosition endPosition = chessMove.getEndPosition();
+            if (endPosition.equals(kingPosition)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

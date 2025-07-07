@@ -1,9 +1,12 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessPiece.PieceType.KING;
 import static chess.ChessPiece.PieceType.ROOK;
 
 /**
@@ -50,6 +53,40 @@ public class ChessBoard {
      */
     public boolean isInBounds(int row, int col){
         return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
+    }
+
+    /**
+     * A function for determining the available moves of all pieces of the opponent
+     *
+     * @param teamColor color of the team current team
+     * @return availableMoves array of available moves of the opposite team.
+     */
+    public static Collection<ChessMove> availableTeamMoves(ChessGame.TeamColor enemyColor, ChessBoard board){
+        Collection<ChessMove> availableMoves = new HashSet<>();
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(newPosition);
+                if (piece != null && piece.getTeamColor() == enemyColor){
+                    availableMoves.addAll(piece.pieceMoves(board, newPosition));
+                }
+
+            }
+        }
+        return availableMoves;
+    }
+
+    public static ChessPosition findKing(ChessGame.TeamColor team, ChessBoard board){
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                ChessPosition newPosition = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(newPosition);
+                if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING){
+                    return newPosition;
+                }
+            }
+        }
+        return null;
     }
 
     /**

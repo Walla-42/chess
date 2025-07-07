@@ -16,6 +16,19 @@ public class ChessGame {
     private ChessGame.TeamColor teamTurn;
     private ChessBoard gameBoard;
 
+    public ChessGame() {
+        gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
+        setTeamTurn(TeamColor.WHITE);
+    }
+
+    /**
+     * Method to check if a team has at least one move that will allow a player to escape check.
+     * holds shared logic of isInCheckmate and isInStalemate methods.
+     *
+     * @param teamColor color of team that is currently playing
+     * @return boolean true if a player cant escape check, false if a player can escape check.
+     */
     private boolean cantEscapeCheck(TeamColor teamColor){
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -47,12 +60,6 @@ public class ChessGame {
             }
         }
         return true;
-    }
-
-    public ChessGame() {
-        gameBoard = new ChessBoard();
-        gameBoard.resetBoard();
-        setTeamTurn(TeamColor.WHITE);
     }
 
     /**

@@ -34,3 +34,99 @@
     @ in the case of the chess program, I used an interface to estabish that all calculators will have a single method,
     and then I used a base class to provide all the shared code between the calculators. That way, all the calculators 
     acted the same, even though thier implementaitons might be different on the backend. 
+
+# Java I/O:
+    4 Ways to Read/ Write files:
+        - Steams: Read or write a file sequentially (most common)
+            - Binary-Formatted:
+                - InputSteam: Interface used to read bytes sequentially from a data source
+                    -Example usage:
+                        - FileInputStream
+                        - PipedInputSteam
+                        - URLConnection.getInputStream()
+                        - HttpExchange.getRequestBody()
+                        - ResultSet.getBinaryStream(int columnIndex)
+                        - ect.
+                    Filter Input Streams:
+                        - A way to perform actions on an input stream.
+                        - How it works:
+                            - Open an InputStream on a data source, then wrap it in one or more filter input streams 
+                            that provide the features you want. 
+                        - example: 
+
+                        public void compressFile(String inputFilePath, String outputFilePath) throws IOException {
+                            File inputFile = new File(inputFilePath);
+                            File outputFile = new File(ouputFilePath);
+
+                            try(FileInputStream fis = new FileInputStream(inputFile);
+                                BufferedInputStream bis = new BufferedInputStream(fis); # The buffer acts as a way to limit the amount of time we have to access the file. Make it more efficient. 
+                                FileOutputStream fos = new FileOutputStream(outputFile);
+                                BufferedOutputStream bos = new Buffered OutputStream(fos);
+                                GZipOutputStream zipos = new GZipOutputStream(bos)){ # Here the GZIPOutputStream is the wrapper for the buffered output stream which will 
+                                                                                                # apply the zip to the stream as it is written. 
+
+                                byte [] chunk = new byte[CHUNK_SIZE];
+                                int bytesRead;
+                                while((bytesRead = bis.read(chunk)) > 0) {
+                                    zipos.write(chunk, 0 , bytesRead);
+                                }
+                            }
+                        }
+                                
+                - OutputStream:
+                    -Example usage:
+                        - FileInputStream
+                        - PipedInputSteam
+                          - URLConnection.getInputStream()
+                          - HttpExchange.getRequestBody()
+                          - ResultSet.getBinaryStream(int columnIndex)
+                          - ect.
+                - Filter Input Streams:
+                    - A way to perform actions on an input stream.
+                      - How it works:
+                      - Open an InputStream on a data source, then wrap it in one or more filter input streams
+                      that provide the features you want.
+                    - example:
+
+
+                - Text-Formatted Data:
+                    - Reader
+                    - Writer
+            - Scanner class : Tokenize stream input to read one token at a time
+                    import java.io.File;
+                    import java.io.FileNotFoundException;
+                    import java.util.Scanner;
+
+                    public class ReadFile {
+                        public static void main(String[] args) throws FileNotFoundException {
+                            File file = new File(args[0]);
+                            try (Scanner scanner = new Scanner(file)) {
+                                while (scanner.hasNext()) {
+                                    System.out.println(scanner.next());
+                                }
+                            }
+                        }
+                    }
+            - Flies Class: Used to create, delete, copy, ect. whole files. Cant read file.
+                - Check file existence : 
+                    File file = new file("file path");
+                    if(file.exists()) {}
+                - Create a file : 
+                    File file = new file("file path");
+                    file.createNewFile();
+                - Delete a file : 
+                    File file = new file("file path");
+                    file.delete();
+            - RandomAccessFile Class : Use a file pointer to read from / write to any location in a file
+
+
+# Json and reading Json files:
+    - Json is a file format that is used to store and transfer data. It can be read in 3 ways:
+        - DOM (Document Object Model} Parsers : converst the JSON text to an in memory tree data structure. You can then traverse the tree to
+            extract the data. 
+        
+    - Stream Parsers: Tokenizers that return one token at a time from the JSON data file.
+        - great for sorting and extracting data by thier tokens.
+        - GSON library is a useful resource here
+    - Serializers/ Deserializers
+        - Use a library to convert from JSON to Java Objects (and vice versa)

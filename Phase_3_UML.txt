@@ -1,0 +1,192 @@
+actor Client
+participant Server
+participant Handler
+participant Service
+participant DataAccess
+database db
+
+//--------------------------------------
+entryspacing 0.9
+group #lightblue Registration #black
+Client -> Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
+Server -> Handler: {"username":" ", "password":" ", "email":" "}
+Handler -> Service: register(RegisterRequest)
+Service -> DataAccess: getUser(username)
+DataAccess -> db:Find UserData by username
+break User with username already exists
+DataAccess --> Service: UserData
+Service --> Server: AlreadyTakenException
+Server --> Client: 403\n{"message": "Error: username already taken"}
+end
+DataAccess --> Service: null
+Service -> DataAccess:createUser(userData)
+DataAccess -> db:Add UserData
+Service -> DataAccess:createAuth(authData)
+DataAccess -> db:Add AuthData
+Service --> Handler: RegisterResult
+Handler --> Server: {"username" : " ", "authToken" : " "}
+Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+end
+
+//--------------------------------------
+group #orange Login #black
+Client -> Server: [POST] /session\n{username, password}
+Server -> Handler: {username, password}
+Handler -> Service: login(LoginRequest)
+Service -> DataAccess: getUser(username)
+DataAccess -> db: Find UserData by username
+DataAccess --> Service: UserData
+
+break User not found
+DataAccess --> Service: null
+Service --> Server: UnauthorizedAccessException
+Server --> Client: 401\n{"message" : "Error: unauthorized access"}
+end
+
+break Unauthorized access to user account
+Service --> Server: UnauthorizedAccessException
+Server --> Client: 401\n{"message" : "Error: unauthorized access"}
+end
+
+Service -> DataAccess: createAuth(authData)
+DataAccess -> db: Add AuthData
+Service --> Handler: LoginResult
+Handler --> Server: {"username" : " ", "authToken" : " "} 
+Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+end
+
+//--------------------------------------
+group #lightgreen Logout #black
+Client -> Server: [DELETE] /session\nauthToken
+
+Server -> Handler: authToken
+Handler -> Service: authentication(authRequest)
+Service -> DataAccess: getAuth(authToken)
+DataAccess -> db: Get user by authData
+
+DataAccess --> Service: UserData
+
+break authToken not recognized user not found
+DataAccess --> Service: null
+Service --> Server: UnauthorizedAccessException
+
+Server --> Client: 401\n {"message" : "Error: unauthorized"}
+end
+
+Service -> DataAccess: deleteAuth(UserData)
+DataAccess -> db: Remove User Auth Token
+Service --> Handler: logoutResult
+Handler --> Server: { }
+Server --> Client: 200\n { }
+end
+
+//--------------------------------------
+group #pink List Games #black
+Client -> Server: [GET] /game\nauthToken
+Server -> Handler: authToken
+Handler -> Service: authentication(authRequest)
+Service-> DataAccess: getAuth(authToken)
+DataAccess -> db: Get user by authData
+DataAccess --> Service: UserData
+
+break authToken not recognized user not found
+DataAccess --> Service: null
+Service --> Server: UnauthorizedAccessException
+
+Server --> Client: 401\n {"message" : "Error: unauthorized"}
+end
+
+Service -> DataAccess: listGames( )
+DataAccess -> db: Get all games from db
+DataAccess --> Service: gameData
+Service --> Handler: gameListResult
+
+Handler --> Server: { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+Server --> Client: 200\n{ "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+end
+
+//--------------------------------------
+group #violet Create Game #black
+Client -> Server: [POST] /game\nauthToken\n{gameName}
+
+Server -> Handler: authToken\n{gameName}
+Handler -> Service: authentication(authRequest)
+Service -> DataAccess: getAuth(authToken)
+DataAccess -> db: Get user by authData
+DataAccess --> Service: UserData
+
+
+break authToken not recognized user not found
+DataAccess --> Service: null
+Service --> Server:UnauthorizedAccessException
+Server --> Client: 401\n {"message" : "Error: unauthorized"}
+end
+
+Service --> Handler:authResult
+
+Handler -> Service: game(gameName)
+Service -> DataAccess: CreateGame(gameName)
+
+DataAccess -> db: Add GameData
+DataAccess --> Service:gameData
+Service --> Handler: gameResult
+
+Handler --> Server: {"gameID" : }
+Server --> Client: 200\n{"gameID" : }
+end
+
+//--------------------------------------
+group #yellow Join Game #black
+Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
+Server -> Handler: authToken\n{playerColor, gameID}
+Handler -> Service: authentication{authRequest)
+Service -> DataAccess:getAuth(authToken)
+DataAccess -> db: get user by authToken
+
+DataAccess --> Service: UserData
+
+break authToken not recognized
+DataAccess --> Service: null
+Service --> Server:UnauthorizedAccessException
+Server --> Client: 401\n {"message" : "Error: unauthorized"}
+end
+
+Service --> Handler: authResult
+Handler -> Service:joinGame(gameID)
+Service -> DataAccess: getGame(gameID)
+DataAccess -> db:get game using gameID
+DataAccess --> Service: gameData
+
+break GameID recognized but game already taken
+Service --> Server:GameTakenException
+Server --> Client: 403\n {"message" : "Error: already taken"}
+end
+
+break GameID not recognized game not found
+DataAccess --> Service: null
+Service --> Server: BadAccessException
+Server --> Client: 400\n {"message": "Error: bad request"}
+end
+
+Service -> DataAccess: updateGame(playerColor, gameID)
+DataAccess -> db: update game player color
+DataAccess --> Service:gameData
+Service --> Handler: joinGameResult
+Handler --> Server: { }
+Server --> Client: 200\n{ }
+end
+
+//--------------------------------------
+// Note to TA: This endpoint might need an authToken to protect from malicious deletion of database data. 
+group #lightgray Clear application #black
+Client -> Server: [DELETE] /db
+Server -> Handler: { } 
+Handler -> Service: clearObject()
+Service -> DataAccess: clearDataBase()
+DataAccess -> db: Delete all information in db
+DataAccess --> Service: ClearResult
+Service --> Handler: ClearResult
+Handler --> Server: { }
+Server --> Client: 200\n { }
+
+end

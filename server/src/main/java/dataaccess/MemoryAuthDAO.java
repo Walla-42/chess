@@ -2,16 +2,20 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.HashMap;
+
 public class MemoryAuthDAO implements AuthDAO{
+    private HashMap<String, AuthData> authDatabase = new HashMap<>();
+
     public void createAuth(AuthData authData){
-        throw new RuntimeException("not yet implemented");
+        authDatabase.put(authData.getAuthToken(), authData);
     }
 
     public AuthData getAuth(String authToken){
-        throw new RuntimeException("not yet implemented");
+        return authDatabase.get(authToken);
     }
 
     public boolean tokenAlreadyExists(String authToken){
-        throw new RuntimeException("not yet implemented");
+        return (authDatabase.containsKey(authToken));
     }
 }

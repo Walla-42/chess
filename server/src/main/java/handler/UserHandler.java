@@ -13,6 +13,7 @@ import service.UserService;
 import javax.xml.crypto.Data;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 public class UserHandler {
     private final UserService userService;
@@ -58,6 +59,6 @@ public class UserHandler {
     }
 
     private String generateAuth() {
-        throw new RuntimeException("not yet implemented");
+        return UUID.randomUUID().toString();
     }
 }

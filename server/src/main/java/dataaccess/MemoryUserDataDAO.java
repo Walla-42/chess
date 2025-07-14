@@ -2,13 +2,17 @@ package dataaccess;
 
 import model.UserData;
 
-public class MemoryUserDataDAO implements UserDAO{
+import java.util.HashMap;
 
-    public String getUser(String userName){
-        throw new RuntimeException("not yet implemented");
+
+public class MemoryUserDataDAO implements UserDAO{
+    private HashMap<String, UserData> userDatabase = new HashMap<>();
+
+    public UserData getUser(String userName){
+        return userDatabase.get(userName);
     }
 
-    public void createUser(UserData userData){
-        throw new RuntimeException("not yet implemented");
+    public void createUser(UserData userData) {
+        userDatabase.put(userData.getUserName(), userData);
     }
 }

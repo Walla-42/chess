@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.GameData;
 import model.UserData;
@@ -16,12 +17,12 @@ public class UserService {
     }
 
 
-    public void createUser(UserData userData){
-        throw new RuntimeException("not yet implemented");
+    public void createUser(UserData userData) {
+        userDAO.createUser(userData);
     }
 
     public UserData getUser(String userName){
-        throw new RuntimeException("not yet implemented");
+        return userDAO.getUser(userName);
     }
 
     // I am not sure if I want this here in this class:

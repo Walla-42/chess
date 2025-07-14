@@ -11,12 +11,12 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-    public String creatAuth(AuthData authData){
-        throw new RuntimeException("not yet implemented");
+    public void creatAuth(AuthData authData){
+        authDAO.createAuth(authData);
     }
 
     public AuthData getAuth(String authToken){
-        throw new RuntimeException("not yet implemented");
+        return authDAO.getAuth(authToken);
     }
 
     public void deleteAuth(String authToken){

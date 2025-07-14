@@ -7,7 +7,7 @@ import model.UserData;
 import java.util.ArrayList;
 
 public class UserService {
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
     UserService(UserDAO userDAO){
         this.userDAO = userDAO;

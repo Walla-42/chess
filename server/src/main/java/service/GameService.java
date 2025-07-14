@@ -7,7 +7,7 @@ import model.GameData;
 import java.util.ArrayList;
 
 public class GameService {
-    private GameDAO gameDAO;
+    private final GameDAO gameDAO;
 
     GameService(GameDAO gameDAO){
         this.gameDAO = gameDAO;

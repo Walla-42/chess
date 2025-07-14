@@ -130,3 +130,13 @@
         - GSON library is a useful resource here
     - Serializers/ Deserializers
         - Use a library to convert from JSON to Java Objects (and vice versa)
+
+
+# Phase 3 authentication problems:
+Currently any user can register then login after registering even after they are registered and logged in. The problem 
+I see with this is that they are able to get multiple authorization tokens which would make it really hard to log them
+out by deleting the authToken. I need a way to store the authToken with its associated AuthData. Because the AuthData  
+isnt sent in the request, I cant associate the username without puting the authToken as the key to my HashMap. If I do 
+this, I cant see if a user has already been logged in by looking to see if their username already has an associated 
+authToken. The only way I see being able to do this is if I have two hashMaps - one that stores the token as the key, the 
+other stores the username as the key. That way I can access the authData using either the username or token. Seems messy. 

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
@@ -11,7 +12,7 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-    public void creatAuth(AuthData authData){
+    public void createAuth(AuthData authData) throws DataAccessException {
         authDAO.createAuth(authData);
     }
 

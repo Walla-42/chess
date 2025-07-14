@@ -1,12 +1,9 @@
 package handler;
 
-import model.GameData;
-import service.AuthService;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 
-import java.util.Collection;
 
 public class GameHandler {
     private final GameService gameService;

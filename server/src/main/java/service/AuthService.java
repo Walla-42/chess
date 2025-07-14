@@ -11,7 +11,7 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-    public String creatAuth(UserData user){
+    public String creatAuth(AuthData authData){
         throw new RuntimeException("not yet implemented");
     }
 

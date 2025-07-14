@@ -10,4 +10,8 @@ public class MemoryAuthDAO implements AuthDAO{
     public AuthData getAuth(String authToken){
         throw new RuntimeException("not yet implemented");
     }
+
+    public boolean tokenAlreadyExists(String authToken){
+        throw new RuntimeException("not yet implemented");
+    }
 }

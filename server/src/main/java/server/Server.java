@@ -8,6 +8,8 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import javax.xml.crypto.Data;
+
 
 public class Server {
     private UserService userService;
@@ -29,9 +31,8 @@ public class Server {
         UserService userService = new UserService(userDAO, authService);
 
         // Handler objects:
-        UserHandler userHandler = new UserHandler(userService);
+        UserHandler userHandler = new UserHandler(userService, authService);
         GameHandler GameHandler = new GameHandler(gameService);
-
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", userHandler::handleRegister);
@@ -41,6 +42,7 @@ public class Server {
         Spark.post("/game", GameHandler::handleCreateGame);
         Spark.put("/game", GameHandler::handleJoinGame);
 //        Spark.delete("/db", ) need to figure how I want to integrate this one...
+
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();

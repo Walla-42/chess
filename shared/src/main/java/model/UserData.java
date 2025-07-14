@@ -1,11 +1,11 @@
 package model;
 
-public class UserData() {
+public class UserData {
     private final String userName;
     private final String password;
     private final String email;
 
-    UserData(String userName, String password, String email){
+    public UserData(String userName, String password, String email){
         this.userName = userName;
         this.password = password;
         this.email = email;

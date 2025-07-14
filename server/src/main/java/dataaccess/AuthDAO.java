@@ -8,4 +8,5 @@ public interface AuthDAO {
 
     AuthData getAuth(String authToken);
 
+    boolean tokenAlreadyExists(String authToken);
 }

@@ -7,7 +7,7 @@ import model.UserData;
 public class AuthService {
     private final AuthDAO authDAO;
 
-    AuthService(AuthDAO authDAO){
+    public AuthService(AuthDAO authDAO){
         this.authDAO = authDAO;
     }
 

@@ -8,9 +8,11 @@ import java.util.ArrayList;
 
 public class UserService {
     private final UserDAO userDAO;
+    private final AuthService authService;
 
-    UserService(UserDAO userDAO){
+    public UserService(UserDAO userDAO, AuthService authService){
         this.userDAO = userDAO;
+        this.authService = authService;
     }
 
     public void createUser(UserData userData){

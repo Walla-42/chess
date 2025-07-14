@@ -1,9 +1,10 @@
 package server;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import handler.GameHandler;
 import handler.UserHandler;
+import service.AuthService;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
@@ -17,14 +18,29 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        AuthDAO authDAO = new AuthDAO();
-        UserDAO userDAO = new UserDAO();
-        // establish handler objects:
+        // DAO objects:
+        AuthDAO authDAO = new MemoryAuthDAO();
+        UserDAO userDAO = new MemoryUserDataDAO();
+        GameDAO gameDAO = new MemoryGameDataDAO();
+
+        // Service Objects:
+        AuthService authService = new AuthService(authDAO);
+        GameService gameService = new GameService(gameDAO, authService); // I dont think gameService needs access to userdb
+        UserService userService = new UserService(userDAO, authService);
+
+        // Handler objects:
         UserHandler userHandler = new UserHandler(userService);
-        GameHandler GameHandler = new GameHandler(userService);
+        GameHandler GameHandler = new GameHandler(gameService);
+
 
         // Register your endpoints and handle exceptions here.
-        Spark.get("/user", userHandler::handleRegister);
+        Spark.post("/user", userHandler::handleRegister);
+        Spark.post("/session", userHandler::handleLogin);
+        Spark.delete("/session", userHandler::handleLogout);
+        Spark.get("/game", GameHandler::handleListGames);
+        Spark.post("/game", GameHandler::handleCreateGame);
+        Spark.put("/game", GameHandler::handleJoinGame);
+//        Spark.delete("/db", ) need to figure how I want to integrate this one...
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();

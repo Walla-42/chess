@@ -8,9 +8,11 @@ import java.util.ArrayList;
 
 public class GameService {
     private final GameDAO gameDAO;
+    private final AuthService authService;
 
-    GameService(GameDAO gameDAO){
+    public GameService(GameDAO gameDAO, AuthService authService){
         this.gameDAO = gameDAO;
+        this.authService = authService;
     }
 
     public ArrayList<GameData> listGames(){

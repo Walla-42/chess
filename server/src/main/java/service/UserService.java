@@ -1,11 +1,7 @@
 package service;
 
-import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import model.GameData;
 import model.UserData;
-
-import java.util.ArrayList;
 
 public class UserService {
     private final UserDAO userDAO;
@@ -21,8 +17,8 @@ public class UserService {
         userDAO.createUser(userData);
     }
 
-    public UserData getUser(String userName){
-        return userDAO.getUser(userName);
+    public UserData getUser(String username){
+        return userDAO.getUser(username);
     }
 
     // I am not sure if I want this here in this class:

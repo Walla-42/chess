@@ -1,18 +1,18 @@
 package model;
 
 public class UserData {
-    private final String userName;
+    private final String username;
     private final String password;
     private final String email;
 
-    public UserData(String userName, String password, String email){
-        this.userName = userName;
+    public UserData(String username, String password, String email){
+        this.username = username;
         this.password = password;
         this.email = email;
     }
 
-    public String getUserName(){
-        return userName;
+    public String getUsername(){
+        return username;
     }
 
     public String getPassword(){

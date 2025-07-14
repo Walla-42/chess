@@ -10,9 +10,6 @@ import spark.Response;
 
 import service.UserService;
 
-import javax.xml.crypto.Data;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.UUID;
 
 public class UserHandler {
@@ -28,14 +25,14 @@ public class UserHandler {
         Gson gson = new Gson();
         RegisterRequest request = gson.fromJson(registerReq.body(), RegisterRequest.class);
         try {
-            if (userService.getUser(request.userName()) == null) {
+            if (userService.getUser(request.username()) == null) {
 
-                UserData userData = new UserData(request.userName(), request.password(), request.email());
+                UserData userData = new UserData(request.username(), request.password(), request.email());
                 userService.createUser(userData);
 
                 String authToken = generateAuth();
 
-                AuthData authData = new AuthData(authToken, request.userName());
+                AuthData authData = new AuthData(authToken, request.username());
                 authService.creatAuth(authData);
 
                 registerResp.status(200);

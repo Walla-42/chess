@@ -102,9 +102,7 @@ public class UserHandler {
         try{
             String authToken = logoutReq.headers("Authorization");
 
-            if (authToken == null) throw new DataAccessException("Unable to fetch authToken");
-
-            if (authService.getAuth(authToken) == null){
+            if (authToken == null || authService.getAuth(authToken) == null){
                 throw new DataAccessException("Invalid Auth Token");
             }
 

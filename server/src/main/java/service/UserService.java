@@ -7,11 +7,9 @@ import java.util.Objects;
 
 public class UserService {
     private final UserDAO userDAO;
-    private final AuthService authService;
 
-    public UserService(UserDAO userDAO, AuthService authService){
+    public UserService(UserDAO userDAO){
         this.userDAO = userDAO;
-        this.authService = authService;
     }
 
     /**
@@ -50,11 +48,11 @@ public class UserService {
             return false;
         }
         UserService that = (UserService) o;
-        return Objects.equals(userDAO, that.userDAO) && Objects.equals(authService, that.authService);
+        return Objects.equals(userDAO, that.userDAO);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userDAO, authService);
+        return Objects.hashCode(userDAO);
     }
 }

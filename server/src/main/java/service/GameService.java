@@ -5,18 +5,17 @@ import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class GameService {
     private final GameDAO gameDAO;
-    private final AuthService authService;
 
-    public GameService(GameDAO gameDAO, AuthService authService){
+    public GameService(GameDAO gameDAO){
         this.gameDAO = gameDAO;
-        this.authService = authService;
     }
 
-    public ArrayList<GameData> listGames(){
-        throw new RuntimeException("not yet implemented");
+    public Collection<GameData> listGames(){
+        return gameDAO.listGames();
     }
 
     public GameData createGame(String gameName){

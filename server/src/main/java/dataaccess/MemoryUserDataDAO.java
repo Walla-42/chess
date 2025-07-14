@@ -7,12 +7,23 @@ import java.util.Objects;
 
 
 public class MemoryUserDataDAO implements UserDAO{
-    private HashMap<String, UserData> userDatabase = new HashMap<>();
+    private final HashMap<String, UserData> userDatabase = new HashMap<>();
 
+    /**
+     * gets user information from the database using the users username
+     *
+     * @param username users username
+     * @return UserData object obtained from the database
+     */
     public UserData getUser(String username){
         return userDatabase.get(username);
     }
 
+    /**
+     * adds all the users data to the database
+     *
+     * @param userData Collection of all user data to be added to the database
+     */
     public void createUser(UserData userData) {
         userDatabase.put(userData.getUsername(), userData);
     }

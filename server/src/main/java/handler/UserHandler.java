@@ -12,7 +12,6 @@ import spark.Response;
 
 import service.UserService;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserHandler {
@@ -24,6 +23,13 @@ public class UserHandler {
         this.authService = authService;
     }
 
+    /**
+     * Function handling register requests sent by the server. Sends request objects to User and Auth Service.
+     *
+     * @param registerReq a request object containing a body with all data necessary to create a UserData object
+     * @param registerResp a response object containing the response status
+     * @return a json object containing all the data contained in AuthData
+     */
     public Object handleRegister(Request registerReq, Response registerResp) {
         Gson gson = new Gson();
         RegisterRequest request = gson.fromJson(registerReq.body(), RegisterRequest.class);
@@ -50,6 +56,13 @@ public class UserHandler {
         }
     }
 
+    /**
+     * A function for handling the user login requests. Creates objects for the User and Auth Services.
+     *
+     * @param loginReq a request object containing an empty head and a body with user information.
+     * @param loginResp a response object containing the request status code.
+     * @return json of authData if successful or a user error message if not.
+     */
     public Object handleLogin(Request loginReq, Response loginResp){
         Gson gson = new Gson();
         LoginRequest request = gson.fromJson(loginReq.body(), LoginRequest.class);
@@ -77,6 +90,13 @@ public class UserHandler {
 
     }
 
+    /**
+     * A function for handling the logout request and responses. Creates objects to be used by User and Auth Services.
+     *
+     * @param logoutReq Request object containing a header with the auth token and an empty body
+     * @param logoutResp Response object containing a request status
+     * @return empty object if successful, else an error message object.
+     */
     public Object handleLogout(Request logoutReq, Response logoutResp){
         Gson gson = new Gson();
         try{
@@ -98,6 +118,11 @@ public class UserHandler {
         }
     }
 
+    /**
+     * A function for generating a random authToken
+     *
+     * @return random generated authToken
+     */
     private String generateAuth() {
         return UUID.randomUUID().toString();
     }

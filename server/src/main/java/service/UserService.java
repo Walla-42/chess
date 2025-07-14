@@ -14,16 +14,32 @@ public class UserService {
         this.authService = authService;
     }
 
-
+    /**
+     * communicates with the UserDAO to add userdata to the database
+     *
+     * @param userData UserData object containing all user information to be stored in the database
+     */
     public void createUser(UserData userData) {
         userDAO.createUser(userData);
     }
 
+    /**
+     * communicates with the UserDAO to get UserData from the database
+     *
+     * @param username username of user
+     * @return UserData object containing all information of the user
+     */
     public UserData getUser(String username){
         return userDAO.getUser(username);
     }
 
-    // I am not sure if I want this here in this class:
+    /**
+     * A function to check if the correct password is given by the user.
+     *
+     * @param inputPassword Password given by the user
+     * @param userPassword Password stored by the user in the database
+     * @return boolean True if password match, false otherwise
+     */
     public boolean comparePasswords(String inputPassword, String userPassword){
         return inputPassword.equals(userPassword);
     }

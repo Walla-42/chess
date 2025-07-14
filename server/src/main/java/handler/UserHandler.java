@@ -1,5 +1,6 @@
 package handler;
 import Requests.LoginRequest;
+import Requests.LogoutRequest;
 import Requests.RegisterRequest;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -11,6 +12,7 @@ import spark.Response;
 
 import service.UserService;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserHandler {
@@ -22,7 +24,7 @@ public class UserHandler {
         this.authService = authService;
     }
 
-    public Object handleRegister(Request registerReq, Response registerResp) throws DataAccessException {
+    public Object handleRegister(Request registerReq, Response registerResp) {
         Gson gson = new Gson();
         RegisterRequest request = gson.fromJson(registerReq.body(), RegisterRequest.class);
         try {
@@ -76,7 +78,24 @@ public class UserHandler {
     }
 
     public Object handleLogout(Request logoutReq, Response logoutResp){
-        throw new RuntimeException("not yet implemented");
+        Gson gson = new Gson();
+        try{
+            String authToken = logoutReq.headers("Authorization");
+
+            if (authToken == null) throw new DataAccessException("Unable to fetch authToken");
+
+            if (authService.getAuth(authToken) == null){
+                throw new DataAccessException("Invalid Auth Token");
+            }
+
+            authService.deleteAuth(authToken);
+            logoutResp.status(200);
+            return gson.toJson(new Object());
+
+        } catch (DataAccessException e){
+            logoutResp.status(401);
+            return gson.toJson(e.toString());
+        }
     }
 
     private String generateAuth() {

@@ -35,8 +35,8 @@ public class Server {
         GameHandler GameHandler = new GameHandler(gameService);
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", userHandler::handleRegister);
-        Spark.post("/session", userHandler::handleLogin);
+        Spark.post("/user", userHandler::handleRegister); // endpoint complete
+        Spark.post("/session", userHandler::handleLogin); // endpoint complete
         Spark.delete("/session", userHandler::handleLogout);
         Spark.get("/game", GameHandler::handleListGames);
         Spark.post("/game", GameHandler::handleCreateGame);

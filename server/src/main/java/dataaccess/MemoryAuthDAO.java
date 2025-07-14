@@ -22,6 +22,12 @@ public class MemoryAuthDAO implements AuthDAO{
         return tokenAuthDatabase.get(authToken);
     }
 
+    public void deleteAuth(String authToken){
+        String username = tokenAuthDatabase.get(authToken).getUsername();
+        tokenAuthDatabase.remove(authToken);
+        userAuthDatabase.remove(username);
+    }
+
     public boolean userLoggedIn(String username){
         return userAuthDatabase.containsKey(username);
     }
@@ -29,6 +35,7 @@ public class MemoryAuthDAO implements AuthDAO{
     public boolean tokenAlreadyExists(String authToken){
         return tokenAuthDatabase.containsKey(authToken);
     }
+
 
     @Override
     public boolean equals(Object o) {

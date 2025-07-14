@@ -21,6 +21,6 @@ public class AuthService {
     }
 
     public void deleteAuth(String authToken){
-        throw new RuntimeException("not yet implemented");
+        authDAO.deleteAuth(authToken);
     }
 }

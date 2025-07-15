@@ -47,20 +47,25 @@ public class GameHandler {
 
     public Object handleCreateGame(Request createGameReq, Response createGameResp){
         Gson gson = new Gson();
-        CreateGameRequest request = gson.fromJson(createGameReq.body(), CreateGameRequest.class);
 
-        try{
-            if (request == null){
-                throw new DataAccessException("Must provide a game name");
-            }
-
-            CreateGameResponse createGameResponse = new CreateGameResponse(gameService.createGame(request.gameName()).getGameID());
+        try {
+            CreateGameRequest requestBody = gson.fromJson(createGameReq.body(), CreateGameRequest.class);
+            CreateGameRequest createGameRequest = new CreateGameRequest(createGameReq.headers("Authorization"), requestBody.gameName());
+            CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
 
             createGameResp.status(200);
             return gson.toJson(createGameResponse);
 
-        } catch (DataAccessException e){
+        } catch (BadRequestException e){
+            createGameResp.status(400);
+            return gson.toJson(e.toString());
+
+        } catch (UnauthorizedAccessException e) {
             createGameResp.status(401);
+            return gson.toJson(e.toString());
+
+        } catch (Exception e){
+            createGameResp.status(500);
             return gson.toJson(e.toString());
         }
     }

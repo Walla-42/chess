@@ -3,6 +3,7 @@ package service;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.GameTakenException;
 import dataaccess.exceptions.UnauthorizedAccessException;
+import model.AuthData;
 import model.GamesObject;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
@@ -15,7 +16,10 @@ import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
+import java.util.Objects;
 
+import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.BLACK;
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthService authService;
@@ -75,7 +79,7 @@ public class GameService {
 
         GameData gameData = gameDAO.createGame(gameName);
 
-        return new CreateGameResponse(gameData.getGameID());
+        return new CreateGameResponse(gameData.gameID());
     }
 
     /**
@@ -91,19 +95,57 @@ public class GameService {
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
             UnauthorizedAccessException, GameTakenException, Exception {
-        throw new RuntimeException("not yet implemented");
+        String authToken = joinGameRequest.authToken();
+        AuthData authorization = authService.getAuth(authToken);
+        if (authToken == null || authorization == null){
+            throw new UnauthorizedAccessException("unauthorized");
+        }
+
+        if (joinGameRequest == null){
+            throw new BadRequestException("bad request");
+        }
+
+        ChessGame.TeamColor requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor());
+
+        GameData requestedGame = gameDAO.getGame(joinGameRequest.gameID());
+
+        checkColorAvailability(requestedGame, requestedColor);
+
+        if (requestedColor == BLACK){
+            GameData updatedGameData = requestedGame.updateBlackUsername(authorization.getUsername());
+            gameDAO.updateGame(updatedGameData);
+        } else if (requestedColor == WHITE){
+            GameData updatedGameData = requestedGame.updateWhiteUsername(authorization.getUsername());
+            gameDAO.updateGame(updatedGameData);
+        }
+
+        return new JoinGameResponse();
+
     }
 
-    public GameData getGame(int gameID){
-        throw new RuntimeException("not yet implemented");
+
+
+    public void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
+        if (requestedColor == BLACK && requestedGame.blackUserName() != null){
+            throw new GameTakenException("already taken");
+        }
+
+        if (requestedColor == WHITE && requestedGame.whiteUserName() != null){
+            throw new GameTakenException("already taken");
+        };
     }
 
-    public GameData updateGame(String playerColor, int gameID, String userName){
-        throw new RuntimeException("not yet implemented");
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GameService that = (GameService) o;
+        return Objects.equals(gameDAO, that.gameDAO) && Objects.equals(authService, that.authService);
     }
 
-    public boolean checkColorAvailability(ChessGame.TeamColor gameColor, ChessGame.TeamColor plaayerColor){
-        throw new RuntimeException("not yet implemented");
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameDAO, authService);
     }
-
 }

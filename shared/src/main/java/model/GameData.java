@@ -1,41 +1,25 @@
 package model;
 
 import chess.ChessGame;
-import chess.ChessMove;
 
-public class GameData {
-    private final int gameID;
-    private final String whiteUserName;
-    private final String blackUserName;
-    private final String gameName;
-    private final ChessGame game;
-
-    public GameData(int gameID, String whiteUserName, String blackUserName, String gameName, ChessGame game){
-        this.gameID = gameID;
-        this.whiteUserName = whiteUserName;
-        this.blackUserName = blackUserName;
-        this.gameName = gameName;
-        this.game = game;
+public record GameData(int gameID, String whiteUserName, String blackUserName, String gameName, ChessGame game) {
+    public GameData UpdateGameID(int gameID){
+        return new GameData(gameID, whiteUserName, blackUserName, gameName, game);
     }
 
-    public int getGameID() {
-        return gameID;
+    public GameData updateWhiteUsername(String whiteUserName){
+        return new GameData(gameID, whiteUserName, blackUserName, gameName, game);
     }
 
-    public String getWhiteUserName(){
-        return whiteUserName;
+    public GameData updateBlackUsername(String blackUserName){
+        return new GameData(gameID, whiteUserName, blackUserName, gameName, game);
     }
 
-    public String getBlackUserName() {
-        return blackUserName;
+    public GameData updateGameName(String gameName){
+        return new GameData(gameID, whiteUserName, blackUserName, gameName, game);
     }
 
-    public String getGameName(){
-        return gameName;
-    }
-
-    // is getGame overriding another method?
-    public ChessGame getGame(){
-        return game;
+    public GameData updateGame(ChessGame game){
+        return new GameData(gameID, whiteUserName, blackUserName, gameName, game);
     }
 }

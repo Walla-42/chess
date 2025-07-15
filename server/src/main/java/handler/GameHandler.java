@@ -11,7 +11,6 @@ import responses.JoinGameResponse;
 import com.google.gson.Gson;
 import dataaccess.exceptions.DataAccessException;
 import responses.ListGamesResponse;
-import service.AuthService;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -42,7 +41,6 @@ public class GameHandler {
             listGamesResp.status(500);
             return gson.toJson(e.toString());
         }
-
     }
 
     public Object handleCreateGame(Request createGameReq, Response createGameResp){
@@ -74,7 +72,8 @@ public class GameHandler {
         Gson gson = new Gson();
 
         try{
-            JoinGameRequest joinGameRequest = gson.fromJson(joinGameReq.body(), JoinGameRequest.class);
+            JoinGameRequest requestBody = gson.fromJson(joinGameReq.body(), JoinGameRequest.class);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameReq.headers("Authorization"), requestBody.playerColor(), requestBody.gameID());
             JoinGameResponse joinGameResponse = gameService.joinGame(joinGameRequest);
 
             joinGameResp.status(200);

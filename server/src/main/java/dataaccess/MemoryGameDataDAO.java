@@ -18,10 +18,10 @@ public class MemoryGameDataDAO implements GameDAO{
 
         for (int gameID : gameIDs){
             GameData gameData = gameDatabase.get(gameID);
-            GamesObject game = new GamesObject(gameData.getGameID(),
-                    gameData.getWhiteUserName() != null ? gameData.getWhiteUserName() : "",
-                    gameData.getBlackUserName() != null ? gameData.getBlackUserName() : "",
-                    gameData.getGameName());
+            GamesObject game = new GamesObject(gameData.gameID(),
+                    gameData.whiteUserName() != null ? gameData.whiteUserName() : "",
+                    gameData.blackUserName() != null ? gameData.blackUserName() : "",
+                    gameData.gameName());
 
             activeGames.add(game);
         }
@@ -34,5 +34,17 @@ public class MemoryGameDataDAO implements GameDAO{
         gameIDs.add(gameID);
         gameID += 1;
         return newGame;
+    }
+
+    public GameData getGame(int gameID){
+        return gameDatabase.get(gameID);
+    }
+
+    public void updateGame(GameData gameData){
+        gameDatabase.remove(gameData.gameID());
+        gameDatabase.put(gameData.gameID(), gameData);
+        gameIDs.add(gameData.gameID());
+
+
     }
 }

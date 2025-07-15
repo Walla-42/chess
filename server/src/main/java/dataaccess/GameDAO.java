@@ -1,12 +1,12 @@
 package dataaccess;
 
-import responses.ListGameResponse;
+import model.GamesObject;
 import model.GameData;
 
 import java.util.Collection;
 
 public interface GameDAO {
-    Collection<ListGameResponse> listGames();
+    Collection<GamesObject> listGames();
 
     GameData createGame(String gameName);
 }

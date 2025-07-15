@@ -27,12 +27,12 @@ public class Server {
 
         // Service Objects:
         AuthService authService = new AuthService(authDAO);
-        GameService gameService = new GameService(gameDAO);
+        GameService gameService = new GameService(gameDAO, authService);
         UserService userService = new UserService(userDAO, authService);
 
         // Handler objects:
         UserHandler userHandler = new UserHandler(userService);
-        GameHandler GameHandler = new GameHandler(gameService, authService);
+        GameHandler GameHandler = new GameHandler(gameService);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", userHandler::handleRegister); // endpoint complete

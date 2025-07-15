@@ -1,6 +1,6 @@
 package dataaccess;
 
-import responses.ListGameResponse;
+import model.GamesObject;
 import chess.ChessGame;
 import model.GameData;
 
@@ -13,17 +13,17 @@ public class MemoryGameDataDAO implements GameDAO{
     HashSet<Integer> gameIDs = new HashSet<>();
     private static int gameID = 1;
 
-    public Collection<ListGameResponse> listGames(){
-        HashSet<ListGameResponse> activeGames = new HashSet<>();
+    public Collection<GamesObject> listGames(){
+        HashSet<GamesObject> activeGames = new HashSet<>();
 
         for (int gameID : gameIDs){
             GameData gameData = gameDatabase.get(gameID);
-            ListGameResponse listGameResponse = new ListGameResponse(gameData.getGameID(),
+            GamesObject game = new GamesObject(gameData.getGameID(),
                     gameData.getWhiteUserName() != null ? gameData.getWhiteUserName() : "",
                     gameData.getBlackUserName() != null ? gameData.getBlackUserName() : "",
                     gameData.getGameName());
 
-            activeGames.add(listGameResponse);
+            activeGames.add(game);
         }
         return activeGames;
     }

@@ -3,7 +3,6 @@ package dataaccess;
 import model.UserData;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 
 public class MemoryUserDataDAO implements UserDAO{
@@ -29,24 +28,9 @@ public class MemoryUserDataDAO implements UserDAO{
     }
 
     /**
-     * Function for clearing the UserDatabase
+     * Method for clearing the UserDatabase
      */
     public void clearDB(){
         userDatabase.clear();
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MemoryUserDataDAO that = (MemoryUserDataDAO) o;
-        return Objects.equals(userDatabase, that.userDatabase);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(userDatabase);
     }
 }

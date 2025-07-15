@@ -1,5 +1,7 @@
 package model;
 
+import java.util.HashSet;
+
 public class AuthData {
     private final String authToken;
     private final String username;

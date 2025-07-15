@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.UserDAO;
 import dataaccess.exceptions.BadRequestException;
-import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import dataaccess.exceptions.UsernameTakenException;
 import model.AuthData;

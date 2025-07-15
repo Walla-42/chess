@@ -6,20 +6,15 @@ import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
 import com.google.gson.Gson;
-import dataaccess.exceptions.DataAccessException;
-import model.AuthData;
-import model.UserData;
+
 import responses.ErrorResponseClass;
 import responses.LoginResponse;
 import responses.LogoutResponse;
 import responses.RegisterResponse;
-import service.AuthService;
 import spark.Request;
 import spark.Response;
 
 import service.UserService;
-
-import java.util.UUID;
 
 public class UserHandler {
     private final UserService userService;

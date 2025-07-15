@@ -69,7 +69,7 @@ public class MemoryGameDataDAO implements GameDAO{
     }
 
     /**
-     * Function for clearing the GameDatabase
+     * Method for clearing the GameDatabase
      */
     public void clearDB(){
         gameDatabase.clear();

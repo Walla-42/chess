@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import responses.ErrorResponseClass;
 import responses.LoginResponse;
 import responses.LogoutResponse;
 import responses.RegisterResponse;
@@ -45,15 +46,15 @@ public class UserHandler {
 
         } catch (UsernameTakenException e) {
             registerResp.status(403);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (BadRequestException e) {
             registerResp.status(400);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e){
             registerResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 
@@ -75,15 +76,15 @@ public class UserHandler {
 
         } catch (BadRequestException e) {
             loginResp.status(400);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (UnauthorizedAccessException e){
             loginResp.status(401);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e) {
             loginResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 
@@ -105,11 +106,11 @@ public class UserHandler {
 
         } catch (UnauthorizedAccessException e){
             logoutResp.status(401);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e){
             logoutResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 

@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class MemoryAuthDAO implements AuthDAO{
-    private HashMap<String, AuthData> tokenAuthDatabase = new HashMap<>();
-    private HashMap<String, AuthData> userAuthDatabase = new HashMap<>();
+    private final HashMap<String, AuthData> tokenAuthDatabase = new HashMap<>();
+    private final HashMap<String, AuthData> userAuthDatabase = new HashMap<>();
 
     public void createAuth(AuthData authData) throws Exception {
-        if (userLoggedIn(authData.getUsername())) throw new Exception("User already logged in");
+        if (userLoggedIn(authData.getUsername())) throw new Exception("Error: User already logged in");
 
         tokenAuthDatabase.put(authData.getAuthToken(), authData);
         userAuthDatabase.put(authData.getUsername(), authData);
@@ -58,6 +58,13 @@ public class MemoryAuthDAO implements AuthDAO{
         return tokenAuthDatabase.containsKey(authToken);
     }
 
+    /**
+     * Function for clearing the AuthDatabase
+     */
+    public void clearDB(){
+        tokenAuthDatabase.clear();
+        userAuthDatabase.clear();
+    }
 
     @Override
     public boolean equals(Object o) {

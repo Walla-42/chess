@@ -7,6 +7,7 @@ import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.ListGamesRequest;
 import responses.CreateGameResponse;
+import responses.ErrorResponseClass;
 import responses.JoinGameResponse;
 import com.google.gson.Gson;
 import dataaccess.exceptions.DataAccessException;
@@ -23,6 +24,13 @@ public class GameHandler {
         this.gameService = gameService;
     }
 
+    /**
+     * A method for processing Json requests and responses for the List Games endpoint
+     *
+     * @param listGamesReq Request Object containing the authToken for performing the request as well as the status
+     * @param listGamesResp Response Object containing the list of games available as well as the status
+     * @return
+     */
     public Object handleListGames(Request listGamesReq, Response listGamesResp){
         Gson gson = new Gson();
         try{
@@ -35,14 +43,26 @@ public class GameHandler {
 
         } catch (DataAccessException e){
             listGamesResp.status(401);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e) {
             listGamesResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 
+    /**
+     * Handles the HTTP request to create a new game. This function is invoked when a client sends a POST request to the `/game` endpoint.
+     *
+     * It parses the request body into a CreateGameRequest object, extracts the authorization header,
+     * and calls the gameService.createGame method to process the request. Depending on the outcome,
+     * it returns a JSON response with either the created game information or an error message.
+     *
+     *
+     * @param createGameReq  the HTTP request sent by the client, containing the authorization header and request body
+     * @param createGameResp the HTTP response object, used to set the response status code
+     * @return a JSON string representing either a CreateGameResponse object on success, or an ErrorResponseClass on failure
+     */
     public Object handleCreateGame(Request createGameReq, Response createGameResp){
         Gson gson = new Gson();
 
@@ -56,15 +76,15 @@ public class GameHandler {
 
         } catch (BadRequestException e){
             createGameResp.status(400);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (UnauthorizedAccessException e) {
             createGameResp.status(401);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e){
             createGameResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 
@@ -81,19 +101,19 @@ public class GameHandler {
 
         } catch (BadRequestException e) {
             joinGameResp.status(400);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (UnauthorizedAccessException e){
             joinGameResp.status(401);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (GameTakenException e){
             joinGameResp.status(403);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
         } catch (Exception e){
             joinGameResp.status(500);
-            return gson.toJson(e.toString());
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
     }
 }

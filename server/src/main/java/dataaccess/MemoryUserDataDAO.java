@@ -28,6 +28,14 @@ public class MemoryUserDataDAO implements UserDAO{
         userDatabase.put(userData.getUsername(), userData);
     }
 
+    /**
+     * Function for clearing the UserDatabase
+     */
+    public void clearDB(){
+        userDatabase.clear();
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

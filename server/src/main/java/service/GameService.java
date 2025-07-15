@@ -42,7 +42,7 @@ public class GameService {
         String authToken = listGamesRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {
-            throw new UnauthorizedAccessException("Unauthorized Access");
+            throw new UnauthorizedAccessException("Error: Unauthorized Access");
         }
 
         Collection<GamesObject> games = gameDAO.listGames();
@@ -62,19 +62,19 @@ public class GameService {
      */
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException{
         if (createGameRequest == null){
-            throw new BadRequestException("Must provide a game name");
+            throw new BadRequestException("Error:must provide a game name");
         }
 
         String authToken = createGameRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {
-            throw new UnauthorizedAccessException("Unauthorized Access");
+            throw new UnauthorizedAccessException("Error: unauthorized Access");
         }
 
         String gameName = createGameRequest.gameName();
 
         if (gameName == null){
-            throw new BadRequestException("Username cannot be blank");
+            throw new BadRequestException("Error: username cannot be blank");
         }
 
         GameData gameData = gameDAO.createGame(gameName);
@@ -95,14 +95,15 @@ public class GameService {
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
             UnauthorizedAccessException, GameTakenException, Exception {
-        String authToken = joinGameRequest.authToken();
-        AuthData authorization = authService.getAuth(authToken);
-        if (authToken == null || authorization == null){
-            throw new UnauthorizedAccessException("unauthorized");
+        if (joinGameRequest == null){
+            throw new BadRequestException("Error: bad request");
         }
 
-        if (joinGameRequest == null){
-            throw new BadRequestException("bad request");
+        String authToken = joinGameRequest.authToken();
+        AuthData authorization = authService.getAuth(authToken);
+
+        if (authToken == null || authorization == null){
+            throw new UnauthorizedAccessException("Error: unauthorized");
         }
 
         ChessGame.TeamColor requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor());
@@ -123,15 +124,13 @@ public class GameService {
 
     }
 
-
-
-    public void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
+    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
         if (requestedColor == BLACK && requestedGame.blackUserName() != null){
-            throw new GameTakenException("already taken");
+            throw new GameTakenException("Error: color already taken");
         }
 
         if (requestedColor == WHITE && requestedGame.whiteUserName() != null){
-            throw new GameTakenException("already taken");
+            throw new GameTakenException("Error: color already taken");
         };
     }
 

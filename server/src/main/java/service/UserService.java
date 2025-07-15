@@ -37,11 +37,11 @@ public class UserService {
      */
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, Exception {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null){
-            throw new BadRequestException("Missing Data in Request");
+            throw new BadRequestException("Error: Missing Data in Request");
         }
 
         if (getUser(registerRequest.username()) != null){
-            throw new UsernameTakenException("User already exists");
+            throw new UsernameTakenException("Error: User already exists");
         }
 
         UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
@@ -67,17 +67,17 @@ public class UserService {
      */
     public LoginResponse loginUser(LoginRequest loginRequest) throws BadRequestException, UnauthorizedAccessException, Exception {
         if (loginRequest.username() == null || loginRequest.password() == null) {
-            throw new BadRequestException("Must enter username and password");
+            throw new BadRequestException("Error: Must enter username and password");
         }
 
         UserData userData = getUser(loginRequest.username());
 
         if (userData == null){
-            throw new UnauthorizedAccessException("Username or password is incorrect");
+            throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 
         if (!comparePasswords(loginRequest.password(), userData.getPassword())){
-            throw new UnauthorizedAccessException("Username or password is incorrect");
+            throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 
         String authToken = authService.generateAuth();
@@ -100,7 +100,7 @@ public class UserService {
         String authToken = logoutRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null){
-            throw new UnauthorizedAccessException("Invalid Auth Token");
+            throw new UnauthorizedAccessException("Error: Invalid Auth Token");
         }
 
         authService.deleteAuth(authToken);

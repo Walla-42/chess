@@ -11,4 +11,6 @@ public interface AuthDAO {
     boolean tokenAlreadyExists(String authToken);
 
     void deleteAuth(String authToken);
+
+    void clearDB();
 }

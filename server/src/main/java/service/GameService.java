@@ -1,11 +1,10 @@
 package service;
 
-import Responses.ListGameResponse;
+import responses.ListGameResponse;
 import chess.ChessGame;
 import dataaccess.GameDAO;
 import model.GameData;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class GameService {

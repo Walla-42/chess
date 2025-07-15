@@ -28,18 +28,18 @@ public class Server {
         // Service Objects:
         AuthService authService = new AuthService(authDAO);
         GameService gameService = new GameService(gameDAO);
-        UserService userService = new UserService(userDAO);
+        UserService userService = new UserService(userDAO, authService);
 
         // Handler objects:
-        UserHandler userHandler = new UserHandler(userService, authService);
+        UserHandler userHandler = new UserHandler(userService);
         GameHandler GameHandler = new GameHandler(gameService, authService);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", userHandler::handleRegister); // endpoint complete
         Spark.post("/session", userHandler::handleLogin); // endpoint complete
         Spark.delete("/session", userHandler::handleLogout); // endpoint complete
-        Spark.get("/game", GameHandler::handleListGames);
-        Spark.post("/game", GameHandler::handleCreateGame);
+        Spark.get("/game", GameHandler::handleListGames); // endpoint complete
+        Spark.post("/game", GameHandler::handleCreateGame); // endpoint complete
         Spark.put("/game", GameHandler::handleJoinGame);
 //        Spark.delete("/db", ) need to figure how I want to integrate this one...
 

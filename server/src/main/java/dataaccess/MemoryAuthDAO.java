@@ -1,18 +1,17 @@
 package dataaccess;
 
+import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
 
-import javax.xml.crypto.Data;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Objects;
 
 public class MemoryAuthDAO implements AuthDAO{
     private HashMap<String, AuthData> tokenAuthDatabase = new HashMap<>();
     private HashMap<String, AuthData> userAuthDatabase = new HashMap<>();
 
-    public void createAuth(AuthData authData) throws DataAccessException {
-        if (userLoggedIn(authData.getUsername())) throw new DataAccessException("User already logged in");
+    public void createAuth(AuthData authData) throws Exception {
+        if (userLoggedIn(authData.getUsername())) throw new Exception("User already logged in");
 
         tokenAuthDatabase.put(authData.getAuthToken(), authData);
         userAuthDatabase.put(authData.getUsername(), authData);

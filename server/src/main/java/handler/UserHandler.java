@@ -1,11 +1,17 @@
 package handler;
-import Requests.LoginRequest;
-import Requests.LogoutRequest;
-import Requests.RegisterRequest;
+import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.UnauthorizedAccessException;
+import dataaccess.exceptions.UsernameTakenException;
+import requests.LoginRequest;
+import requests.LogoutRequest;
+import requests.RegisterRequest;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import responses.LoginResponse;
+import responses.LogoutResponse;
+import responses.RegisterResponse;
 import service.AuthService;
 import spark.Request;
 import spark.Response;
@@ -16,15 +22,13 @@ import java.util.UUID;
 
 public class UserHandler {
     private final UserService userService;
-    private final AuthService authService;
 
-    public UserHandler(UserService userService, AuthService authService){
+    public UserHandler(UserService userService){
         this.userService = userService;
-        this.authService = authService;
     }
 
     /**
-     * Function handling register requests sent by the server. Sends request objects to User and Auth Service.
+     * Function handling register requests sent by the server. Sends request objects to UserService.
      *
      * @param registerReq a request object containing a body with all data necessary to create a UserData object
      * @param registerResp a response object containing the response status
@@ -32,32 +36,29 @@ public class UserHandler {
      */
     public Object handleRegister(Request registerReq, Response registerResp) {
         Gson gson = new Gson();
-        RegisterRequest request = gson.fromJson(registerReq.body(), RegisterRequest.class);
         try {
-            if (userService.getUser(request.username()) == null) {
+            RegisterRequest registerRequest = gson.fromJson(registerReq.body(), RegisterRequest.class);
+            RegisterResponse registerResponse = userService.registerUser(registerRequest);
 
-                UserData userData = new UserData(request.username(), request.password(), request.email());
-                userService.createUser(userData);
+            registerResp.status(200);
+            return gson.toJson(registerResponse);
 
-                String authToken = generateAuth();
-
-                AuthData authData = new AuthData(authToken, request.username());
-                authService.createAuth(authData);
-
-                registerResp.status(200);
-                return gson.toJson(authData);
-
-            } else {
-                throw new DataAccessException("User already exists");
-            }
-        } catch (DataAccessException e){
+        } catch (UsernameTakenException e) {
             registerResp.status(403);
+            return gson.toJson(e.toString());
+
+        } catch (BadRequestException e) {
+            registerResp.status(400);
+            return gson.toJson(e.toString());
+
+        } catch (Exception e){
+            registerResp.status(500);
             return gson.toJson(e.toString());
         }
     }
 
     /**
-     * A function for handling the user login requests. Creates objects for the User and Auth Services.
+     * A function for handling the user login requests. Creates objects for the UserService.
      *
      * @param loginReq a request object containing an empty head and a body with user information.
      * @param loginResp a response object containing the request status code.
@@ -65,33 +66,29 @@ public class UserHandler {
      */
     public Object handleLogin(Request loginReq, Response loginResp){
         Gson gson = new Gson();
-        LoginRequest request = gson.fromJson(loginReq.body(), LoginRequest.class);
         try {
-            UserData userData = userService.getUser(request.username());
-            if (userData != null){
-                if (userService.comparePasswords(request.password(), userData.getPassword())){
-                    String authToken = generateAuth();
+            LoginRequest loginRequest = gson.fromJson(loginReq.body(), LoginRequest.class);
+            LoginResponse loginResponse = userService.loginUser(loginRequest);
 
-                    AuthData authData = new AuthData(authToken, request.username());
-                    authService.createAuth(authData);
+            loginResp.status(200);
+            return gson.toJson(loginResponse);
 
-                    loginResp.status(200);
-                    return gson.toJson(authData);
-                } else {
-                    throw new DataAccessException("Username or password are incorrect");
-                }
-            } else {
-                throw new DataAccessException("Username or password are incorrect");
-            }
-        } catch (DataAccessException e){
+        } catch (BadRequestException e) {
+            loginResp.status(400);
+            return gson.toJson(e.toString());
+
+        } catch (UnauthorizedAccessException e){
             loginResp.status(401);
             return gson.toJson(e.toString());
-        }
 
+        } catch (Exception e) {
+            loginResp.status(500);
+            return gson.toJson(e.toString());
+        }
     }
 
     /**
-     * A function for handling the logout request and responses. Creates objects to be used by User and Auth Services.
+     * A function for handling the logout request and responses. Creates objects to be used by UserService.
      *
      * @param logoutReq Request object containing a header with the auth token and an empty body
      * @param logoutResp Response object containing a request status
@@ -100,28 +97,21 @@ public class UserHandler {
     public Object handleLogout(Request logoutReq, Response logoutResp){
         Gson gson = new Gson();
         try{
-            String authToken = logoutReq.headers("Authorization");
+            LogoutRequest logoutRequest = new LogoutRequest(logoutReq.headers("Authorization"));
+            LogoutResponse logoutResponse = userService.logoutUser(logoutRequest);
 
-            if (authToken == null || authService.getAuth(authToken) == null){
-                throw new DataAccessException("Invalid Auth Token");
-            }
-
-            authService.deleteAuth(authToken);
             logoutResp.status(200);
-            return gson.toJson(new Object());
+            return gson.toJson(logoutResponse);
 
-        } catch (DataAccessException e){
+        } catch (UnauthorizedAccessException e){
             logoutResp.status(401);
+            return gson.toJson(e.toString());
+
+        } catch (Exception e){
+            logoutResp.status(500);
             return gson.toJson(e.toString());
         }
     }
 
-    /**
-     * A function for generating a random authToken
-     *
-     * @return random generated authToken
-     */
-    private String generateAuth() {
-        return UUID.randomUUID().toString();
-    }
+
 }

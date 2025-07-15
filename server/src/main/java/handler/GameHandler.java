@@ -1,18 +1,16 @@
 package handler;
 
-import Requests.CreateGameRequest;
-import Requests.ListGamesRequest;
-import Responses.CreateGameResponse;
-import Responses.ListGameResponse;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import responses.CreateGameResponse;
+import responses.ListGameResponse;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import model.GameData;
+import dataaccess.exceptions.DataAccessException;
 import service.AuthService;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 
 
@@ -65,7 +63,17 @@ public class GameHandler {
         }
     }
 
-    public Object handleJoinGame(Request req, Response resp){
-        throw new RuntimeException("not yet implemented");
+    public Object handleJoinGame(Request joinGameReq, Response joinGameResp){
+        Gson gson = new Gson();
+        JoinGameRequest joinGameRequest = gson.fromJson(joinGameReq.body(), JoinGameRequest.class);
+
+        try {
+            if (joinGameRequest == null) {
+                throw new DataAccessException("")
+            }
+        } catch (DataAccessException e) {
+            joinGameResp.status(403);
+            return gson.toJson(e.toString());
+        }
     }
 }

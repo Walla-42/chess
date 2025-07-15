@@ -1,6 +1,6 @@
 package dataaccess;
 
-import Responses.ListGameResponse;
+import responses.ListGameResponse;
 import model.GameData;
 
 import java.util.Collection;

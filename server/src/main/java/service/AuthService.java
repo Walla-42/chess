@@ -1,9 +1,10 @@
 package service;
 
 import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
-import model.UserData;
+
+import java.util.UUID;
 
 public class AuthService {
     private final AuthDAO authDAO;
@@ -18,7 +19,7 @@ public class AuthService {
      * @param authData An AuthData object containing an authToken and the users username
      * @throws DataAccessException Exception thrown when the authToken is invalid or doesnt exist.
      */
-    public void createAuth(AuthData authData) throws DataAccessException {
+    public void createAuth(AuthData authData) throws Exception {
         authDAO.createAuth(authData);
     }
 
@@ -39,5 +40,14 @@ public class AuthService {
      */
     public void deleteAuth(String authToken){
         authDAO.deleteAuth(authToken);
+    }
+
+    /**
+     * A function for generating a random authToken
+     *
+     * @return random generated authToken
+     */
+    String generateAuth() {
+        return UUID.randomUUID().toString();
     }
 }

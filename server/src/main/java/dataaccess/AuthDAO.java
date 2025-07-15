@@ -1,10 +1,10 @@
 package dataaccess;
 
+import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
-import model.UserData;
 
 public interface AuthDAO {
-    void createAuth(AuthData authData) throws DataAccessException;
+    void createAuth(AuthData authData) throws Exception;
 
     AuthData getAuth(String authToken);
 

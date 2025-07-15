@@ -1,5 +1,6 @@
 package service;
 
+import Responses.ListGameResponse;
 import chess.ChessGame;
 import dataaccess.GameDAO;
 import model.GameData;
@@ -14,12 +15,12 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public Collection<GameData> listGames(){
+    public Collection<ListGameResponse> listGames(){
         return gameDAO.listGames();
     }
 
     public GameData createGame(String gameName){
-        throw new RuntimeException("not yet implemented");
+        return gameDAO.createGame(gameName);
     }
 
     public GameData getGame(int gameID){

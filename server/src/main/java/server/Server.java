@@ -15,18 +15,14 @@ import javax.xml.crypto.Data;
 
 
 public class Server {
-    private UserService userService;
-
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final UserDAO userDAO = new MemoryUserDataDAO();
+    private final GameDAO gameDAO = new MemoryGameDataDAO();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-
-        // DAO objects:
-        AuthDAO authDAO = new MemoryAuthDAO();
-        UserDAO userDAO = new MemoryUserDataDAO();
-        GameDAO gameDAO = new MemoryGameDataDAO();
 
         // Service Objects:
         AuthService authService = new AuthService(authDAO);

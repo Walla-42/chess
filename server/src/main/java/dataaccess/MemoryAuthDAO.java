@@ -11,10 +11,30 @@ public class MemoryAuthDAO implements AuthDAO{
     private final HashMap<String, AuthData> userAuthDatabase = new HashMap<>();
 
     public void createAuth(AuthData authData) throws Exception {
-        if (userLoggedIn(authData.getUsername())) throw new Exception("Error: User already logged in");
+
+        if (userLoggedIn(authData.getUsername())){ // if user is already logged in, log them out .
+            String oldAuthToken = userAuthDatabase.get(authData.getUsername()).getAuthToken();
+            deleteAuth(oldAuthToken);
+        }
+
+        System.out.println("Saving token: " + authData.getAuthToken());
+
 
         tokenAuthDatabase.put(authData.getAuthToken(), authData);
         userAuthDatabase.put(authData.getUsername(), authData);
+    }
+
+    /**
+     * Deletes the users current authToken from the database using the current authToken, logging them out.
+     *
+     * @param authToken authToken given by their current session.
+     */
+    public void deleteAuth(String authToken){
+        System.out.println("Deleting authToken: " + authToken);
+
+        String username = tokenAuthDatabase.get(authToken).getUsername();
+        tokenAuthDatabase.remove(authToken);
+        userAuthDatabase.remove(username);
     }
 
     /**
@@ -24,19 +44,11 @@ public class MemoryAuthDAO implements AuthDAO{
      * @return AuthData obtained from the database including authToken and username
      */
     public AuthData getAuth(String authToken){
+        System.out.println("Looking up token: " + authToken);
+
         return tokenAuthDatabase.get(authToken);
     }
 
-    /**
-     * Deletes the users current authToken from the database, logging them out.
-     *
-     * @param authToken authToken given by their current session.
-     */
-    public void deleteAuth(String authToken){
-        String username = tokenAuthDatabase.get(authToken).getUsername();
-        tokenAuthDatabase.remove(authToken);
-        userAuthDatabase.remove(username);
-    }
 
     /**
      * checks if a user is already logged into the server
@@ -44,7 +56,7 @@ public class MemoryAuthDAO implements AuthDAO{
      * @param username users username
      * @return boolean, True if logged in, false otherwise
      */
-    public boolean userLoggedIn(String username){
+    private boolean userLoggedIn(String username){
         return userAuthDatabase.containsKey(username);
     }
 

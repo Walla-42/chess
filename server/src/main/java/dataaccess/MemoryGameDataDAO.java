@@ -21,7 +21,7 @@ public class MemoryGameDataDAO implements GameDAO{
     public Collection<GamesObject> listGames(){
         HashSet<GamesObject> activeGames = new HashSet<>();
 
-        for (int gameID : gameIDs){
+        for (Integer gameID : gameIDs){
             GameData gameData = gameDatabase.get(gameID);
             GamesObject game = new GamesObject(gameData.gameID(),
                     gameData.whiteUserName(),
@@ -53,7 +53,7 @@ public class MemoryGameDataDAO implements GameDAO{
      * @param gameID ID of the game to be fetched
      * @return GameData for the Game
      */
-    public GameData getGame(int gameID){
+    public GameData getGame(Integer gameID){
         return gameDatabase.get(gameID);
     }
 

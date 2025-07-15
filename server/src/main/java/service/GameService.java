@@ -95,7 +95,7 @@ public class GameService {
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
             UnauthorizedAccessException, GameTakenException, Exception {
-        if (joinGameRequest == null){
+        if (joinGameRequest == null || joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null){
             throw new BadRequestException("Error: bad request");
         }
 
@@ -106,7 +106,12 @@ public class GameService {
             throw new UnauthorizedAccessException("Error: unauthorized");
         }
 
-        ChessGame.TeamColor requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor());
+        ChessGame.TeamColor requestedColor;
+        try {
+            requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Error: invalid player color");
+        }
 
         GameData requestedGame = gameDAO.getGame(joinGameRequest.gameID());
 

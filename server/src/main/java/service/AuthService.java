@@ -14,17 +14,19 @@ public class AuthService {
     }
 
     /**
-     * Communicates with authDAO to add all data in AuthData to the database
+     * Service method for adding data in AuthData to the AuthDatabase. Encapsulates interactions with authDAO to prevent
+     * access to AuthDatabase through user or Game Service classes.
      *
      * @param authData An AuthData object containing an authToken and the users username
-     * @throws DataAccessException Exception thrown when the authToken is invalid or doesnt exist.
+     *
      */
-    public void createAuth(AuthData authData) throws Exception {
+    public void createAuth(AuthData authData) {
         authDAO.createAuth(authData);
     }
 
     /**
-     * Communicates with authDAO to check the database for the given authToken
+     * Service method for returning an authData object from AuthDatabase. Encapsulates interaction with AuthDAO to prevent
+     * access to authDataBase through User or Game Service Classes.
      *
      * @param authToken authToken given by the users session
      * @return AuthData Object containing the authToken and the associated username
@@ -34,7 +36,8 @@ public class AuthService {
     }
 
     /**
-     * Function to facilitate logout of user. Communicates with AuthDAO to remove the users authorization.
+     * Service method to facilitate logout of user by removal of authTokens from AuthDatabase. Encapsulates interactions
+     * with authDAO to prevent access to AuthDatabase through user or Game Service classes.
      *
      * @param authToken authToken given by the users session
      */
@@ -43,11 +46,15 @@ public class AuthService {
     }
 
     /**
-     * A function for generating a random authToken
+     * Service method for generating a random authToken. Checks that the generated token doesn't already exists.
      *
      * @return random generated authToken
      */
-    String generateAuth() {
-        return UUID.randomUUID().toString();
+    public String generateAuth() {
+        String authToken;
+        do {
+            authToken = UUID.randomUUID().toString();
+        } while (authDAO.tokenAlreadyExists(authToken));
+        return authToken;
     }
 }

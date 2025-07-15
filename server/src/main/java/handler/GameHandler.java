@@ -25,11 +25,12 @@ public class GameHandler {
     }
 
     /**
-     * A method for processing Json requests and responses for the List Games endpoint
+     * Handler Method for the ListGames endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the GameService. This function is invoked when a client sends a GET request to the `/game` endpoint.
      *
-     * @param listGamesReq Request Object containing the authToken for performing the request as well as the status
-     * @param listGamesResp Response Object containing the list of games available as well as the status
-     * @return
+     * @param listGamesReq the HTTP request sent by the client
+     * @param listGamesResp the HTTP response object, used to set the response code
+     * @return a Json string representing a listGamesResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleListGames(Request listGamesReq, Response listGamesResp){
         Gson gson = new Gson();
@@ -52,12 +53,8 @@ public class GameHandler {
     }
 
     /**
-     * Handles the HTTP request to create a new game. This function is invoked when a client sends a POST request to the `/game` endpoint.
-     *
-     * It parses the request body into a CreateGameRequest object, extracts the authorization header,
-     * and calls the gameService.createGame method to process the request. Depending on the outcome,
-     * it returns a JSON response with either the created game information or an error message.
-     *
+     * Handles the HTTP request to create a new game. This function is invoked when a client sends a POST request to
+     * the `/game` endpoint.
      *
      * @param createGameReq  the HTTP request sent by the client, containing the authorization header and request body
      * @param createGameResp the HTTP response object, used to set the response status code
@@ -88,6 +85,14 @@ public class GameHandler {
         }
     }
 
+    /**
+     * Handler Method for the JoinGame endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the GameService. This function is invoked when a client sends a PUT request to the `/game` endpoint.
+     *
+     * @param joinGameReq the HTTP request sent by the client
+     * @param joinGameResp the HTTP response object, used to set the response code
+     * @return a Json string representing a joinGameResponse object on success, or an ErrorResponseClass object on failure
+     */
     public Object handleJoinGame(Request joinGameReq, Response joinGameResp){
         Gson gson = new Gson();
 

@@ -16,10 +16,11 @@ import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
-import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static chess.ChessGame.TeamColor.BLACK;
+
+
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthService authService;
@@ -30,13 +31,13 @@ public class GameService {
     }
 
     /**
-     * Method for handling ListGames endpoint logic.
+     * Service method for handling ListGames endpoint logic.
      *
      * @param listGamesRequest ListGamesRequest Object containing the authToken of the users session
      * @return ListGamesResponse object containing an array of available games on the server
      *
-     * @throws UnauthorizedAccessException
-     * @throws Exception
+     * @throws UnauthorizedAccessException invalid authToken given
+     * @throws Exception all other exceptions
      */
     public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, Exception{
         String authToken = listGamesRequest.authToken();
@@ -52,16 +53,16 @@ public class GameService {
     }
 
     /**
-     * Method for handling CreateGame Logic
+     * Service method for handling CreateGame Logic
      *
-     * @param createGameRequest CreateGameRequest taken from GameHandler
+     * @param createGameRequest CreateGameRequest object containing the users session authToken and the desired gameName
      * @return CreateGameResponse object containing GameID of created game
      *
-     * @throws BadRequestException
-     * @throws UnauthorizedAccessException
+     * @throws BadRequestException Missing gameName
+     * @throws UnauthorizedAccessException Invalid authToken provided with request
      */
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException{
-        if (createGameRequest == null){
+        if (createGameRequest.gameName() == null){
             throw new BadRequestException("Error:must provide a game name");
         }
 
@@ -73,29 +74,26 @@ public class GameService {
 
         String gameName = createGameRequest.gameName();
 
-        if (gameName == null){
-            throw new BadRequestException("Error: username cannot be blank");
-        }
-
         GameData gameData = gameDAO.createGame(gameName);
 
         return new CreateGameResponse(gameData.gameID());
     }
 
     /**
-     * Function for handling the JoinGame Logic
+     * Service method for handling the JoinGame Logic
      *
-     * @param joinGameRequest JoinGameRequest object taken from the GameHandler
-     * @return empty JoinGameResponse object
+     * @param joinGameRequest JoinGameRequest object including the authToken and the gameID
+     * @return JoinGameResponse Object
      *
-     * @throws BadRequestException
-     * @throws UnauthorizedAccessException
-     * @throws GameTakenException
-     * @throws Exception
+     * @throws BadRequestException gameID or playerColor not provided in request
+     * @throws UnauthorizedAccessException Invalid authToken provided with request
+     * @throws GameTakenException game is already taken
+     * @throws Exception all other exceptions
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
             UnauthorizedAccessException, GameTakenException, Exception {
-        if (joinGameRequest == null || joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null){
+
+        if (joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null){
             throw new BadRequestException("Error: bad request");
         }
 
@@ -109,26 +107,32 @@ public class GameService {
         ChessGame.TeamColor requestedColor;
         try {
             requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
+
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Error: invalid player color");
         }
 
         GameData requestedGame = gameDAO.getGame(joinGameRequest.gameID());
-
         checkColorAvailability(requestedGame, requestedColor);
 
-        if (requestedColor == BLACK){
-            GameData updatedGameData = requestedGame.updateBlackUsername(authorization.getUsername());
-            gameDAO.updateGame(updatedGameData);
-        } else if (requestedColor == WHITE){
-            GameData updatedGameData = requestedGame.updateWhiteUsername(authorization.getUsername());
-            gameDAO.updateGame(updatedGameData);
-        }
+        GameData updatedGame = (requestedColor == BLACK)
+                ? requestedGame.updateBlackUsername(authorization.getUsername())
+                : requestedGame.updateWhiteUsername(authorization.getUsername());
+
+        gameDAO.updateGame(updatedGame);
 
         return new JoinGameResponse();
 
     }
 
+    /**
+     * Helper service method for checking if the color requested is available when joining a game
+     *
+     * @param requestedGame the GameData of the requested game
+     * @param requestedColor the TeamColor desired by the user
+     *
+     * @throws GameTakenException Color already taken by another player
+     */
     private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
         if (requestedColor == BLACK && requestedGame.blackUserName() != null){
             throw new GameTakenException("Error: color already taken");
@@ -139,17 +143,4 @@ public class GameService {
         };
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        GameService that = (GameService) o;
-        return Objects.equals(gameDAO, that.gameDAO) && Objects.equals(authService, that.authService);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(gameDAO, authService);
-    }
 }

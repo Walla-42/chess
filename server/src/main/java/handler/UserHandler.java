@@ -24,11 +24,12 @@ public class UserHandler {
     }
 
     /**
-     * Function handling register requests sent by the server. Sends request objects to UserService.
+     * Handler Method for the Register endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the UserService. This function is invoked when a client sends a POST request to the `/user` endpoint.
      *
-     * @param registerReq a request object containing a body with all data necessary to create a UserData object
-     * @param registerResp a response object containing the response status
-     * @return a json object containing all the data contained in AuthData
+     * @param registerReq the HTTP request sent by the client
+     * @param registerResp the HTTP response object, used to set the response code
+     * @return a Json string representing a RegisterResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleRegister(Request registerReq, Response registerResp) {
         Gson gson = new Gson();
@@ -54,11 +55,12 @@ public class UserHandler {
     }
 
     /**
-     * A function for handling the user login requests. Creates objects for the UserService.
+     * Handler Method for the Login endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the UserService. This function is invoked when a client sends a POST request to the `/session` endpoint.
      *
-     * @param loginReq a request object containing an empty head and a body with user information.
-     * @param loginResp a response object containing the request status code.
-     * @return json of authData if successful or a user error message if not.
+     * @param loginReq the HTTP request sent by the client
+     * @param loginResp the HTTP response object, used to set the response code
+     * @return a Json string representing a LoginResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleLogin(Request loginReq, Response loginResp){
         Gson gson = new Gson();
@@ -84,11 +86,12 @@ public class UserHandler {
     }
 
     /**
-     * A function for handling the logout request and responses. Creates objects to be used by UserService.
+     * Handler Method for the Logout endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the UserService. This function is invoked when a client sends a POST request to the `/user` endpoint.
      *
-     * @param logoutReq Request object containing a header with the auth token and an empty body
-     * @param logoutResp Response object containing a request status
-     * @return empty object if successful, else an error message object.
+     * @param logoutReq the HTTP request sent by the client
+     * @param logoutResp the HTTP response object, used to set the response code
+     * @return a Json string representing a LogoutResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleLogout(Request logoutReq, Response logoutResp){
         Gson gson = new Gson();

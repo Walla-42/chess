@@ -15,6 +15,14 @@ public class ClearHandler {
         this.clearService = clearService;
     }
 
+    /**
+     * Handler Method for the clear endpoint. Takes in Json Requests and Responses and parses them before sending them
+     * to the ClearDbService.
+     *
+     * @param clearReq the HTTP request sent by the client
+     * @param clearResp the HTTP response object, used to set the response code
+     * @return a Json string representing a clearResponse object on success, or an ErrorResponseClass object on failure
+     */
     public Object handleClear(Request clearReq, Response clearResp) {
         Gson gson = new Gson();
 

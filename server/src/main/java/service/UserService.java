@@ -25,26 +25,26 @@ public class UserService {
     }
 
     /**
-     * Method for handling user registration logic
+     * Service method for handling user registration logic.
      *
-     * @param registerRequest RegisterRequest object given by the UerHandler
+     * @param registerRequest RegisterRequest object given by the UserHandler
      * @return RegisterResponse object which holds the users username and authToken
      *
-     * @throws UsernameTakenException
-     * @throws BadRequestException
-     * @throws Exception
+     * @throws UsernameTakenException User already Exists
+     * @throws BadRequestException Missing Data in Request
+     * @throws Exception all other exceptions
      */
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, Exception {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null){
             throw new BadRequestException("Error: Missing Data in Request");
         }
 
-        if (getUser(registerRequest.username()) != null){
+        if (userDAO.getUser(registerRequest.username()) != null){
             throw new UsernameTakenException("Error: User already exists");
         }
 
         UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
-        createUser(userData);
+        userDAO.createUser(userData);
 
         String authToken = authService.generateAuth();
 
@@ -55,21 +55,21 @@ public class UserService {
     }
 
     /**
-     * Method for handling the User Login logic
+     * Service method for handling the User Login logic
      *
      * @param loginRequest LoginRequest object given by the UserHandler
      * @return LoginResponse object which holds the users username and the assigned authToken
      *
-     * @throws BadRequestException
-     * @throws UnauthorizedAccessException
-     * @throws Exception
+     * @throws BadRequestException Missing Username or Password
+     * @throws UnauthorizedAccessException Username or Password are incorrect
+     * @throws Exception all other exceptions
      */
     public LoginResponse loginUser(LoginRequest loginRequest) throws BadRequestException, UnauthorizedAccessException, Exception {
         if (loginRequest.username() == null || loginRequest.password() == null) {
             throw new BadRequestException("Error: Must enter username and password");
         }
 
-        UserData userData = getUser(loginRequest.username());
+        UserData userData = userDAO.getUser(loginRequest.username());
 
         if (userData == null){
             throw new UnauthorizedAccessException("Error: Username or password is incorrect");
@@ -88,12 +88,12 @@ public class UserService {
     }
 
     /**
-     * Method for handling logout logic
+     * Service method for handling logout logic
      *
      * @param logoutRequest LogoutRequest object given by the UserHandler
-     * @return empty LogoutResponse object
+     * @return LogoutResponse object
      *
-     * @throws UnauthorizedAccessException
+     * @throws UnauthorizedAccessException Invalid authToken sent with request
      */
     public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException {
         String authToken = logoutRequest.authToken();
@@ -108,32 +108,13 @@ public class UserService {
     }
 
     /**
-     * communicates with the UserDAO to add userdata to the database
-     *
-     * @param userData UserData object containing all user information to be stored in the database
-     */
-    public void createUser(UserData userData) {
-        userDAO.createUser(userData);
-    }
-
-    /**
-     * communicates with the UserDAO to get UserData from the database
-     *
-     * @param username username of user
-     * @return UserData object containing all information of the user
-     */
-    public UserData getUser(String username){
-        return userDAO.getUser(username);
-    }
-
-    /**
-     * A function to check if the correct password is given by the user.
+     * A method to check if the correct password is given by the user.
      *
      * @param inputPassword Password given by the user
      * @param userPassword Password stored by the user in the database
      * @return boolean True if password match, false otherwise
      */
-    public boolean comparePasswords(String inputPassword, String userPassword){
+    private boolean comparePasswords(String inputPassword, String userPassword){
         return inputPassword.equals(userPassword);
     }
 

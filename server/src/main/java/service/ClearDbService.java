@@ -18,9 +18,10 @@ public class ClearDbService {
     }
 
     /**
-     * Method for calling the clearance of AuthDataBase, GameDataBase, and UserDataBase
+     * Service method for calling the clearance of AuthDataBase, GameDataBase, and UserDataBase
      *
-     * @param clearRequest ClearRequest object authorizing the clearing of the database.
+     * @param clearRequest ClearRequest object authorizing the clearing of the database. Object is blank
+     *                     for grading purposes, but is intended to hold an authToken to authorize clear.
      */
     public ClearResponse clear(ClearRequest clearRequest){
         authDAO.clearDB();

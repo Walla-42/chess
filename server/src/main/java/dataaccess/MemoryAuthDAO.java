@@ -50,8 +50,6 @@ public class MemoryAuthDAO implements AuthDAO{
      * @return AuthData obtained from the database including authToken and username
      */
     public AuthData getAuth(String authToken){
-        System.out.println("Looking up token: " + authToken);
-
         return tokenAuthDatabase.get(authToken);
     }
 

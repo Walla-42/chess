@@ -15,9 +15,9 @@ import chess.chessmovecalculators.*;
 public class ChessPiece {
 
     private final ChessGame.TeamColor color;
-    private final pieceType type;
+    private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor TeamColor, pieceType PieceType) {
+    public ChessPiece(ChessGame.TeamColor TeamColor, PieceType PieceType) {
         this.color = TeamColor;
         this.type = PieceType;
     }
@@ -35,7 +35,7 @@ public class ChessPiece {
     /**
      * The various different chess piece options
      */
-    public enum pieceType {
+    public enum PieceType {
         KING,
         QUEEN,
         BISHOP,
@@ -54,7 +54,7 @@ public class ChessPiece {
     /**
      * @return which type of chess piece this piece is
      */
-    public pieceType getPieceType() {
+    public PieceType getPieceType() {
         return type;
     }
 

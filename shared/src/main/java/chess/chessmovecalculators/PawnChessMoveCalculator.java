@@ -63,10 +63,10 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
 
     private void chessPiecePromotion(ChessPosition myPosition, HashSet<ChessMove> moves, int promotionRow, ChessPosition newChessPosition) {
         if (newChessPosition.getRow() == promotionRow) {
-            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.pieceType.QUEEN));
-            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.pieceType.ROOK));
-            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.pieceType.BISHOP));
-            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.pieceType.KNIGHT));
+            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.PieceType.QUEEN));
+            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.PieceType.ROOK));
+            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.PieceType.BISHOP));
+            moves.add(new ChessMove(myPosition, newChessPosition, ChessPiece.PieceType.KNIGHT));
         } else {
             moves.add(new ChessMove(myPosition, newChessPosition));
         }

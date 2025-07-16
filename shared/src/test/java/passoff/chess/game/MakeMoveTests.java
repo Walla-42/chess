@@ -342,9 +342,9 @@ public class MakeMoveTests {
 
 
     @ParameterizedTest
-    @EnumSource(value = ChessPiece.pieceType.class, names = {"QUEEN", "ROOK", "KNIGHT", "BISHOP"})
+    @EnumSource(value = ChessPiece.PieceType.class, names = {"QUEEN", "ROOK", "KNIGHT", "BISHOP"})
     @DisplayName("Pawn Promotion")
-    public void promotionMoves(ChessPiece.pieceType promotionType) throws InvalidMoveException {
+    public void promotionMoves(ChessPiece.PieceType promotionType) throws InvalidMoveException {
         String pieceAtStart = "After move, a piece is still present in the start position";
         String noPieceAtEnd = "After move, no piece found at the end position";
         String incorrectType = "Found piece at end position is not the correct piece type";

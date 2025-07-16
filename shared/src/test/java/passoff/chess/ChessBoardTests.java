@@ -38,7 +38,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
     @DisplayName("Add and Get Piece")
     public void getAddPiece() {
         ChessPosition position = new ChessPosition(4, 4);
-        ChessPiece piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.BISHOP);
+        ChessPiece piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
 
         var board = new ChessBoard();
         board.addPiece(position, piece);
@@ -79,16 +79,16 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
 
         differentBoards.add(new ChessBoard()); // An empty board
 
-        ChessPiece.pieceType[] pieceSchedule = {
-                ChessPiece.pieceType.ROOK, ChessPiece.pieceType.KNIGHT,
-                ChessPiece.pieceType.BISHOP, ChessPiece.pieceType.QUEEN,
-                ChessPiece.pieceType.KING, ChessPiece.pieceType.PAWN,
-                ChessPiece.pieceType.KING, ChessPiece.pieceType.ROOK,
+        ChessPiece.PieceType[] pieceSchedule = {
+                ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING, ChessPiece.PieceType.PAWN,
+                ChessPiece.PieceType.KING, ChessPiece.PieceType.ROOK,
         };
 
         // Generate boards each with one piece added from a static list.
         // The color is assigned in a mixed pattern.
-        ChessPiece.pieceType type;
+        ChessPiece.PieceType type;
         boolean isWhite;
         for (int col = 1; col <= 8; col++) {
             for (int row = 1; row <= 8; row++) {
@@ -101,7 +101,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
         return differentBoards;
     }
 
-    private ChessBoard createBoardWithPiece(int row, int col, ChessPiece.pieceType type, boolean isWhite) {
+    private ChessBoard createBoardWithPiece(int row, int col, ChessPiece.PieceType type, boolean isWhite) {
         var board = new ChessBoard();
 
         var teamColor = isWhite ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;

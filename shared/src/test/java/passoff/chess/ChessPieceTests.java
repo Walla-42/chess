@@ -19,17 +19,17 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
 
     @Override
     protected ChessPiece buildOriginal() {
-        return new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.KING);
+        return new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
     }
 
     @Override
     protected Collection<ChessPiece> buildAllDifferent() {
         return List.of(
-                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.KING),
-                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.QUEEN),
-                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.QUEEN),
-                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.PAWN),
-                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.PAWN)
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING),
+                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN),
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN),
+                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN),
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN)
         );
     }
 
@@ -41,7 +41,7 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
 
         // 6 piece types * 2 team colors = 12 different pieces
         Collection<ChessPiece> allPossiblePieces =
-                Arrays.stream(ChessPiece.pieceType.values())
+                Arrays.stream(ChessPiece.PieceType.values())
                 .flatMap(pieceType -> Arrays.stream(ChessGame.TeamColor.values())
                 .map(teamColor -> new ChessPiece(teamColor, pieceType)))
                 .toList();
@@ -52,7 +52,7 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
                 ChessPosition position = new ChessPosition(i, j);
 
                 for (var piece : allPossiblePieces) {
-                    if (piece.getPieceType() == ChessPiece.pieceType.PAWN && (i == 1 || i == 8)) {
+                    if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (i == 1 || i == 8)) {
                         continue;
                     }
 

@@ -19,7 +19,7 @@ public class UserService {
     private final UserDAO userDAO;
     private final AuthService authService;
 
-    public UserService(UserDAO userDAO, AuthService authService){
+    public UserService(UserDAO userDAO, AuthService authService) {
         this.userDAO = userDAO;
         this.authService = authService;
     }
@@ -29,17 +29,16 @@ public class UserService {
      *
      * @param registerRequest RegisterRequest object given by the UserHandler
      * @return RegisterResponse object which holds the users username and authToken
-     *
      * @throws UsernameTakenException User already Exists
-     * @throws BadRequestException Missing Data in Request
-     * @throws Exception all other exceptions
+     * @throws BadRequestException    Missing Data in Request
+     * @throws Exception              all other exceptions
      */
     public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, Exception {
-        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null){
+        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new BadRequestException("Error: Missing Data in Request");
         }
 
-        if (userDAO.getUser(registerRequest.username()) != null){
+        if (userDAO.getUser(registerRequest.username()) != null) {
             throw new UsernameTakenException("Error: User already exists");
         }
 
@@ -59,10 +58,9 @@ public class UserService {
      *
      * @param loginRequest LoginRequest object given by the UserHandler
      * @return LoginResponse object which holds the users username and the assigned authToken
-     *
-     * @throws BadRequestException Missing Username or Password
+     * @throws BadRequestException         Missing Username or Password
      * @throws UnauthorizedAccessException Username or Password are incorrect
-     * @throws Exception all other exceptions
+     * @throws Exception                   all other exceptions
      */
     public LoginResponse loginUser(LoginRequest loginRequest) throws BadRequestException, UnauthorizedAccessException, Exception {
         if (loginRequest.username() == null || loginRequest.password() == null) {
@@ -71,11 +69,11 @@ public class UserService {
 
         UserData userData = userDAO.getUser(loginRequest.username());
 
-        if (userData == null){
+        if (userData == null) {
             throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 
-        if (!comparePasswords(loginRequest.password(), userData.getPassword())){
+        if (!comparePasswords(loginRequest.password(), userData.getPassword())) {
             throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 
@@ -92,13 +90,12 @@ public class UserService {
      *
      * @param logoutRequest LogoutRequest object given by the UserHandler
      * @return LogoutResponse object
-     *
      * @throws UnauthorizedAccessException Invalid authToken sent with request
      */
     public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException {
         String authToken = logoutRequest.authToken();
 
-        if (authToken == null || authService.getAuth(authToken) == null){
+        if (authToken == null || authService.getAuth(authToken) == null) {
             throw new UnauthorizedAccessException("Error: Invalid Auth Token");
         }
 
@@ -111,24 +108,10 @@ public class UserService {
      * A method to check if the correct password is given by the user.
      *
      * @param inputPassword Password given by the user
-     * @param userPassword Password stored by the user in the database
+     * @param userPassword  Password stored by the user in the database
      * @return boolean True if password match, false otherwise
      */
-    private boolean comparePasswords(String inputPassword, String userPassword){
+    private boolean comparePasswords(String inputPassword, String userPassword) {
         return inputPassword.equals(userPassword);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        UserService that = (UserService) o;
-        return Objects.equals(userDAO, that.userDAO);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(userDAO);
     }
 }

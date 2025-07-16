@@ -1,192 +1,254 @@
+Detailed project UML sequence diagram text. For a full visual of the UML interaction diagram paste this text into
+www.sequencediagram.org
+
+
 actor Client
 participant Server
-participant Handler
-participant Service
-participant DataAccess
+participant UserHandler
+participant GameHandler
+participant ClearHandler
+
+participant UserService
+participant AuthService
+participant GameService
+participant ClearDbService
+
+participant userDAO
+participant authDAO
+participant gameDAO
+
 database db
 
-//--------------------------------------
-entryspacing 0.9
+-------------------- Registration -----------------------
+
 group #lightblue Registration #black
 Client -> Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
-Server -> Handler: {"username":" ", "password":" ", "email":" "}
-Handler -> Service: register(RegisterRequest)
-Service -> DataAccess: getUser(username)
-DataAccess -> db:Find UserData by username
-break User with username already exists
-DataAccess --> Service: UserData
-Service --> Server: AlreadyTakenException
-Server --> Client: 403\n{"message": "Error: username already taken"}
+Server -> UserHandler: {"username":" ", "password":" ", "email":" "}
+UserHandler -> UserService: registerUser(RegisterRequest)
+
+UserService -> UserService: check registerRequest.username()\ncheck registerRequest.password()\ncheck registerRequest.email()
+
+break Missing user data
+UserService -> Server: BadRequestException
+Server -> Client: 400\n{"message": "Missing Data in Request"}
 end
-DataAccess --> Service: null
-Service -> DataAccess:createUser(userData)
-DataAccess -> db:Add UserData
-Service -> DataAccess:createAuth(authData)
-DataAccess -> db:Add AuthData
-Service --> Handler: RegisterResult
-Handler --> Server: {"username" : " ", "authToken" : " "}
+
+UserService -> userDAO: getUser(registerRequest.username())
+userDAO -> db: Find UserData by username
+
+break User already exists
+userDAO --> UserService: UserData
+UserService -> Server: UsernameTakenException
+Server -> Client: 403\n{"message": "User already exists"}
+end
+
+userDAO --> UserService: null
+
+UserService -> userDAO: createUser(UserData)
+userDAO -> db: Add UserData
+
+UserService -> AuthService: generateAuth()
+AuthService -> AuthService: UUID.randomUUID()
+AuthService -> userDAO: tokenAlreadyExists(authToken)
+userDAO -> db: Check token uniqueness
+userDAO --> AuthService: false
+AuthService --> UserService: authToken
+
+UserService -> AuthService: createAuth(AuthData)
+AuthService -> db: Add AuthData
+
+UserService --> UserHandler: RegisterResponse(username, authToken)
+UserHandler --> Server: {"username" : " ", "authToken" : " "}
 Server --> Client: 200\n{"username" : " ", "authToken" : " "}
 end
 
-//--------------------------------------
-group #orange Login #black
-Client -> Server: [POST] /session\n{username, password}
-Server -> Handler: {username, password}
-Handler -> Service: login(LoginRequest)
-Service -> DataAccess: getUser(username)
-DataAccess -> db: Find UserData by username
-DataAccess --> Service: UserData
+-------------------- Login -----------------------
+
+group #lightgreen Login #black
+Client -> Server: [POST] /session\n{"username":" ", "password":" "}
+Server -> UserHandler: {"username":" ", "password":" "}
+UserHandler -> UserService: loginUser(LoginRequest)
+
+UserService -> UserService: check loginRequest.username()\ncheck loginRequest.password()
+
+break Missing credentials
+UserService -> Server: BadRequestException
+Server -> Client: 400\n{"message": "Must enter username and password"}
+end
+
+UserService -> userDAO: getUser(loginRequest.username())
+userDAO -> db: Find UserData by username
 
 break User not found
-DataAccess --> Service: null
-Service --> Server: UnauthorizedAccessException
-Server --> Client: 401\n{"message" : "Error: unauthorized access"}
+userDAO --> UserService: null
+UserService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "Username or password is incorrect"}
 end
 
-break Unauthorized access to user account
-Service --> Server: UnauthorizedAccessException
-Server --> Client: 401\n{"message" : "Error: unauthorized access"}
+userDAO --> UserService: UserData
+UserService -> UserService: comparePasswords()
+
+break Invalid password
+UserService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "Username or password is incorrect"}
 end
 
-Service -> DataAccess: createAuth(authData)
-DataAccess -> db: Add AuthData
-Service --> Handler: LoginResult
-Handler --> Server: {"username" : " ", "authToken" : " "} 
-Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+UserService -> AuthService: generateAuth()
+AuthService -> AuthService: UUID.randomUUID()
+AuthService -> userDAO: tokenAlreadyExists(authToken)
+userDAO -> db: Check token uniqueness
+userDAO --> AuthService: false
+AuthService --> UserService: authToken
+
+UserService -> AuthService: createAuth(AuthData)
+AuthService -> db: Add AuthData
+
+UserService --> UserHandler: LoginResponse(username, authToken)
+UserHandler --> Server: {"username":" ", "authToken":" "}
+Server --> Client: 200\n{"username":" ", "authToken":" "}
 end
 
-//--------------------------------------
-group #lightgreen Logout #black
-Client -> Server: [DELETE] /session\nauthToken
+-------------------- Logout -----------------------
 
-Server -> Handler: authToken
-Handler -> Service: authentication(authRequest)
-Service -> DataAccess: getAuth(authToken)
-DataAccess -> db: Get user by authData
+group #coral Logout #black
+Client -> Server: [DELETE] /session\nAuthorization: <authToken>
+Server -> UserHandler: Authorization: <authToken>
+UserHandler -> UserService: logoutUser(LogoutRequest)
 
-DataAccess --> Service: UserData
+UserService -> AuthService: getAuth(authToken)
+AuthService -> db: Find AuthData by authToken
 
-break authToken not recognized user not found
-DataAccess --> Service: null
-Service --> Server: UnauthorizedAccessException
-
-Server --> Client: 401\n {"message" : "Error: unauthorized"}
+break Invalid token
+AuthService --> UserService: null
+UserService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "Invalid Auth Token"}
 end
 
-Service -> DataAccess: deleteAuth(UserData)
-DataAccess -> db: Remove User Auth Token
-Service --> Handler: logoutResult
-Handler --> Server: { }
-Server --> Client: 200\n { }
+UserService -> AuthService: deleteAuth(authToken)
+AuthService -> db: Delete AuthData
+
+UserService --> UserHandler: LogoutResponse()
+UserHandler --> Server: {}
+Server --> Client: 200\n{}
 end
 
-//--------------------------------------
-group #pink List Games #black
-Client -> Server: [GET] /game\nauthToken
-Server -> Handler: authToken
-Handler -> Service: authentication(authRequest)
-Service-> DataAccess: getAuth(authToken)
-DataAccess -> db: Get user by authData
-DataAccess --> Service: UserData
+-------------------- CreateGame -----------------------
 
-break authToken not recognized user not found
-DataAccess --> Service: null
-Service --> Server: UnauthorizedAccessException
+group #violet CreateGame #black
+Client -> Server: [POST] /game\nAuthorization: <authToken>\n{"gameName":" "}
+Server -> GameHandler: Authorization + body
+GameHandler -> GameService: createGame(CreateGameRequest)
 
-Server --> Client: 401\n {"message" : "Error: unauthorized"}
+GameService -> GameService: check createGameRequest.gameName()
+
+break Missing game name
+GameService -> Server: BadRequestException
+Server -> Client: 400\n{"message": "must provide a game name"}
 end
 
-Service -> DataAccess: listGames( )
-DataAccess -> db: Get all games from db
-DataAccess --> Service: gameData
-Service --> Handler: gameListResult
+GameService -> AuthService: getAuth(authToken)
+AuthService -> db: Find AuthData by authToken
 
-Handler --> Server: { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
-Server --> Client: 200\n{ "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+break Invalid authToken
+AuthService --> GameService: null
+GameService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "unauthorized Access"}
 end
 
-//--------------------------------------
-group #violet Create Game #black
-Client -> Server: [POST] /game\nauthToken\n{gameName}
+GameService -> gameDAO: createGame(gameName)
+gameDAO -> db: Insert new GameData
+gameDAO --> GameService: GameData
 
-Server -> Handler: authToken\n{gameName}
-Handler -> Service: authentication(authRequest)
-Service -> DataAccess: getAuth(authToken)
-DataAccess -> db: Get user by authData
-DataAccess --> Service: UserData
-
-
-break authToken not recognized user not found
-DataAccess --> Service: null
-Service --> Server:UnauthorizedAccessException
-Server --> Client: 401\n {"message" : "Error: unauthorized"}
+GameService --> GameHandler: CreateGameResponse(gameID)
+GameHandler --> Server: {"gameID":" "}
+Server --> Client: 200\n{"gameID":" "}
 end
 
-Service --> Handler:authResult
+-------------------- JoinGame -----------------------
 
-Handler -> Service: game(gameName)
-Service -> DataAccess: CreateGame(gameName)
+group #orange JoinGame #black
+Client -> Server: [PUT] /game\nAuthorization: <authToken>\n{"gameID":X, "playerColor":"WHITE"}
+Server -> GameHandler: Authorization + body
+GameHandler -> GameService: joinGame(JoinGameRequest)
 
-DataAccess -> db: Add GameData
-DataAccess --> Service:gameData
-Service --> Handler: gameResult
+GameService -> GameService: check joinGameRequest.gameID()\ncheck joinGameRequest.playerColor()
 
-Handler --> Server: {"gameID" : }
-Server --> Client: 200\n{"gameID" : }
+break Missing fields
+GameService -> Server: BadRequestException
+Server -> Client: 400\n{"message": "bad request"}
 end
 
-//--------------------------------------
-group #yellow Join Game #black
-Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
-Server -> Handler: authToken\n{playerColor, gameID}
-Handler -> Service: authentication{authRequest)
-Service -> DataAccess:getAuth(authToken)
-DataAccess -> db: get user by authToken
+GameService -> AuthService: getAuth(authToken)
+AuthService -> db: Find AuthData by authToken
 
-DataAccess --> Service: UserData
-
-break authToken not recognized
-DataAccess --> Service: null
-Service --> Server:UnauthorizedAccessException
-Server --> Client: 401\n {"message" : "Error: unauthorized"}
+break Invalid authToken
+AuthService --> GameService: null
+GameService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "unauthorized"}
 end
 
-Service --> Handler: authResult
-Handler -> Service:joinGame(gameID)
-Service -> DataAccess: getGame(gameID)
-DataAccess -> db:get game using gameID
-DataAccess --> Service: gameData
+GameService -> gameDAO: getGame(gameID)
+gameDAO -> db: Find GameData by gameID
+gameDAO --> GameService: GameData
 
-break GameID recognized but game already taken
-Service --> Server:GameTakenException
-Server --> Client: 403\n {"message" : "Error: already taken"}
+GameService -> GameService: checkColorAvailability(GameData, TeamColor)
+
+break Color taken
+GameService -> Server: GameTakenException
+Server -> Client: 403\n{"message": "color already taken"}
 end
 
-break GameID not recognized game not found
-DataAccess --> Service: null
-Service --> Server: BadAccessException
-Server --> Client: 400\n {"message": "Error: bad request"}
+GameService -> GameService: update GameData with username
+GameService -> gameDAO: updateGame(updatedGame)
+gameDAO -> db: Update GameData
+
+GameService --> GameHandler: JoinGameResponse()
+GameHandler --> Server: {}
+Server --> Client: 200\n{}
 end
 
-Service -> DataAccess: updateGame(playerColor, gameID)
-DataAccess -> db: update game player color
-DataAccess --> Service:gameData
-Service --> Handler: joinGameResult
-Handler --> Server: { }
-Server --> Client: 200\n{ }
+-------------------- ListGames -----------------------
+
+group #pink ListGames #black
+Client -> Server: [GET] /game\nAuthorization: <authToken>
+Server -> GameHandler: Authorization: <authToken>
+GameHandler -> GameService: listGames(ListGamesRequest)
+
+GameService -> AuthService: getAuth(authToken)
+AuthService -> db: Find AuthData by authToken
+
+break Invalid authToken
+AuthService --> GameService: null
+GameService -> Server: UnauthorizedAccessException
+Server -> Client: 401\n{"message": "Unauthorized Access"}
 end
 
-//--------------------------------------
-// Note to TA: This endpoint might need an authToken to protect from malicious deletion of database data. 
-group #lightgray Clear application #black
+GameService -> gameDAO: listGames()
+gameDAO -> db: Return all GameData
+gameDAO --> GameService: List<GamesObject>
+
+GameService --> GameHandler: ListGamesResponse(games)
+GameHandler --> Server: {"games":[...]}
+Server --> Client: 200\n{"games":[...]}
+end
+
+-------------------- ClearDB -----------------------
+
+group #lightcoral ClearDB #black
 Client -> Server: [DELETE] /db
-Server -> Handler: { } 
-Handler -> Service: clearObject()
-Service -> DataAccess: clearDataBase()
-DataAccess -> db: Delete all information in db
-DataAccess --> Service: ClearResult
-Service --> Handler: ClearResult
-Handler --> Server: { }
-Server --> Client: 200\n { }
+Server -> ClearHandler: ClearRequest()
+ClearHandler -> ClearDbService: clear(ClearRequest)
 
+ClearDbService -> authDAO: clear()
+authDAO -> db: Delete all auth entries
+
+ClearDbService -> userDAO: clear()
+userDAO -> db: Delete all user entries
+
+ClearDbService -> gameDAO: clear()
+gameDAO -> db: Delete all game entries
+
+ClearDbService --> ClearHandler: ClearResponse()
+ClearHandler --> Server: {}
+Server --> Client: 200\n{}
 end

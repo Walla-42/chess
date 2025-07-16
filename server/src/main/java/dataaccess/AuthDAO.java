@@ -1,10 +1,11 @@
 package dataaccess;
 
+import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DataAccessException;
 import model.AuthData;
 
 public interface AuthDAO {
-    void createAuth(AuthData authData);
+    void createAuth(AuthData authData) throws BadRequestException;
 
     AuthData getAuth(String authToken);
 

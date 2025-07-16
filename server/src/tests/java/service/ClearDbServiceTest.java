@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import requests.ClearRequest;
 import responses.ClearResponse;
-import service.ClearDbService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +18,7 @@ public class ClearDbServiceTest {
     private MemoryUserDataDAO userDAO;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception{
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDataDAO();
         userDAO = new MemoryUserDataDAO();

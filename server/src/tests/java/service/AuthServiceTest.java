@@ -2,10 +2,10 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.MemoryAuthDAO;
+import dataaccess.exceptions.BadRequestException;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.AuthService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +37,19 @@ public class AuthServiceTest {
     }
 
     @Test
-    void getAuthPositive(){
+    void createAuthNegativeNullDataPresent() {
+        AuthData authData = new AuthData(null, "authToken");
+
+        assertThrows(BadRequestException.class, () -> authService.createAuth(authData));
+
+        AuthData newAuthData = new AuthData("authToken", null);
+
+        assertThrows(BadRequestException.class, () -> authService.createAuth(newAuthData));
+
+    }
+
+    @Test
+    void getAuthPositive() throws Exception {
         AuthData newAuth = new AuthData("authToken", "user");
         authService.createAuth(newAuth);
 
@@ -52,7 +64,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void deleteAuthPositive() {
+    void deleteAuthPositive() throws Exception {
         AuthData auth = new AuthData("authToken", "user");
         authService.createAuth(auth);
 
@@ -62,7 +74,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void deleteAuthNegativeInvalidToken(){
+    void deleteAuthNegativeInvalidToken() throws Exception {
         AuthData originalAuth = new AuthData("authToken", "user");
         authService.createAuth(originalAuth);
 
@@ -74,19 +86,17 @@ public class AuthServiceTest {
     }
 
     @Test
-    void generateAuthPositive() {
+    void generateAuthPositive() throws Exception {
         String token = authService.generateAuth();
         assertNotNull(token);
         assertFalse(token.isEmpty());
 
-        // Simulate using the token
         authService.createAuth(new AuthData(token, "username"));
         assertEquals("username", authService.getAuth(token).username());
     }
 
     @Test
-    void generateAuthUniqueness() {
-        // Simulate storing multiple tokens to ensure no duplicates
+    void generateAuthUniqueness() throws Exception {
         for (int i = 0; i < 10000; i++) {
             String authToken = authService.generateAuth();
 

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import dataaccess.exceptions.BadRequestException;
 import model.AuthData;
 
 import java.util.HashMap;
@@ -15,8 +16,10 @@ public class MemoryAuthDAO implements AuthDAO{
      *
      * @param authData AuthData object containing the AuthToken and the username of the user
      */
-    public void createAuth(AuthData authData) {
-
+    public void createAuth(AuthData authData) throws BadRequestException {
+        if (authData.authToken() == null || authData.username() == null){
+            throw new BadRequestException("Error: missing authToken or username");
+        }
         tokenAuthDatabase.put(authData.authToken(), authData);
 
         userAuthDatabase.computeIfAbsent(authData.username(), username -> new HashSet<>()).add(authData.authToken());

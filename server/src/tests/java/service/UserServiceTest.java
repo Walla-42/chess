@@ -17,8 +17,7 @@ import requests.RegisterRequest;
 import responses.LoginResponse;
 import responses.LogoutResponse;
 import responses.RegisterResponse;
-import service.AuthService;
-import service.UserService;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +37,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void registerUser_Positive() throws Exception {
+    void registerUserPositive() throws Exception {
         RegisterRequest request = new RegisterRequest("user", "password", "user@email.com");
         RegisterResponse response = userService.registerUser(request);
 
@@ -51,7 +50,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void registerUser_Negative_UsernameTaken() throws Exception {
+    void registerUserNegativeUsernameTaken() throws Exception {
         RegisterRequest request = new RegisterRequest("user", "password", "user@email.com");
         userService.registerUser(request);
 
@@ -61,14 +60,14 @@ public class UserServiceTest {
     }
 
     @Test
-    void registerUser_Negative_MissingField() {
+    void registerUserNegativeMissingField() {
         RegisterRequest badRequest = new RegisterRequest(null, "password", "user@email.com");
 
         assertThrows(BadRequestException.class, () -> userService.registerUser(badRequest));
     }
 
     @Test
-    void loginUser_Positive() throws Exception {
+    void loginUserPositive() throws Exception {
         // Register first
         RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
         userService.registerUser(reg);
@@ -84,7 +83,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginUser_Negative_WrongPassword() throws Exception {
+    void loginUserNegativeWrongPassword() throws Exception {
         RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
         userService.registerUser(reg);
 
@@ -94,21 +93,21 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginUser_Negative_UserDoesNotExist() {
+    void loginUserNegativeUserDoesNotExist() {
         LoginRequest loginRequest = new LoginRequest("NonexistentUser", "InvalidPassword");
 
         assertThrows(UnauthorizedAccessException.class, () -> userService.loginUser(loginRequest));
     }
 
     @Test
-    void loginUser_Negative_MissingUsername() {
+    void loginUserNegativeMissingUsername() {
         LoginRequest badRequest = new LoginRequest(null, "password");
 
         assertThrows(BadRequestException.class, () -> userService.loginUser(badRequest));
     }
 
     @Test
-    void logoutUser_Positive() throws Exception {
+    void logoutUserPositive() throws Exception {
         RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
         RegisterResponse regResponse = userService.registerUser(reg);
 
@@ -121,7 +120,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void logoutUser_Negative_InvalidToken() {
+    void logoutUserNegativeInvalidToken() {
         LogoutRequest logoutRequest = new LogoutRequest("invalidToken");
 
         assertThrows(UnauthorizedAccessException.class, () -> userService.logoutUser(logoutRequest));

@@ -17,8 +17,7 @@ import requests.JoinGameRequest;
 import requests.ListGamesRequest;
 import responses.CreateGameResponse;
 import responses.ListGamesResponse;
-import service.AuthService;
-import service.GameService;
+
 
 import java.util.Collection;
 
@@ -35,7 +34,7 @@ public class GameServiceTest {
     private final String username = "test-user";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         gameDAO = new MemoryGameDataDAO();
         authDAO = new MemoryAuthDAO();
         authService = new AuthService(authDAO);
@@ -120,7 +119,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void joinGame_Negative_ColorAlreadyTaken() throws Exception {
+    void joinGameNegativeColorAlreadyTaken() throws Exception {
         int gameID = gameDAO.createGame("TakenGame").gameID();
 
         gameService.joinGame(new JoinGameRequest(validToken, "white", gameID));
@@ -135,7 +134,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void joinGame_Negative_InvalidColor() {
+    void joinGameNegativeInvalidColor() {
         int gameID = gameDAO.createGame("BadColorGame").gameID();
         JoinGameRequest request = new JoinGameRequest(validToken, "invalid-color", gameID);
 

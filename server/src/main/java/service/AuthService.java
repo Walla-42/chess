@@ -21,7 +21,7 @@ public class AuthService {
      * @param authData An AuthData object containing an authToken and the users username
      *
      */
-    public void createAuth(AuthData authData) {
+    public void createAuth(AuthData authData) throws BadRequestException {
         authDAO.createAuth(authData);
     }
 

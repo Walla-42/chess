@@ -50,7 +50,9 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
             int targetCol = col + attackMove;
             int targetRow = row + pieceMovement;
 
-            if (!board.isInBounds(targetRow, targetCol)) continue;
+            if (!board.isInBounds(targetRow, targetCol)) {
+                continue;
+            }
 
             ChessPosition newAttackPosition = new ChessPosition(targetRow, targetCol);
             ChessPiece attackTarget = board.getPiece(newAttackPosition);

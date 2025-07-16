@@ -16,7 +16,6 @@ import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.ListGamesRequest;
 import responses.CreateGameResponse;
-import responses.JoinGameResponse;
 import responses.ListGamesResponse;
 
 
@@ -24,7 +23,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameServiceTest {
+public class GameServiceTests {
 
     private GameService gameService;
     private GameDAO gameDAO;

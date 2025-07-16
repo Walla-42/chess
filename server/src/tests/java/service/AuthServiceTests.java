@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AuthServiceTest {
+public class AuthServiceTests {
 
     private AuthService authService;
     private AuthDAO authDAO;

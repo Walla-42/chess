@@ -21,7 +21,7 @@ import responses.RegisterResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTest {
+public class UserServiceTests {
 
     private UserService userService;
     private UserDAO userDAO;

@@ -10,7 +10,7 @@ import responses.ClearResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClearDbServiceTest {
+public class ClearDbServiceTests {
 
     private ClearDbService clearDbService;
     private AuthDAO authDAO;

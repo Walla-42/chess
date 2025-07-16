@@ -25,7 +25,7 @@ public class GameStatusTests {
         var game = new ChessGame();
         var expectedBoard = TestUtilities.defaultBoard();
         Assertions.assertEquals(expectedBoard, game.getBoard(), "Incorrect starting board");
-        Assertions.assertEquals(ChessGame.teamColor.WHITE, game.getTeamTurn(), "Incorrect starting team turn");
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, game.getTeamTurn(), "Incorrect starting team turn");
     }
 
     @Test
@@ -33,14 +33,14 @@ public class GameStatusTests {
     public void noGameStatuses() {
         var game = new ChessGame();
         game.setBoard(TestUtilities.defaultBoard());
-        game.setTeamTurn(ChessGame.teamColor.WHITE);
+        game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
-        Assertions.assertFalse(game.isInCheck(ChessGame.teamColor.BLACK), INCORRECT_BLACK_CHECK);
-        Assertions.assertFalse(game.isInCheck(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECK);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_STALEMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_STALEMATE);
+        Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECK);
+        Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECK);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_STALEMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_STALEMATE);
     }
 
 
@@ -59,8 +59,8 @@ public class GameStatusTests {
                 | | | | | | | | |
                 """));
 
-        Assertions.assertTrue(game.isInCheck(ChessGame.teamColor.WHITE), MISSING_WHITE_CHECK);
-        Assertions.assertFalse(game.isInCheck(ChessGame.teamColor.BLACK), INCORRECT_BLACK_CHECK);
+        Assertions.assertTrue(game.isInCheck(ChessGame.TeamColor.WHITE), MISSING_WHITE_CHECK);
+        Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECK);
     }
 
 
@@ -79,8 +79,8 @@ public class GameStatusTests {
                 | | | | | | | | |
                 """));
 
-        Assertions.assertTrue(game.isInCheck(ChessGame.teamColor.BLACK), MISSING_BLACK_CHECK);
-        Assertions.assertFalse(game.isInCheck(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECK);
+        Assertions.assertTrue(game.isInCheck(ChessGame.TeamColor.BLACK), MISSING_BLACK_CHECK);
+        Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECK);
     }
 
 
@@ -99,10 +99,10 @@ public class GameStatusTests {
                 | | | | |n| | | |
                 | | | | | | | | |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.WHITE);
+        game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
-        Assertions.assertTrue(game.isInCheckmate(ChessGame.teamColor.WHITE), MISSING_WHITE_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
+        Assertions.assertTrue(game.isInCheckmate(ChessGame.TeamColor.WHITE), MISSING_WHITE_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
     }
 
 
@@ -120,10 +120,10 @@ public class GameStatusTests {
                 | | | | | | | | |
                 | | | |K| | | | |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.BLACK);
+        game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-        Assertions.assertTrue(game.isInCheckmate(ChessGame.teamColor.BLACK), MISSING_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertTrue(game.isInCheckmate(ChessGame.TeamColor.BLACK), MISSING_BLACK_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
 
     }
 
@@ -142,10 +142,10 @@ public class GameStatusTests {
                 | | | | |n| | | |
                 |K| | | | | | | |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.BLACK);
+        game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
     }
 
 
@@ -164,10 +164,10 @@ public class GameStatusTests {
                 | | | | |n| | | |
                 |K| | | | | |R| |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.BLACK);
+        game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-        Assertions.assertTrue(game.isInCheckmate(ChessGame.teamColor.BLACK), MISSING_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertTrue(game.isInCheckmate(ChessGame.TeamColor.BLACK), MISSING_BLACK_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
     }
 
 
@@ -186,10 +186,10 @@ public class GameStatusTests {
                 | | | | | | | | |
                 |K| | | | | | |R|
                 """));
-        game.setTeamTurn(ChessGame.teamColor.BLACK);
+        game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-        Assertions.assertTrue(game.isInCheckmate(ChessGame.teamColor.BLACK), MISSING_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertTrue(game.isInCheckmate(ChessGame.TeamColor.BLACK), MISSING_BLACK_CHECKMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
     }
 
 
@@ -207,10 +207,10 @@ public class GameStatusTests {
                 | | | | | | | | |
                 | | | | |b| | | |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.WHITE);
+        game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
-        Assertions.assertTrue(game.isInStalemate(ChessGame.teamColor.WHITE), MISSING_WHITE_STALEMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_STALEMATE);
+        Assertions.assertTrue(game.isInStalemate(ChessGame.TeamColor.WHITE), MISSING_WHITE_STALEMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_STALEMATE);
     }
 
     @Test
@@ -227,9 +227,9 @@ public class GameStatusTests {
                 | | | | | | | |r|
                 |K| | | | | |r| |
                 """));
-        game.setTeamTurn(ChessGame.teamColor.WHITE);
+        game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
-        Assertions.assertFalse(game.isInStalemate(ChessGame.teamColor.WHITE), INCORRECT_WHITE_STALEMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.teamColor.BLACK), INCORRECT_BLACK_STALEMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_STALEMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_STALEMATE);
     }
 }

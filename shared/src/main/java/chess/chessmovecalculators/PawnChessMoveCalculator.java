@@ -9,13 +9,13 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
     @Override
     public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        ChessGame.teamColor team = piece.getTeamColor();
+        ChessGame.TeamColor team = piece.getTeamColor();
 
         HashSet<ChessMove> moves = new HashSet<>();
 
-        int startRow = (team == ChessGame.teamColor.WHITE) ? 2 : 7;
-        int promotionRow = (team == ChessGame.teamColor.WHITE) ? 8 : 1;
-        int pieceMovement = (team == ChessGame.teamColor.WHITE) ? 1 : -1;
+        int startRow = (team == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promotionRow = (team == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        int pieceMovement = (team == ChessGame.TeamColor.WHITE) ? 1 : -1;
 
         addForwardMoves(board, myPosition, moves, pieceMovement, startRow, promotionRow);
         addDiagonalAttacks(board, myPosition, team, moves, pieceMovement, promotionRow);
@@ -41,7 +41,7 @@ public class PawnChessMoveCalculator implements PieceMovesCalculator {
         }
     }
 
-    private void addDiagonalAttacks(ChessBoard board, ChessPosition myPosition, ChessGame.teamColor team,
+    private void addDiagonalAttacks(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor team,
                                     HashSet<ChessMove> moves, int pieceMovement, int promotionRow) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();

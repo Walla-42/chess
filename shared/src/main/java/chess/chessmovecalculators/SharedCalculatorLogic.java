@@ -31,9 +31,9 @@ public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
     public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
         HashSet<ChessMove> moves = new HashSet<>();
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece == null) return moves;
+        if (piece == null) {return moves;}
 
-        ChessGame.teamColor team = piece.getTeamColor();
+        ChessGame.TeamColor team = piece.getTeamColor();
 
         int[][] directionalMoves = allowedDirectionalMoves();
         if (directionalMoves != null){

@@ -13,13 +13,13 @@ import static chess.ChessBoard.availableTeamMoves;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private teamColor teamTurn;
+    private TeamColor teamTurn;
     private ChessBoard gameBoard;
 
     public ChessGame() {
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
-        setTeamTurn(teamColor.WHITE);
+        setTeamTurn(TeamColor.WHITE);
     }
 
     /**
@@ -29,7 +29,7 @@ public class ChessGame {
      * @param teamColor color of team that is currently playing
      * @return boolean true if a player cant escape check, false if a player can escape check.
      */
-    private boolean cantEscapeCheck(teamColor teamColor){
+    private boolean cantEscapeCheck(TeamColor teamColor){
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition fromPos = new ChessPosition(row, col);
@@ -65,7 +65,7 @@ public class ChessGame {
     /**
      * @return Which team's turn it is
      */
-    public teamColor getTeamTurn() {
+    public TeamColor getTeamTurn() {
         return teamTurn;
     }
 
@@ -74,14 +74,14 @@ public class ChessGame {
      *
      * @param team the team whose turn it is
      */
-    public void setTeamTurn(teamColor team) {
+    public void setTeamTurn(TeamColor team) {
         teamTurn = team;
     }
 
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
-    public enum teamColor {
+    public enum TeamColor {
         WHITE,
         BLACK
     }
@@ -124,13 +124,13 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.startPosition;
         ChessPosition end = move.endPosition;
-        teamColor turn = getTeamTurn();
+        TeamColor turn = getTeamTurn();
         ChessBoard chessBoard = getBoard();
         ChessPiece piece = chessBoard.getPiece(start);
-        if (piece == null) throw new InvalidMoveException("Must select a valid piece");
+        if (piece == null) {throw new InvalidMoveException("Must select a valid piece");}
 
-        teamColor team = piece.getTeamColor();
-        if (team != turn) throw new InvalidMoveException("Not Your Turn");
+        TeamColor team = piece.getTeamColor();
+        if (team != turn) {throw new InvalidMoveException("Not Your Turn");}
         Collection<ChessMove> validMoves = validMoves(start);
 
         if (validMoves.contains(move)){
@@ -151,10 +151,10 @@ public class ChessGame {
      * A function for updating the current team
      */
     public void updateTurn(){
-        if (getTeamTurn() == teamColor.BLACK){
-            setTeamTurn(teamColor.WHITE);
+        if (getTeamTurn() == TeamColor.BLACK){
+            setTeamTurn(TeamColor.WHITE);
         } else {
-            setTeamTurn(teamColor.BLACK);
+            setTeamTurn(TeamColor.BLACK);
         }
     }
 
@@ -164,10 +164,10 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(teamColor teamColor){
+    public boolean isInCheck(TeamColor teamColor){
 
         ChessPosition kingPosition = ChessBoard.findKing(teamColor, gameBoard);
-        teamColor enemy = (teamColor == ChessGame.teamColor.WHITE) ? ChessGame.teamColor.BLACK : ChessGame.teamColor.WHITE;
+        TeamColor enemy = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
         Collection<ChessMove> availableEnemyMoves = availableTeamMoves(enemy, gameBoard);
         for (ChessMove chessMove : availableEnemyMoves){
@@ -185,7 +185,7 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(teamColor teamColor) {
+    public boolean isInCheckmate(TeamColor teamColor) {
         return (isInCheck(teamColor) && cantEscapeCheck(teamColor));
     }
 
@@ -197,7 +197,7 @@ public class ChessGame {
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
      */
-    public boolean isInStalemate(teamColor teamColor) {
+    public boolean isInStalemate(TeamColor teamColor) {
         return (!isInCheck(teamColor) && cantEscapeCheck(teamColor));
     }
 

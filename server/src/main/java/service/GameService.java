@@ -17,8 +17,8 @@ import model.GameData;
 
 import java.util.Collection;
 
-import static chess.ChessGame.teamColor.WHITE;
-import static chess.ChessGame.teamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.BLACK;
 
 
 public class GameService {
@@ -104,9 +104,9 @@ public class GameService {
             throw new UnauthorizedAccessException("Error: unauthorized");
         }
 
-        ChessGame.teamColor requestedColor;
+        ChessGame.TeamColor requestedColor;
         try {
-            requestedColor = ChessGame.teamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
+            requestedColor = ChessGame.TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
 
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Error: invalid player color");
@@ -133,7 +133,7 @@ public class GameService {
      *
      * @throws GameTakenException Color already taken by another player
      */
-    private void checkColorAvailability(GameData requestedGame, ChessGame.teamColor requestedColor) throws GameTakenException{
+    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
         if (requestedColor == BLACK && requestedGame.blackUserName() != null){
             throw new GameTakenException("Error: color already taken");
         }

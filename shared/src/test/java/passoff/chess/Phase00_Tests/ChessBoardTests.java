@@ -38,7 +38,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
     @DisplayName("Add and Get Piece")
     public void getAddPiece() {
         ChessPosition position = new ChessPosition(4, 4);
-        ChessPiece piece = new ChessPiece(ChessGame.teamColor.BLACK, ChessPiece.pieceType.BISHOP);
+        ChessPiece piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.BISHOP);
 
         var board = new ChessBoard();
         board.addPiece(position, piece);
@@ -104,7 +104,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
     private ChessBoard createBoardWithPiece(int row, int col, ChessPiece.pieceType type, boolean isWhite) {
         var board = new ChessBoard();
 
-        var teamColor = isWhite ? ChessGame.teamColor.WHITE : ChessGame.teamColor.BLACK;
+        var teamColor = isWhite ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
         var piece = new ChessPiece(teamColor, type);
 
         var position = new ChessPosition(row, col);

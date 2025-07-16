@@ -14,10 +14,10 @@ import chess.chessmovecalculators.*;
  */
 public class ChessPiece {
 
-    private final ChessGame.teamColor color;
+    private final ChessGame.TeamColor color;
     private final pieceType type;
 
-    public ChessPiece(ChessGame.teamColor TeamColor, pieceType PieceType) {
+    public ChessPiece(ChessGame.TeamColor TeamColor, pieceType PieceType) {
         this.color = TeamColor;
         this.type = PieceType;
     }
@@ -47,7 +47,7 @@ public class ChessPiece {
     /**
      * @return Which team this chess piece belongs to
      */
-    public ChessGame.teamColor getTeamColor() {
+    public ChessGame.TeamColor getTeamColor() {
         return color;
     }
 
@@ -106,7 +106,7 @@ public class ChessPiece {
         }
 
         String stringValue;
-        if (color == ChessGame.teamColor.WHITE){
+        if (color == ChessGame.TeamColor.WHITE){
             stringValue = String.valueOf(typeSymbol);
         } else {
             stringValue = String.valueOf(Character.toLowerCase(typeSymbol));

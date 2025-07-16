@@ -55,8 +55,8 @@ public class TestUtilities {
                 case '|' -> {
                 }
                 default -> {
-                    ChessGame.teamColor color = Character.isLowerCase(c) ? ChessGame.teamColor.BLACK
-                            : ChessGame.teamColor.WHITE;
+                    ChessGame.TeamColor color = Character.isLowerCase(c) ? ChessGame.TeamColor.BLACK
+                            : ChessGame.TeamColor.WHITE;
                     var type = CHAR_TO_TYPE_MAP.get(Character.toLowerCase(c));
                     var position = new ChessPosition(row, column);
                     var piece = new ChessPiece(color, type);

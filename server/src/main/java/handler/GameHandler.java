@@ -97,8 +97,10 @@ public class GameHandler {
         Gson gson = new Gson();
 
         try{
+            String authToken = joinGameReq.headers("Authorization");
+
             JoinGameRequest requestBody = gson.fromJson(joinGameReq.body(), JoinGameRequest.class);
-            JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameReq.headers("Authorization"), requestBody.playerColor(), requestBody.gameID());
+            JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, requestBody.playerColor(), requestBody.gameID());
             JoinGameResponse joinGameResponse = gameService.joinGame(joinGameRequest);
 
             joinGameResp.status(200);

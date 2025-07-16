@@ -19,17 +19,17 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
 
     @Override
     protected ChessPiece buildOriginal() {
-        return new ChessPiece(ChessGame.teamColor.WHITE, ChessPiece.pieceType.KING);
+        return new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.KING);
     }
 
     @Override
     protected Collection<ChessPiece> buildAllDifferent() {
         return List.of(
-                new ChessPiece(ChessGame.teamColor.BLACK, ChessPiece.pieceType.KING),
-                new ChessPiece(ChessGame.teamColor.WHITE, ChessPiece.pieceType.QUEEN),
-                new ChessPiece(ChessGame.teamColor.BLACK, ChessPiece.pieceType.QUEEN),
-                new ChessPiece(ChessGame.teamColor.WHITE, ChessPiece.pieceType.PAWN),
-                new ChessPiece(ChessGame.teamColor.BLACK, ChessPiece.pieceType.PAWN)
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.KING),
+                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.QUEEN),
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.QUEEN),
+                new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.pieceType.PAWN),
+                new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.pieceType.PAWN)
         );
     }
 
@@ -42,7 +42,7 @@ public class ChessPieceTests extends EqualsTestingUtility<ChessPiece> {
         // 6 piece types * 2 team colors = 12 different pieces
         Collection<ChessPiece> allPossiblePieces =
                 Arrays.stream(ChessPiece.pieceType.values())
-                .flatMap(pieceType -> Arrays.stream(ChessGame.teamColor.values())
+                .flatMap(pieceType -> Arrays.stream(ChessGame.TeamColor.values())
                 .map(teamColor -> new ChessPiece(teamColor, pieceType)))
                 .toList();
 

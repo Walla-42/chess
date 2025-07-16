@@ -203,7 +203,7 @@ public class StandardAPITests {
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
 
         //join as white
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.WHITE, createResult.getGameID());
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
 
         //try join
         TestResult joinResult = serverFacade.joinPlayer(joinRequest, existingAuth);
@@ -228,7 +228,7 @@ public class StandardAPITests {
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
 
         //try join as white
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.WHITE, createResult.getGameID());
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
         TestResult joinResult = serverFacade.joinPlayer(joinRequest, existingAuth + "bad stuff");
 
         //check
@@ -256,7 +256,7 @@ public class StandardAPITests {
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
 
         //add existing user as black
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.BLACK, createResult.getGameID());
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.BLACK, createResult.getGameID());
         serverFacade.joinPlayer(joinRequest, existingAuth);
 
         //register second user
@@ -278,7 +278,7 @@ public class StandardAPITests {
         serverFacade.createGame(createRequest, existingAuth);
 
         //try join as white
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.WHITE, null);
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, null);
         TestResult joinResult = serverFacade.joinPlayer(joinRequest, existingAuth);
 
         //check
@@ -315,30 +315,30 @@ public class StandardAPITests {
         //1 as black from A
         String game1Name = "I'm numbah one!";
         TestCreateResult game1 = serverFacade.createGame(new TestCreateRequest(game1Name), authA.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.BLACK, game1.getGameID()), authA.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.BLACK, game1.getGameID()), authA.getAuthToken());
         expectedList[0] = new TestListEntry(game1.getGameID(), game1Name, null, authA.getUsername());
 
 
         //1 as white from B
         String game2Name = "Lonely";
         TestCreateResult game2 = serverFacade.createGame(new TestCreateRequest(game2Name), authB.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.WHITE, game2.getGameID()), authB.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, game2.getGameID()), authB.getAuthToken());
         expectedList[1] = new TestListEntry(game2.getGameID(), game2Name, authB.getUsername(), null);
 
 
         //1 of each from C
         String game3Name = "GG";
         TestCreateResult game3 = serverFacade.createGame(new TestCreateRequest(game3Name), authC.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.WHITE, game3.getGameID()), authC.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.BLACK, game3.getGameID()), authA.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, game3.getGameID()), authC.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.BLACK, game3.getGameID()), authA.getAuthToken());
         expectedList[2] = new TestListEntry(game3.getGameID(), game3Name, authC.getUsername(), authA.getUsername());
 
 
         //C play self
         String game4Name = "All by myself";
         TestCreateResult game4 = serverFacade.createGame(new TestCreateRequest(game4Name), authC.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.WHITE, game4.getGameID()), authC.getAuthToken());
-        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.teamColor.BLACK, game4.getGameID()), authC.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, game4.getGameID()), authC.getAuthToken());
+        serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.BLACK, game4.getGameID()), authC.getAuthToken());
         expectedList[3] = new TestListEntry(game4.getGameID(), game4Name, authC.getUsername(), authC.getUsername());
 
 
@@ -383,7 +383,7 @@ public class StandardAPITests {
         assertHttpOk(logoutResult);
 
 
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.WHITE, createResult.getGameID());
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
         TestResult joinResult = serverFacade.joinPlayer(joinRequest, loginOne.getAuthToken());
         assertHttpOk(joinResult);
 
@@ -412,7 +412,7 @@ public class StandardAPITests {
         TestCreateResult createResult = serverFacade.createGame(new TestCreateRequest("Clear game"),
                 registerResult.getAuthToken());
 
-        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.teamColor.WHITE, createResult.getGameID());
+        TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
         serverFacade.joinPlayer(joinRequest, registerResult.getAuthToken());
 
         //do clear

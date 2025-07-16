@@ -31,7 +31,7 @@ public class ClearDbServiceTest {
     }
 
     @Test
-    void clear_Positive() {
+    void clearPositive() {
         assertNotNull(authDAO.getAuth("authToken"));
         assertFalse(gameDAO.listGames().isEmpty());
         assertNotNull(userDAO.getUser("user"));

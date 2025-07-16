@@ -1,4 +1,4 @@
-package chess.chessMoveCalculators;
+package chess.chessmovecalculators;
 
 /**
  * class extension of the SharedCalculatorLogic class returning the allowed direction for the Queen chess piece

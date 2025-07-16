@@ -45,7 +45,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void listGames_Positive() throws Exception {
+    void listGamesPositive() throws Exception {
         gameDAO.createGame("game1");
         gameDAO.createGame("game2");
 
@@ -57,14 +57,14 @@ public class GameServiceTest {
     }
 
     @Test
-    void listGames_Negative_InvalidToken() {
+    void listGamesNegativeInvalidToken() {
         ListGamesRequest request = new ListGamesRequest("invalid-token");
 
         assertThrows(UnauthorizedAccessException.class, () -> gameService.listGames(request));
     }
 
     @Test
-    void createGame_Positive() throws Exception {
+    void createGamePositive() throws Exception {
         CreateGameRequest request = new CreateGameRequest(validToken, "MyGame");
         CreateGameResponse response = gameService.createGame(request);
 
@@ -72,21 +72,21 @@ public class GameServiceTest {
     }
 
     @Test
-    void createGame_Negative_MissingGameName() {
+    void createGameNegativeMissingGameName() {
         CreateGameRequest request = new CreateGameRequest(validToken, null);
 
         assertThrows(BadRequestException.class, () -> gameService.createGame(request));
     }
 
     @Test
-    void createGame_Negative_InvalidToken() {
+    void createGameNegativeInvalidToken() {
         CreateGameRequest request = new CreateGameRequest("invalid-token", "MyGame");
 
         assertThrows(UnauthorizedAccessException.class, () -> gameService.createGame(request));
     }
 
     @Test
-    void joinGame_Positive() throws Exception {
+    void joinGamePositive() throws Exception {
         int gameID = gameDAO.createGame("JoinGameTest").gameID();
 
         JoinGameRequest request = new JoinGameRequest(validToken, "white", gameID);
@@ -97,7 +97,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void joinGame_Negative_InvalidToken() {
+    void joinGameNegativeInvalidToken() {
         int gameID = gameDAO.createGame("JoinGameFail").gameID();
         JoinGameRequest request = new JoinGameRequest("invalid-token", "black", gameID);
 
@@ -105,7 +105,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void joinGame_Negative_BadRequest_MissingColor() {
+    void joinGameNegativeBadRequestMissingColor() {
         int gameID = gameDAO.createGame("JoinGameNoColor").gameID();
         JoinGameRequest request = new JoinGameRequest(validToken, null, gameID);
 
@@ -113,7 +113,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void joinGame_Negative_BadRequest_MissingGameID() {
+    void joinGameNegativeBadRequestMissingGameID() {
         JoinGameRequest request = new JoinGameRequest(validToken, "white", null);
 
         assertThrows(BadRequestException.class, () -> gameService.joinGame(request));

@@ -33,13 +33,13 @@ public class TestUtilities {
     }
 
 
-    private static final Map<Character, ChessPiece.PieceType> CHAR_TO_TYPE_MAP = Map.of(
-            'p', ChessPiece.PieceType.PAWN,
-            'n', ChessPiece.PieceType.KNIGHT,
-            'r', ChessPiece.PieceType.ROOK,
-            'q', ChessPiece.PieceType.QUEEN,
-            'k', ChessPiece.PieceType.KING,
-            'b', ChessPiece.PieceType.BISHOP);
+    private static final Map<Character, ChessPiece.pieceType> CHAR_TO_TYPE_MAP = Map.of(
+            'p', ChessPiece.pieceType.PAWN,
+            'n', ChessPiece.pieceType.KNIGHT,
+            'r', ChessPiece.pieceType.ROOK,
+            'q', ChessPiece.pieceType.QUEEN,
+            'k', ChessPiece.pieceType.KING,
+            'b', ChessPiece.pieceType.BISHOP);
 
     public static ChessBoard loadBoard(String boardText) {
         var board = new ChessBoard();
@@ -55,8 +55,8 @@ public class TestUtilities {
                 case '|' -> {
                 }
                 default -> {
-                    ChessGame.TeamColor color = Character.isLowerCase(c) ? ChessGame.TeamColor.BLACK
-                            : ChessGame.TeamColor.WHITE;
+                    ChessGame.teamColor color = Character.isLowerCase(c) ? ChessGame.teamColor.BLACK
+                            : ChessGame.teamColor.WHITE;
                     var type = CHAR_TO_TYPE_MAP.get(Character.toLowerCase(c));
                     var position = new ChessPosition(row, column);
                     var piece = new ChessPiece(color, type);

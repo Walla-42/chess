@@ -24,7 +24,7 @@ public class MemoryUserDataDAO implements UserDAO{
      * @param userData Collection of all user data to be added to the database
      */
     public void createUser(UserData userData) {
-        userDatabase.put(userData.getUsername(), userData);
+        userDatabase.put(userData.username(), userData);
     }
 
     /**

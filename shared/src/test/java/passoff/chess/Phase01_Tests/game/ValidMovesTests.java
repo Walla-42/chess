@@ -19,7 +19,7 @@ public class ValidMovesTests {
     public void forcedMove() {
 
         var game = new ChessGame();
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
         game.setBoard(TestUtilities.loadBoard("""
                     | | | | | | | | |
                     | | | | | | | | |
@@ -93,7 +93,7 @@ public class ValidMovesTests {
     public void kingInDanger() {
 
         var game = new ChessGame();
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
         game.setBoard(TestUtilities.loadBoard("""
                     |R| | | | | | | |
                     | | | |k| | | |b|
@@ -155,7 +155,7 @@ public class ValidMovesTests {
     public void validMovesOtherTeam() {
         var game = new ChessGame();
         game.setBoard(TestUtilities.defaultBoard());
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
 
         ChessPosition position = new ChessPosition(2, 5);
         var validMoves = TestUtilities.loadMoves(position, new int[][]{

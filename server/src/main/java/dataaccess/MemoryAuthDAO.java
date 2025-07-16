@@ -17,9 +17,9 @@ public class MemoryAuthDAO implements AuthDAO{
      */
     public void createAuth(AuthData authData) {
 
-        tokenAuthDatabase.put(authData.getAuthToken(), authData);
+        tokenAuthDatabase.put(authData.authToken(), authData);
 
-        userAuthDatabase.computeIfAbsent(authData.getUsername(), username -> new HashSet<>()).add(authData.getAuthToken());
+        userAuthDatabase.computeIfAbsent(authData.username(), username -> new HashSet<>()).add(authData.authToken());
     }
 
     /**
@@ -31,13 +31,13 @@ public class MemoryAuthDAO implements AuthDAO{
 
         AuthData data = tokenAuthDatabase.remove(authToken);
         if (data != null) {
-            Set<String> tokens = userAuthDatabase.get(data.getUsername());
+            Set<String> tokens = userAuthDatabase.get(data.username());
 
             if (tokens != null) {
                 tokens.remove(authToken);
 
                 if (tokens.isEmpty()) {
-                    userAuthDatabase.remove(data.getUsername());
+                    userAuthDatabase.remove(data.username());
                 }
             }
         }

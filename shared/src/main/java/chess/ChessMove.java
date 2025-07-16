@@ -12,10 +12,10 @@ public class ChessMove {
 
     ChessPosition startPosition;
     ChessPosition endPosition;
-    ChessPiece.PieceType promotionPiece;
+    ChessPiece.pieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
-                     ChessPiece.PieceType promotionPiece) {
+                     ChessPiece.pieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
@@ -45,7 +45,7 @@ public class ChessMove {
      *
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
-    public ChessPiece.PieceType getPromotionPiece() {
+    public ChessPiece.pieceType getPromotionPiece() {
         return promotionPiece;
     }
 

@@ -1,11 +1,8 @@
-package chess.chessMoveCalculators;
+package chess.chessmovecalculators;
 
 import chess.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Class built to house the shared move calculator logic for all pieces on the chessboard except the pawn.
@@ -36,7 +33,7 @@ public abstract class SharedCalculatorLogic implements PieceMovesCalculator{
         ChessPiece piece = board.getPiece(myPosition);
         if (piece == null) return moves;
 
-        ChessGame.TeamColor team = piece.getTeamColor();
+        ChessGame.teamColor team = piece.getTeamColor();
 
         int[][] directionalMoves = allowedDirectionalMoves();
         if (directionalMoves != null){

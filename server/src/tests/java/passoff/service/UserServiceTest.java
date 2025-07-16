@@ -47,7 +47,7 @@ public class UserServiceTest {
 
         UserData user = userDAO.getUser("user");
         assertNotNull(user);
-        assertEquals("password", user.getPassword());
+        assertEquals("password", user.password());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class UserServiceTest {
         assertNotNull(response.authToken());
 
         AuthData auth = authDAO.getAuth(response.authToken());
-        assertEquals("user", auth.getUsername());
+        assertEquals("user", auth.username());
     }
 
     @Test

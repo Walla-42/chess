@@ -16,7 +16,7 @@ public class MakeMoveTests {
     @BeforeEach
     public void setUp() {
         game = new ChessGame();
-        game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        game.setTeamTurn(ChessGame.teamColor.WHITE);
         game.setBoard(TestUtilities.defaultBoard());
     }
 
@@ -33,7 +33,7 @@ public class MakeMoveTests {
                 | | | | | | | | |
                 | |K| | | | | | |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        game.setTeamTurn(ChessGame.teamColor.WHITE);
 
         var kingStartPosition = new ChessPosition(1, 2);
         var kingEndPosition = new ChessPosition(1, 1);
@@ -64,7 +64,7 @@ public class MakeMoveTests {
                 | | | | | | | | |
                 |K| |k| | | | | |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
 
         var queenStartPosition = new ChessPosition(6, 7);
         var queenEndPosition = new ChessPosition(1, 2);
@@ -95,7 +95,7 @@ public class MakeMoveTests {
                 | | | | | | | | |
                 |K| | | | | | | |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        game.setTeamTurn(ChessGame.teamColor.WHITE);
 
         var rookStartPosition = new ChessPosition(3, 8);
         var rookEndPosition = new ChessPosition(7, 8);
@@ -126,7 +126,7 @@ public class MakeMoveTests {
                 | | | | | | | |P|
                 | | | | |K| | | |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
 
         var knightStartPosition = new ChessPosition(6, 3);
         var knightEndPosition = new ChessPosition(4, 4);
@@ -157,7 +157,7 @@ public class MakeMoveTests {
                 | | | | | | | | |
                 | | |B| |K| | | |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        game.setTeamTurn(ChessGame.teamColor.WHITE);
 
         var bishopStartPosition = new ChessPosition(1, 3);
         var bishopEndPosition = new ChessPosition(6, 8);
@@ -188,7 +188,7 @@ public class MakeMoveTests {
                 | | | | | | |P| |
                 | | | | | | |K| |
                 """));
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
 
         var pawnStartPosition = new ChessPosition(7, 2);
         var pawnEndPosition = new ChessPosition(6, 2);
@@ -212,10 +212,10 @@ public class MakeMoveTests {
         String failureMessage = "Team color not changed after move made";
 
         game.makeMove(new ChessMove(new ChessPosition(2, 5), new ChessPosition(4, 5), null));
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, game.getTeamTurn(), failureMessage);
+        Assertions.assertEquals(ChessGame.teamColor.BLACK, game.getTeamTurn(), failureMessage);
 
         game.makeMove(new ChessMove(new ChessPosition(7, 5), new ChessPosition(5, 5), null));
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, game.getTeamTurn(), failureMessage);
+        Assertions.assertEquals(ChessGame.teamColor.WHITE, game.getTeamTurn(), failureMessage);
     }
 
     @Test
@@ -342,9 +342,9 @@ public class MakeMoveTests {
 
 
     @ParameterizedTest
-    @EnumSource(value = ChessPiece.PieceType.class, names = {"QUEEN", "ROOK", "KNIGHT", "BISHOP"})
+    @EnumSource(value = ChessPiece.pieceType.class, names = {"QUEEN", "ROOK", "KNIGHT", "BISHOP"})
     @DisplayName("Pawn Promotion")
-    public void promotionMoves(ChessPiece.PieceType promotionType) throws InvalidMoveException {
+    public void promotionMoves(ChessPiece.pieceType promotionType) throws InvalidMoveException {
         String pieceAtStart = "After move, a piece is still present in the start position";
         String noPieceAtEnd = "After move, no piece found at the end position";
         String incorrectType = "Found piece at end position is not the correct piece type";
@@ -369,11 +369,11 @@ public class MakeMoveTests {
         ChessPiece whiteEndPiece = game.getBoard().getPiece(whitePromotion.getEndPosition());
         Assertions.assertNotNull(whiteEndPiece, noPieceAtEnd);
         Assertions.assertEquals(promotionType, whiteEndPiece.getPieceType(), incorrectType);
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, whiteEndPiece.getTeamColor(), incorrectColor);
+        Assertions.assertEquals(ChessGame.teamColor.WHITE, whiteEndPiece.getTeamColor(), incorrectColor);
 
 
         //Black take + promotion
-        game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        game.setTeamTurn(ChessGame.teamColor.BLACK);
         ChessMove blackPromotion = new ChessMove(new ChessPosition(2, 5), new ChessPosition(1, 6), promotionType);
         game.makeMove(blackPromotion);
 
@@ -381,6 +381,6 @@ public class MakeMoveTests {
         ChessPiece blackEndPiece = game.getBoard().getPiece(blackPromotion.getEndPosition());
         Assertions.assertNotNull(blackEndPiece, noPieceAtEnd);
         Assertions.assertEquals(promotionType, blackEndPiece.getPieceType(), incorrectType);
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, blackEndPiece.getTeamColor(), incorrectColor);
+        Assertions.assertEquals(ChessGame.teamColor.BLACK, blackEndPiece.getTeamColor(), incorrectColor);
     }
 }

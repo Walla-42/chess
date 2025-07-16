@@ -3,7 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.Objects;
 
-import chess.chessMoveCalculators.*;
+import chess.chessmovecalculators.*;
 
 
 /**
@@ -14,10 +14,10 @@ import chess.chessMoveCalculators.*;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor color;
-    private final PieceType type;
+    private final ChessGame.teamColor color;
+    private final pieceType type;
 
-    public ChessPiece(ChessGame.TeamColor TeamColor, ChessPiece.PieceType PieceType) {
+    public ChessPiece(ChessGame.teamColor TeamColor, pieceType PieceType) {
         this.color = TeamColor;
         this.type = PieceType;
     }
@@ -35,7 +35,7 @@ public class ChessPiece {
     /**
      * The various different chess piece options
      */
-    public enum PieceType {
+    public enum pieceType {
         KING,
         QUEEN,
         BISHOP,
@@ -47,14 +47,14 @@ public class ChessPiece {
     /**
      * @return Which team this chess piece belongs to
      */
-    public ChessGame.TeamColor getTeamColor() {
+    public ChessGame.teamColor getTeamColor() {
         return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
-    public PieceType getPieceType() {
+    public pieceType getPieceType() {
         return type;
     }
 
@@ -106,7 +106,7 @@ public class ChessPiece {
         }
 
         String stringValue;
-        if (color == ChessGame.TeamColor.WHITE){
+        if (color == ChessGame.teamColor.WHITE){
             stringValue = String.valueOf(typeSymbol);
         } else {
             stringValue = String.valueOf(Character.toLowerCase(typeSymbol));

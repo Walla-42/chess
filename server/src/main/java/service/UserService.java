@@ -73,7 +73,7 @@ public class UserService {
             throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 
-        if (!comparePasswords(loginRequest.password(), userData.getPassword())) {
+        if (!comparePasswords(loginRequest.password(), userData.password())) {
             throw new UnauthorizedAccessException("Error: Username or password is incorrect");
         }
 

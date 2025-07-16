@@ -2,7 +2,6 @@ package passoff.service;
 
 import dataaccess.AuthDAO;
 import dataaccess.MemoryAuthDAO;
-import dataaccess.exceptions.BadRequestException;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,39 +21,39 @@ public class AuthServiceTest {
     }
 
     @Test
-    void createAuth_Positive() {
-        AuthData authData = new AuthData("authToken", "user1");
+    void createAuthPositive() {
+        AuthData authData = new AuthData("authToken", "user");
 
         assertDoesNotThrow(() -> authService.createAuth(authData));
         assertEquals(authData, authDAO.getAuth("authToken"));
     }
 
     @Test
-    void createAuth_No_Null_Data() {
-        AuthData authData = new AuthData("authToken", "user1");
+    void createAuthNoNullData() {
+        AuthData authData = new AuthData("authToken", "user");
 
-        assertNotNull(authData.getUsername());
-        assertNotNull(authData.getAuthToken());
+        assertNotNull(authData.username());
+        assertNotNull(authData.authToken());
     }
 
     @Test
-    void getAuth_Positive(){
-        AuthData newAuth = new AuthData("authToken", "user1");
+    void getAuthPositive(){
+        AuthData newAuth = new AuthData("authToken", "user");
         authService.createAuth(newAuth);
 
-        AuthData result = authService.getAuth(newAuth.getAuthToken());
+        AuthData result = authService.getAuth(newAuth.authToken());
         assertEquals(result, newAuth);
     }
 
     @Test
-    void getAuth_Negative_Invalid_Token() {
-        AuthData result = authService.getAuth("nonexistent-token");
+    void getAuthNegativeInvalidToken() {
+        AuthData result = authService.getAuth("authToken");
         assertNull(result);
     }
 
     @Test
-    void deleteAuth_Positive() {
-        AuthData auth = new AuthData("authToken", "user1");
+    void deleteAuthPositive() {
+        AuthData auth = new AuthData("authToken", "user");
         authService.createAuth(auth);
 
         authService.deleteAuth("authToken");
@@ -63,30 +62,30 @@ public class AuthServiceTest {
     }
 
     @Test
-    void deleteAuth_Negative_Invalid_Token(){
-        AuthData originalAuth = new AuthData("valid-token", "user1");
+    void deleteAuthNegativeInvalidToken(){
+        AuthData originalAuth = new AuthData("authToken", "user");
         authService.createAuth(originalAuth);
 
-        authService.deleteAuth("nonexistent-token");
+        authService.deleteAuth("invalidAuthToken");
 
-        AuthData fetched = authService.getAuth("valid-token");
+        AuthData fetched = authService.getAuth("authToken");
 
         assertEquals(originalAuth, fetched);
     }
 
     @Test
-    void generateAuth_Positive() {
+    void generateAuthPositive() {
         String token = authService.generateAuth();
         assertNotNull(token);
         assertFalse(token.isEmpty());
 
         // Simulate using the token
-        authService.createAuth(new AuthData(token, "someone"));
-        assertEquals("someone", authService.getAuth(token).getUsername());
+        authService.createAuth(new AuthData(token, "username"));
+        assertEquals("username", authService.getAuth(token).username());
     }
 
     @Test
-    void generateAuth_Uniqueness() {
+    void generateAuthUniqueness() {
         // Simulate storing multiple tokens to ensure no duplicates
         for (int i = 0; i < 10000; i++) {
             String authToken = authService.generateAuth();

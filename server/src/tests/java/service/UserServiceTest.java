@@ -25,8 +25,12 @@ public class UserServiceTest {
 
     private UserService userService;
     private UserDAO userDAO;
-    private AuthDAO authDAO;
     private AuthService authService;
+    private AuthDAO authDAO;
+
+    private final String validUsername = "username";
+    private final String validPassword = "password";
+    private final String validEmail = "user@email.com";
 
     @BeforeEach
     void setUp() {
@@ -36,58 +40,83 @@ public class UserServiceTest {
         userService = new UserService(userDAO, authService);
     }
 
+//----------------------------------------registerUser Tests------------------------------------------------------------
+
     @Test
     void registerUserPositive() throws Exception {
-        RegisterRequest request = new RegisterRequest("user", "password", "user@email.com");
-        RegisterResponse response = userService.registerUser(request);
+        RegisterRequest registerRequest = new RegisterRequest(validUsername, validPassword, validEmail);
+        RegisterResponse response = userService.registerUser(registerRequest);
 
-        assertEquals("user", response.username());
+        // check registration returns the correct user with a valid authToken
+        assertEquals(validUsername, response.username());
         assertNotNull(response.authToken());
 
-        UserData user = userDAO.getUser("user");
+        UserData user = userDAO.getUser(validUsername);
+
+        // check that registered user is stored correctly in database
         assertNotNull(user);
-        assertEquals("password", user.password());
+        assertEquals(validPassword, user.password());
     }
 
     @Test
     void registerUserNegativeUsernameTaken() throws Exception {
-        RegisterRequest request = new RegisterRequest("user", "password", "user@email.com");
-        userService.registerUser(request);
+        RegisterRequest registerRequest = new RegisterRequest(validUsername, validPassword, validEmail);
+        userService.registerUser(registerRequest);
 
-        RegisterRequest duplicate = new RegisterRequest("user", "password", "user@email.com");
-
+        RegisterRequest duplicate = new RegisterRequest(validUsername, validPassword, validEmail);
         assertThrows(UsernameTakenException.class, () -> userService.registerUser(duplicate));
     }
 
     @Test
     void registerUserNegativeMissingField() {
-        RegisterRequest badRequest = new RegisterRequest(null, "password", "user@email.com");
-
+        // Register user missing username
+        RegisterRequest badRequest = new RegisterRequest(null, validPassword, validEmail);
         assertThrows(BadRequestException.class, () -> userService.registerUser(badRequest));
+
+        // Register user missing password
+        RegisterRequest badRequest2 = new RegisterRequest(validUsername, null, validEmail);
+        assertThrows(BadRequestException.class, () -> userService.registerUser(badRequest2));
+
+        // Register user missing email
+        RegisterRequest badRequest3 = new RegisterRequest(validUsername, validPassword, null);
+        assertThrows(BadRequestException.class, () -> userService.registerUser(badRequest3));
     }
 
-    @Test
-    void loginUserPositive() throws Exception {
-        // Register first
-        RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
-        userService.registerUser(reg);
+//--------------------------------------------loginUser Tests-----------------------------------------------------------
 
-        LoginRequest loginRequest = new LoginRequest("user", "password");
+
+    @Test
+    void loginUserPositiveMultipleAuth() throws Exception {
+        RegisterRequest register = new RegisterRequest(validUsername, validPassword, validEmail);
+        RegisterResponse registerResponse = userService.registerUser(register);
+
+        // check authData returned not null and username is username that was given
+        assertNotNull(registerResponse.authToken());
+        assertNotNull(registerResponse.username());
+        assertEquals(validUsername, registerResponse.username());
+
+        LoginRequest loginRequest = new LoginRequest(validUsername, validPassword);
         LoginResponse response = userService.loginUser(loginRequest);
 
-        assertEquals("user", response.username());
+        // check that second authToken given still accesses the correct user
+        assertEquals(validUsername, response.username());
         assertNotNull(response.authToken());
 
+        // check that auth stored in database still gives the correct user
         AuthData auth = authDAO.getAuth(response.authToken());
-        assertEquals("user", auth.username());
+        assertEquals(validUsername, auth.username());
+
+        // check that original auth still gets the correct user
+        AuthData auth2 = authDAO.getAuth(registerResponse.authToken());
+        assertEquals(validUsername, auth2.username());
     }
 
     @Test
     void loginUserNegativeWrongPassword() throws Exception {
-        RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
-        userService.registerUser(reg);
+        RegisterRequest registerRequest = new RegisterRequest(validUsername, validPassword, validEmail);
+        userService.registerUser(registerRequest);
 
-        LoginRequest loginRequest = new LoginRequest("user", "InvalidPassword");
+        LoginRequest loginRequest = new LoginRequest(validUsername, validEmail);
 
         assertThrows(UnauthorizedAccessException.class, () -> userService.loginUser(loginRequest));
     }
@@ -100,22 +129,26 @@ public class UserServiceTest {
     }
 
     @Test
-    void loginUserNegativeMissingUsername() {
-        LoginRequest badRequest = new LoginRequest(null, "password");
-
+    void loginUserNegativeMissingData() {
+        LoginRequest badRequest = new LoginRequest(null, validPassword);
         assertThrows(BadRequestException.class, () -> userService.loginUser(badRequest));
+
+        LoginRequest badRequest2 = new LoginRequest(validUsername, null);
+        assertThrows(BadRequestException.class, () -> userService.loginUser(badRequest2));
     }
+
+//--------------------------------------------logoutUser Tests----------------------------------------------------------
 
     @Test
     void logoutUserPositive() throws Exception {
-        RegisterRequest reg = new RegisterRequest("user", "password", "user@email.com");
-        RegisterResponse regResponse = userService.registerUser(reg);
+        RegisterRequest registerRequest = new RegisterRequest(validUsername, validPassword, validEmail);
+        RegisterResponse regResponse = userService.registerUser(registerRequest);
 
         LogoutRequest logoutRequest = new LogoutRequest(regResponse.authToken());
 
         LogoutResponse logoutResponse = userService.logoutUser(logoutRequest);
-        assertNotNull(logoutResponse);
 
+        assertNotNull(logoutResponse);
         assertNull(authDAO.getAuth(regResponse.authToken()));
     }
 

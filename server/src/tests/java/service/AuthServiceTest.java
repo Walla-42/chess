@@ -14,76 +14,82 @@ public class AuthServiceTest {
     private AuthService authService;
     private AuthDAO authDAO;
 
+    private final String validAuthToken = "authToken";
+    private final String validUsername = "username";
+
     @BeforeEach
     void setUp() {
         authDAO = new MemoryAuthDAO();
         authService = new AuthService(authDAO);
     }
-
+//--------------------------------------------------createAuth Tests----------------------------------------------------
     @Test
     void createAuthPositive() {
-        AuthData authData = new AuthData("authToken", "user");
+        AuthData authData = new AuthData(validAuthToken, validUsername);
 
         assertDoesNotThrow(() -> authService.createAuth(authData));
-        assertEquals(authData, authDAO.getAuth("authToken"));
+        assertEquals(authData, authDAO.getAuth(validAuthToken));
     }
 
     @Test
-    void createAuthNoNullData() {
-        AuthData authData = new AuthData("authToken", "user");
-
-        assertNotNull(authData.username());
-        assertNotNull(authData.authToken());
-    }
-
-    @Test
-    void createAuthNegativeNullDataPresent() {
-        AuthData authData = new AuthData(null, "authToken");
-
+    void createAuthNegativeNullToken() {
+        AuthData authData = new AuthData(null, validUsername);
         assertThrows(BadRequestException.class, () -> authService.createAuth(authData));
-
-        AuthData newAuthData = new AuthData("authToken", null);
-
-        assertThrows(BadRequestException.class, () -> authService.createAuth(newAuthData));
-
     }
+
+    @Test
+    void createAuthNegativeNullUsername() {
+        AuthData newAuthData = new AuthData(validAuthToken, null);
+        assertThrows(BadRequestException.class, () -> authService.createAuth(newAuthData));
+    }
+
+//-----------------------------------------------------getAuth Tests----------------------------------------------------
 
     @Test
     void getAuthPositive() throws Exception {
-        AuthData newAuth = new AuthData("authToken", "user");
+        AuthData newAuth = new AuthData(validAuthToken, validUsername);
         authService.createAuth(newAuth);
 
+        // Checks that the data returned from getAuth is the same as was passed into createAuth
         AuthData result = authService.getAuth(newAuth.authToken());
         assertEquals(result, newAuth);
     }
 
     @Test
-    void getAuthNegativeInvalidToken() {
-        AuthData result = authService.getAuth("authToken");
+    void getAuthNegativeInvalidToken() throws Exception {
+        AuthData newAuth = new AuthData(validAuthToken, validUsername);
+        authService.createAuth(newAuth);
+
+        // checks that nothing is fetched with an invalid authToken. Error Handling done in specific use cases.
+        AuthData result = authService.getAuth("invalidAuthToken");
         assertNull(result);
     }
 
+//--------------------------------------------------deleteAuth Tests----------------------------------------------------
+
+
     @Test
     void deleteAuthPositive() throws Exception {
-        AuthData auth = new AuthData("authToken", "user");
+        AuthData auth = new AuthData(validAuthToken, validUsername);
         authService.createAuth(auth);
 
-        authService.deleteAuth("authToken");
+        authService.deleteAuth(validAuthToken);
 
-        assertNull(authService.getAuth("authToken"));
+        assertNull(authService.getAuth(validAuthToken));
     }
 
     @Test
     void deleteAuthNegativeInvalidToken() throws Exception {
-        AuthData originalAuth = new AuthData("authToken", "user");
+        AuthData originalAuth = new AuthData(validAuthToken, validUsername);
         authService.createAuth(originalAuth);
 
         authService.deleteAuth("invalidAuthToken");
 
-        AuthData fetched = authService.getAuth("authToken");
-
-        assertEquals(originalAuth, fetched);
+        AuthData fetchedData = authService.getAuth(validAuthToken);
+        assertEquals(originalAuth, fetchedData);
     }
+
+//--------------------------------------------------generateAuth Tests--------------------------------------------------
 
     @Test
     void generateAuthPositive() throws Exception {
@@ -91,17 +97,17 @@ public class AuthServiceTest {
         assertNotNull(token);
         assertFalse(token.isEmpty());
 
-        authService.createAuth(new AuthData(token, "username"));
-        assertEquals("username", authService.getAuth(token).username());
+        authService.createAuth(new AuthData(token, validUsername));
+        assertEquals(validUsername, authService.getAuth(token).username());
     }
 
     @Test
     void generateAuthUniqueness() throws Exception {
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             String authToken = authService.generateAuth();
 
             assertFalse(authDAO.tokenAlreadyExists(authToken));
-            authService.createAuth(new AuthData(authToken, "user" + i));
+            authService.createAuth(new AuthData(authToken, validUsername + i));
         }
     }
 }

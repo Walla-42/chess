@@ -80,10 +80,14 @@ java -jar client/target/client-jar-with-dependencies.jar
  
 
 ## Things to Do – Phase 2 : Chess Design
-- [ ] Design chess server / Complete sequence diagram of chess server
+- [x] Design chess server / Complete sequence diagram of chess server
 
 ## Things to Do – Phase 3 : Chess Web API
-- [ ] StandardAPITests
+- [x] StandardAPITests
+- [x] AuthServiceTests
+- [x] ClearDbServiceTests
+- [x] GameServiceTests
+- [x] UserServiceTests
 
 ## Things to Do - Phase 4 : Chess Database
 - [ ] DatabaseTests

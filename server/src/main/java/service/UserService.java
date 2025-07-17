@@ -13,8 +13,6 @@ import responses.LoginResponse;
 import responses.LogoutResponse;
 import responses.RegisterResponse;
 
-import java.util.Objects;
-
 public class UserService {
     private final UserDAO userDAO;
     private final AuthService authService;
@@ -43,7 +41,7 @@ public class UserService {
         }
 
         UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
-        userDAO.createUser(userData);
+        userDAO.putUser(userData);
 
         String authToken = authService.generateAuth();
 

@@ -18,7 +18,7 @@ public class ClearDbServiceTests {
     private MemoryUserDataDAO userDAO;
 
     @BeforeEach
-    void setUp() throws Exception{
+    void setUp() throws Exception {
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDataDAO();
         userDAO = new MemoryUserDataDAO();
@@ -26,7 +26,7 @@ public class ClearDbServiceTests {
 
         authDAO.createAuth(new AuthData("authToken", "user"));
         gameDAO.createGame("newGame");
-        userDAO.createUser(new UserData("user", "pass", "user@email.com"));
+        userDAO.putUser(new UserData("user", "pass", "user@email.com"));
     }
 
     @Test

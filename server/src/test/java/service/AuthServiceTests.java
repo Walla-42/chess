@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.AuthDAO;
+import dataaccess.Interfaces.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import model.AuthData;
@@ -22,7 +22,8 @@ public class AuthServiceTests {
         authDAO = new MemoryAuthDAO();
         authService = new AuthService(authDAO);
     }
-//--------------------------------------------------createAuth Tests----------------------------------------------------
+
+    //--------------------------------------------------createAuth Tests----------------------------------------------------
     @Test
     void createAuthPositive() {
         AuthData authData = new AuthData(validAuthToken, validUsername);

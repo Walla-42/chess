@@ -1,5 +1,6 @@
 package dataaccess;
 
+import dataaccess.Interfaces.UserDAO;
 import model.UserData;
 
 import java.util.HashMap;

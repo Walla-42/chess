@@ -1,17 +1,17 @@
 package server;
 
 import dataaccess.*;
+import dataaccess.Interfaces.AuthDAO;
+import dataaccess.Interfaces.GameDAO;
+import dataaccess.Interfaces.UserDAO;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
-import org.eclipse.jetty.server.Authentication;
 import service.AuthService;
 import service.ClearDbService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-
-import javax.xml.crypto.Data;
 
 
 public class Server {

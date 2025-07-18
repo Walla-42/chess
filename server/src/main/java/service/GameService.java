@@ -12,7 +12,7 @@ import responses.CreateGameResponse;
 import responses.JoinGameResponse;
 import responses.ListGamesResponse;
 import chess.ChessGame;
-import dataaccess.GameDAO;
+import dataaccess.Interfaces.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
@@ -25,7 +25,7 @@ public class GameService {
     private final GameDAO gameDAO;
     private final AuthService authService;
 
-    public GameService(GameDAO gameDAO, AuthService authService){
+    public GameService(GameDAO gameDAO, AuthService authService) {
         this.gameDAO = gameDAO;
         this.authService = authService;
     }
@@ -35,11 +35,10 @@ public class GameService {
      *
      * @param listGamesRequest ListGamesRequest Object containing the authToken of the users session
      * @return ListGamesResponse object containing an array of available games on the server
-     *
      * @throws UnauthorizedAccessException invalid authToken given
-     * @throws Exception all other exceptions
+     * @throws Exception                   all other exceptions
      */
-    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, Exception{
+    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, Exception {
         String authToken = listGamesRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {
@@ -57,12 +56,11 @@ public class GameService {
      *
      * @param createGameRequest CreateGameRequest object containing the users session authToken and the desired gameName
      * @return CreateGameResponse object containing GameID of created game
-     *
-     * @throws BadRequestException Missing gameName
+     * @throws BadRequestException         Missing gameName
      * @throws UnauthorizedAccessException Invalid authToken provided with request
      */
-    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException{
-        if (createGameRequest.gameName() == null){
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException {
+        if (createGameRequest.gameName() == null) {
             throw new BadRequestException("Error:must provide a game name");
         }
 
@@ -84,23 +82,22 @@ public class GameService {
      *
      * @param joinGameRequest JoinGameRequest object including the authToken and the gameID
      * @return JoinGameResponse Object
-     *
-     * @throws BadRequestException gameID or playerColor not provided in request
+     * @throws BadRequestException         gameID or playerColor not provided in request
      * @throws UnauthorizedAccessException Invalid authToken provided with request
-     * @throws GameTakenException game is already taken
-     * @throws Exception all other exceptions
+     * @throws GameTakenException          game is already taken
+     * @throws Exception                   all other exceptions
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
             UnauthorizedAccessException, GameTakenException, Exception {
 
-        if (joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null){
+        if (joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
         }
 
         String authToken = joinGameRequest.authToken();
         AuthData authorization = authService.getAuth(authToken);
 
-        if (authToken == null || authorization == null){
+        if (authToken == null || authorization == null) {
             throw new UnauthorizedAccessException("Error: unauthorized");
         }
 
@@ -128,19 +125,19 @@ public class GameService {
     /**
      * Helper service method for checking if the color requested is available when joining a game
      *
-     * @param requestedGame the GameData of the requested game
+     * @param requestedGame  the GameData of the requested game
      * @param requestedColor the TeamColor desired by the user
-     *
      * @throws GameTakenException Color already taken by another player
      */
-    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException{
-        if (requestedColor == BLACK && requestedGame.blackUserName() != null){
+    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException {
+        if (requestedColor == BLACK && requestedGame.blackUserName() != null) {
             throw new GameTakenException("Error: color already taken");
         }
 
-        if (requestedColor == WHITE && requestedGame.whiteUserName() != null){
+        if (requestedColor == WHITE && requestedGame.whiteUserName() != null) {
             throw new GameTakenException("Error: color already taken");
-        };
+        }
+        ;
     }
 
 }

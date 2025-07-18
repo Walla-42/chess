@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.Interfaces;
 
 import model.UserData;
 

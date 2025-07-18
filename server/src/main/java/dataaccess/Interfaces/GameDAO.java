@@ -1,6 +1,5 @@
-package dataaccess;
+package dataaccess.Interfaces;
 
-import chess.ChessGame;
 import model.GamesObject;
 import model.GameData;
 

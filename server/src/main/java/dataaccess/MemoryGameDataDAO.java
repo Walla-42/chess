@@ -1,5 +1,6 @@
 package dataaccess;
 
+import dataaccess.Interfaces.GameDAO;
 import model.GamesObject;
 import chess.ChessGame;
 import model.GameData;
@@ -8,7 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class MemoryGameDataDAO implements GameDAO{
+public class MemoryGameDataDAO implements GameDAO {
     HashMap<Integer, GameData> gameDatabase = new HashMap<>();
     HashSet<Integer> gameIDs = new HashSet<>();
     private static int gameID = 1;
@@ -18,10 +19,10 @@ public class MemoryGameDataDAO implements GameDAO{
      *
      * @return Collectin of GamesObject that can be used by the UserHandlerClass
      */
-    public Collection<GamesObject> listGames(){
+    public Collection<GamesObject> listGames() {
         HashSet<GamesObject> activeGames = new HashSet<>();
 
-        for (Integer gameID : gameIDs){
+        for (Integer gameID : gameIDs) {
             GameData gameData = gameDatabase.get(gameID);
             GamesObject game = new GamesObject(gameData.gameID(),
                     gameData.whiteUserName(),
@@ -39,7 +40,7 @@ public class MemoryGameDataDAO implements GameDAO{
      * @param gameName Desired name of the game
      * @return GameData for the new Game.
      */
-    public GameData createGame(String gameName){
+    public GameData createGame(String gameName) {
         GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
         gameDatabase.put(gameID, newGame);
         gameIDs.add(gameID);
@@ -53,7 +54,7 @@ public class MemoryGameDataDAO implements GameDAO{
      * @param gameID ID of the game to be fetched
      * @return GameData for the Game
      */
-    public GameData getGame(Integer gameID){
+    public GameData getGame(Integer gameID) {
         return gameDatabase.get(gameID);
     }
 
@@ -62,7 +63,7 @@ public class MemoryGameDataDAO implements GameDAO{
      *
      * @param gameData GameData Object with updated game information
      */
-    public void updateGame(GameData gameData){
+    public void updateGame(GameData gameData) {
         gameDatabase.remove(gameData.gameID());
         gameDatabase.put(gameData.gameID(), gameData);
         gameIDs.add(gameData.gameID());
@@ -71,7 +72,7 @@ public class MemoryGameDataDAO implements GameDAO{
     /**
      * Method for clearing the GameDatabase
      */
-    public void clearDB(){
+    public void clearDB() {
         gameDatabase.clear();
         gameIDs.clear();
     }

@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.UserDAO;
+import dataaccess.Interfaces.UserDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import dataaccess.exceptions.UsernameTakenException;

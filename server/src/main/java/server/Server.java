@@ -16,22 +16,20 @@ import spark.*;
 
 
 public class Server {
-    private final boolean useMemory = true; //use this to toggle in memory or Database usage;
 
-    private AuthDAO authDAO;
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
+    //use this to toggle in memory or Database usage;
+    private final boolean useMemory = false;
+    private final AuthDAO authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
+    private final UserDAO userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
+    private final GameDAO gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
 
-    {
+    static {
         try {
-            authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
-            userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
-            gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
+            DatabaseManager.createDatabase();
         } catch (DataAccessException e) {
-            System.err.println("Unable to initialize server");
+            throw new RuntimeException(e.getMessage());
         }
     }
-
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

@@ -11,8 +11,14 @@ import java.sql.SQLException;
 
 public class DatabaseAuthDAO implements AuthDAO {
 
-    public DatabaseAuthDAO() throws DataAccessException {
-        configureDatabase();
+    public DatabaseAuthDAO() {
+        try (var conn = DatabaseManager.getConnection()) {
+            var createTable = conn.prepareStatement(createStatement);
+            createTable.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -66,15 +72,5 @@ public class DatabaseAuthDAO implements AuthDAO {
                 FOREIGN KEY (username) REFERENCES UserData(username) ON DELETE CASCADE
             );
             """;
-
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            PreparedStatement preparedStatement = conn.prepareStatement(createStatement);
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }
+

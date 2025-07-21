@@ -11,6 +11,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
@@ -55,7 +56,7 @@ public class UserServiceTests {
 
         // check that registered user is stored correctly in database
         assertNotNull(user);
-        assertEquals(validPassword, user.password());
+        assertTrue(BCrypt.checkpw(validPassword, user.password()));
     }
 
     @Test

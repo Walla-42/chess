@@ -3,6 +3,8 @@ package dataaccess;
 import java.sql.*;
 import java.util.Properties;
 
+import dataaccess.exceptions.DataAccessException;
+
 public class DatabaseManager {
     private static String databaseName;
     private static String dbUsername;

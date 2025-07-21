@@ -6,6 +6,7 @@ import dataaccess.exceptions.UnauthorizedAccessException;
 import dataaccess.exceptions.UsernameTakenException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
@@ -40,7 +41,9 @@ public class UserService {
             throw new UsernameTakenException("Error: User already exists");
         }
 
-        UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        String hashedPassword = hashPassword(registerRequest.password());
+
+        UserData userData = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
         userDAO.putUser(userData);
 
         String authToken = authService.generateAuth();
@@ -110,6 +113,10 @@ public class UserService {
      * @return boolean True if password match, false otherwise
      */
     private boolean comparePasswords(String inputPassword, String userPassword) {
-        return inputPassword.equals(userPassword);
+        return BCrypt.checkpw(inputPassword, userPassword);
+    }
+
+    private String hashPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
     }
 }

@@ -15,9 +15,11 @@ import spark.*;
 
 
 public class Server {
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final UserDAO userDAO = new MemoryUserDataDAO();
-    private final GameDAO gameDAO = new MemoryGameDataDAO();
+    private final boolean useMemory = false; //use this to toggle in memory or Database usage;
+
+    private final AuthDAO authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
+    private final UserDAO userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
+    private final GameDAO gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DatabaseAccessException;
 import model.AuthData;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class AuthService {
      *
      * @param authData An AuthData object containing an authToken and the users username
      */
-    public void createAuth(AuthData authData) throws BadRequestException {
+    public void createAuth(AuthData authData) throws BadRequestException, DatabaseAccessException {
         authDAO.createAuth(authData);
     }
 

@@ -4,6 +4,7 @@ import dataaccess.*;
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.Interfaces.GameDAO;
 import dataaccess.Interfaces.UserDAO;
+import dataaccess.exceptions.DataAccessException;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -15,11 +16,22 @@ import spark.*;
 
 
 public class Server {
-    private final boolean useMemory = false; //use this to toggle in memory or Database usage;
+    private final boolean useMemory = true; //use this to toggle in memory or Database usage;
 
-    private final AuthDAO authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
-    private final UserDAO userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
-    private final GameDAO gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
+    private AuthDAO authDAO;
+    private UserDAO userDAO;
+    private GameDAO gameDAO;
+
+    {
+        try {
+            authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
+            userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
+            gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
+        } catch (DataAccessException e) {
+            System.err.println("Unable to initialize server");
+        }
+    }
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

@@ -14,3 +14,4 @@ server/**/db.properties
 
 ### Other ###
 notes.md
+db.properties

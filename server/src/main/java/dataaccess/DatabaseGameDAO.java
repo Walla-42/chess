@@ -31,4 +31,16 @@ public class DatabaseGameDAO implements GameDAO {
     public void clearDB() {
         throw new RuntimeException("not yet implemented");
     }
+
+    private final String createStatement = """
+            CREATE TABLE IF NOT EXISTS User_Data (
+                gameID INTEGER PRIMARY KEY,
+                white_username VARCHAR(50),
+                black_username VARCHAR(50),
+                game_name VARCHAR(100),
+                chess_game TEXT NOT NULL,
+                FOREIGN KEY (white_username) REFERENCES UserData(username) ON DELETE SET NULL,
+                FOREIGN KEY (black_username) REFERENCES UserData(username) ON DELETE SET NULL
+                );
+            """;
 }

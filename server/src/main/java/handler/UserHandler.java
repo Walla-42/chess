@@ -1,5 +1,7 @@
 package handler;
+
 import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import dataaccess.exceptions.UsernameTakenException;
 import requests.LoginRequest;
@@ -19,7 +21,7 @@ import service.UserService;
 public class UserHandler {
     private final UserService userService;
 
-    public UserHandler(UserService userService){
+    public UserHandler(UserService userService) {
         this.userService = userService;
     }
 
@@ -27,7 +29,7 @@ public class UserHandler {
      * Handler Method for the Register endpoint. Takes in Json Requests and Responses and parses them before sending them
      * to the UserService. This function is invoked when a client sends a POST request to the `/user` endpoint.
      *
-     * @param registerReq the HTTP request sent by the client
+     * @param registerReq  the HTTP request sent by the client
      * @param registerResp the HTTP response object, used to set the response code
      * @return a Json string representing a RegisterResponse object on success, or an ErrorResponseClass object on failure
      */
@@ -48,7 +50,11 @@ public class UserHandler {
             registerResp.status(400);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (Exception e){
+        } catch (DatabaseAccessException e) {
+            registerResp.status(500);
+            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+
+        } catch (Exception e) {
             registerResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
@@ -58,11 +64,11 @@ public class UserHandler {
      * Handler Method for the Login endpoint. Takes in Json Requests and Responses and parses them before sending them
      * to the UserService. This function is invoked when a client sends a POST request to the `/session` endpoint.
      *
-     * @param loginReq the HTTP request sent by the client
+     * @param loginReq  the HTTP request sent by the client
      * @param loginResp the HTTP response object, used to set the response code
      * @return a Json string representing a LoginResponse object on success, or an ErrorResponseClass object on failure
      */
-    public Object handleLogin(Request loginReq, Response loginResp){
+    public Object handleLogin(Request loginReq, Response loginResp) {
         Gson gson = new Gson();
         try {
             LoginRequest loginRequest = gson.fromJson(loginReq.body(), LoginRequest.class);
@@ -75,7 +81,7 @@ public class UserHandler {
             loginResp.status(400);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (UnauthorizedAccessException e){
+        } catch (UnauthorizedAccessException e) {
             loginResp.status(401);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
@@ -89,24 +95,24 @@ public class UserHandler {
      * Handler Method for the Logout endpoint. Takes in Json Requests and Responses and parses them before sending them
      * to the UserService. This function is invoked when a client sends a POST request to the `/user` endpoint.
      *
-     * @param logoutReq the HTTP request sent by the client
+     * @param logoutReq  the HTTP request sent by the client
      * @param logoutResp the HTTP response object, used to set the response code
      * @return a Json string representing a LogoutResponse object on success, or an ErrorResponseClass object on failure
      */
-    public Object handleLogout(Request logoutReq, Response logoutResp){
+    public Object handleLogout(Request logoutReq, Response logoutResp) {
         Gson gson = new Gson();
-        try{
+        try {
             LogoutRequest logoutRequest = new LogoutRequest(logoutReq.headers("Authorization"));
             LogoutResponse logoutResponse = userService.logoutUser(logoutRequest);
 
             logoutResp.status(200);
             return gson.toJson(logoutResponse);
 
-        } catch (UnauthorizedAccessException e){
+        } catch (UnauthorizedAccessException e) {
             logoutResp.status(401);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (Exception e){
+        } catch (Exception e) {
             logoutResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }

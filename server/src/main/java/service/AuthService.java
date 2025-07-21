@@ -21,7 +21,7 @@ public class AuthService {
      * @param authData An AuthData object containing an authToken and the users username
      */
     public void createAuth(AuthData authData) throws BadRequestException, DatabaseAccessException {
-        authDAO.createAuth(authData);
+        authDAO.addAuth(authData);
     }
 
     /**
@@ -31,7 +31,7 @@ public class AuthService {
      * @param authToken authToken given by the users session
      * @return AuthData Object containing the authToken and the associated username
      */
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DatabaseAccessException {
         return authDAO.getAuth(authToken);
     }
 
@@ -41,7 +41,7 @@ public class AuthService {
      *
      * @param authToken authToken given by the users session
      */
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DatabaseAccessException {
         authDAO.deleteAuth(authToken);
     }
 

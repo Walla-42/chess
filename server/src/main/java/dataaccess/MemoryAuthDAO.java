@@ -17,7 +17,7 @@ public class MemoryAuthDAO implements AuthDAO {
      *
      * @param authData AuthData object containing the AuthToken and the username of the user
      */
-    public void createAuth(AuthData authData) throws BadRequestException {
+    public void addAuth(AuthData authData) throws BadRequestException {
         if (authData.authToken() == null || authData.username() == null) {
             throw new BadRequestException("Error: missing authToken or username");
         }

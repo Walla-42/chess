@@ -26,7 +26,7 @@ public class ClearDbServiceTests {
         userDAO = new MemoryUserDataDAO();
         clearDbService = new ClearDbService(authDAO, gameDAO, userDAO);
 
-        authDAO.createAuth(new AuthData("authToken", "user"));
+        authDAO.addAuth(new AuthData("authToken", "user"));
         gameDAO.createGame("newGame");
         userDAO.putUser(new UserData("user", "pass", "user@email.com"));
     }

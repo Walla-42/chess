@@ -1,10 +1,7 @@
 package service;
 
 import dataaccess.Interfaces.UserDAO;
-import dataaccess.exceptions.BadRequestException;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.UnauthorizedAccessException;
-import dataaccess.exceptions.UsernameTakenException;
+import dataaccess.exceptions.*;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
@@ -94,7 +91,7 @@ public class UserService {
      * @return LogoutResponse object
      * @throws UnauthorizedAccessException Invalid authToken sent with request
      */
-    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException {
+    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException, DatabaseAccessException {
         String authToken = logoutRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {

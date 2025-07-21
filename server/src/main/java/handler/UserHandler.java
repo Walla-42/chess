@@ -50,10 +50,6 @@ public class UserHandler {
             registerResp.status(400);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (DatabaseAccessException e) {
-            registerResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
-
         } catch (Exception e) {
             registerResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));

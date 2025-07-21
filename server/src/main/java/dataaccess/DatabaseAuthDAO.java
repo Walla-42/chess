@@ -6,7 +6,6 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.AuthData;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DatabaseAuthDAO implements AuthDAO {
@@ -27,14 +26,14 @@ public class DatabaseAuthDAO implements AuthDAO {
      * @param authData AuthData object containing the AuthToken and the username of the user
      */
     @Override
-    public void createAuth(AuthData authData) throws BadRequestException, DatabaseAccessException {
+    public void addAuth(AuthData authData) throws BadRequestException, DatabaseAccessException {
         if (authData.authToken() == null || authData.username() == null) {
             throw new BadRequestException("Error: missing authToken or username");
         }
 
-        String insert_string = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+        String insertString = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
 
-        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insert_string)) {
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insertString)) {
             statement.setString(1, authData.authToken());
             statement.setString(2, authData.username());
 
@@ -46,8 +45,33 @@ public class DatabaseAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
-        throw new RuntimeException("not yet implemented");
+    public void deleteAuth(String authToken) throws DatabaseAccessException {
+        String deleteString = "DELETE FROM AuthData WHERE auth_token EQUALS ?";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(deleteString)) {
+            statement.setString(1, authToken);
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException(e.getMessage());
+        }
+    }
+
+    @Override
+    public AuthData getAuth(String authToken) throws DatabaseAccessException {
+        String getString = "SELECT FROM authData WHERE auth_token EQUALS ?";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
+            statement.setString(1, authToken);
+            var authQuery = statement.executeQuery();
+            if (authQuery.next()) {
+                return new AuthData(authToken, authQuery.getString("username"));
+            }
+            return null;
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException(e.getMessage());
+        }
     }
 
     @Override
@@ -55,10 +79,6 @@ public class DatabaseAuthDAO implements AuthDAO {
         throw new RuntimeException("not yet implemented");
     }
 
-    @Override
-    public void deleteAuth(String authToken) {
-        throw new RuntimeException("not yet implemented");
-    }
 
     @Override
     public void clearDB() {

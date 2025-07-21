@@ -23,7 +23,7 @@ public class AuthServiceTests {
         authService = new AuthService(authDAO);
     }
 
-    //--------------------------------------------------createAuth Tests----------------------------------------------------
+    //--------------------------------------------------addAuth Tests----------------------------------------------------
     @Test
     void createAuthPositive() {
         AuthData authData = new AuthData(validAuthToken, validUsername);
@@ -51,7 +51,7 @@ public class AuthServiceTests {
         AuthData newAuth = new AuthData(validAuthToken, validUsername);
         authService.createAuth(newAuth);
 
-        // Checks that the data returned from getAuth is the same as was passed into createAuth
+        // Checks that the data returned from getAuth is the same as was passed into addAuth
         AuthData result = authService.getAuth(newAuth.authToken());
         assertEquals(result, newAuth);
     }

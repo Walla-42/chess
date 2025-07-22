@@ -5,6 +5,7 @@ import dataaccess.Interfaces.GameDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDataDAO;
 import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.GameTakenException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
@@ -136,7 +137,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameNegativeInvalidToken() {
+    void joinGameNegativeInvalidToken() throws DatabaseAccessException {
         int gameID = gameDAO.createGame("JoinGameFail").gameID();
         JoinGameRequest request = new JoinGameRequest("invalid-token", "black", gameID);
 
@@ -144,7 +145,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameNegativeBadRequestMissingColor() {
+    void joinGameNegativeBadRequestMissingColor() throws DatabaseAccessException {
         int gameID = gameDAO.createGame("JoinGameNoColor").gameID();
         JoinGameRequest request = new JoinGameRequest(validToken, null, gameID);
 
@@ -152,7 +153,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameNegativeBadRequestMissingGameID() {
+    void joinGameNegativeBadRequestMissingGameID() throws DatabaseAccessException {
         JoinGameRequest request = new JoinGameRequest(validToken, "white", null);
 
         assertThrows(BadRequestException.class, () -> gameService.joinGame(request));
@@ -174,7 +175,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameNegativeInvalidColor() {
+    void joinGameNegativeInvalidColor() throws DatabaseAccessException {
         int gameID = gameDAO.createGame("BadColorGame").gameID();
         JoinGameRequest request = new JoinGameRequest(validToken, "red", gameID);
 

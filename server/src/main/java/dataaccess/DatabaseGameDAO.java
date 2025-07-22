@@ -1,35 +1,124 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.Interfaces.GameDAO;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.GameData;
 import model.GamesObject;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
+import java.util.HashSet;
 
 public class DatabaseGameDAO implements GameDAO {
 
     @Override
-    public Collection<GamesObject> listGames() {
-        throw new RuntimeException("not yet implemented");
+    public Collection<GamesObject> listGames() throws DatabaseAccessException {
+        String getString = "SELECT gameID, white_username, black_username, game_name FROM gamedatabase";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
+            try (var gameQuery = statement.executeQuery()) {
+                HashSet<GamesObject> activeGames = new HashSet<>();
+                while (gameQuery.next()) {
+                    var gameID = gameQuery.getInt("gameID");
+                    var whiteUsername = gameQuery.getString("white_username");
+                    var blackUsername = gameQuery.getString("black_username");
+                    var gameName = gameQuery.getString("game_name");
+
+                    activeGames.add(new GamesObject(gameID, whiteUsername, blackUsername, gameName));
+                }
+                return activeGames;
+            }
+        } catch (SQLException | DataAccessException e) {
+            e.printStackTrace();
+            throw new DatabaseAccessException("Error: Database access failed", e);
+        }
     }
 
     @Override
-    public GameData createGame(String gameName) {
-        throw new RuntimeException("not yet implemented");
+    public GameData createGame(String gameName) throws DatabaseAccessException {
+        Gson gson = new Gson();
+        ChessGame newChessGame = new ChessGame();
+        String chessGameString = gson.toJson(newChessGame);
+
+        String insertString = "INSERT INTO gamedatabase (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?)";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setNull(1, java.sql.Types.VARCHAR);
+            statement.setNull(2, java.sql.Types.VARCHAR);
+            statement.setString(3, gameName);
+            statement.setString(4, chessGameString);
+
+            statement.executeUpdate();
+
+            var GameID = statement.getGeneratedKeys();
+
+            int generatedGameID = 1;
+            if (GameID.next()) {
+                generatedGameID = GameID.getInt(1);
+            }
+
+            return new GameData(generatedGameID, null, null, gameName, newChessGame);
+
+        } catch (SQLException | DataAccessException e) {
+            e.printStackTrace();
+            throw new DatabaseAccessException("Error: Database Access Failed", e);
+        }
     }
 
     @Override
     public GameData getGame(Integer gameID) {
-        throw new RuntimeException("not yet implemented");
+        Gson gson = new Gson();
+        String getString = "SELECT * FROM gamedatabase WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
+            statement.setInt(1, gameID);
+            var getGameQuery = statement.executeQuery();
+
+            if (getGameQuery.next()) {
+                String whiteUsername = getGameQuery.getString("white_username");
+                String blackUsername = getGameQuery.getString("black_username");
+                String gameName = getGameQuery.getString("game_name");
+                ChessGame chessGame = gson.fromJson(getGameQuery.getString("chess_game"), ChessGame.class);
+
+
+                return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
+            }
+            return null;
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void updateGame(GameData updatedGameData) {
-        throw new RuntimeException("not yet implemented");
+        Gson gson = new Gson();
+
+        int gameID = updatedGameData.gameID();
+        String whiteUsername = updatedGameData.whiteUserName();
+        String blackUsername = updatedGameData.blackUserName();
+        String gameName = updatedGameData.gameName();
+        String chessGame = gson.toJson(updatedGameData.game());
+
+        String updateString = "UPDATE gamedatabase SET white_username = ?, black_username = ?, game_name = ?, chess_game = ? WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(updateString)) {
+            statement.setString(1, whiteUsername);
+            statement.setString(2, blackUsername);
+            statement.setString(3, gameName);
+            statement.setString(4, chessGame);
+            statement.setInt(5, gameID);
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     @Override
     public void clearDB() throws DatabaseAccessException {
@@ -47,7 +136,7 @@ public class DatabaseGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             var createTable = conn.prepareStatement("""
                     CREATE TABLE IF NOT EXISTS gamedatabase (
-                        gameID INTEGER PRIMARY KEY,
+                        gameID INTEGER PRIMARY KEY AUTO_INCREMENT,
                         white_username VARCHAR(50),
                         black_username VARCHAR(50),
                         game_name VARCHAR(100),

@@ -76,4 +76,29 @@ public class DatabaseManager {
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
+
+    public static void printAllTables() throws DataAccessException {
+        try (Connection conn = getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
+
+            System.out.println("Tables in database " + conn.getCatalog() + ":");
+            while (tables.next()) {
+                System.out.println(tables.getString("TABLE_NAME"));
+            }
+            tables.close();
+        } catch (SQLException ex) {
+            throw new DataAccessException("Failed to list tables", ex);
+        }
+    }
+
+    public static void dropDatabase() throws DataAccessException {
+        String statement = "DROP DATABASE IF EXISTS " + databaseName;
+        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+             var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to drop database", ex);
+        }
+    }
 }

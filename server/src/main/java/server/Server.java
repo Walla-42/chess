@@ -5,6 +5,7 @@ import dataaccess.Interfaces.AuthDAO;
 import dataaccess.Interfaces.GameDAO;
 import dataaccess.Interfaces.UserDAO;
 import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DatabaseAccessException;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -14,22 +15,33 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.sql.SQLException;
+
 
 public class Server {
 
     //use this to toggle in memory or Database usage;
     private final boolean useMemory = false;
-    private final AuthDAO authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
-    private final UserDAO userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
-    private final GameDAO gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
 
-    static {
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e.getMessage());
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+
+    public Server() {
+        if (!useMemory) {
+            try {
+                databaseSetup();
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        this.userDAO = (useMemory) ? new MemoryUserDataDAO() : new DatabaseUserDAO();
+        this.authDAO = (useMemory) ? new MemoryAuthDAO() : new DatabaseAuthDAO();
+        this.gameDAO = (useMemory) ? new MemoryGameDataDAO() : new DatabaseGameDAO();
+
     }
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -63,5 +75,25 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private void databaseSetup() throws DataAccessException {
+        try {
+            DatabaseManager.createDatabase();
+            System.out.println("setting up User Table....");
+            DatabaseUserDAO.setup();
+            System.out.println("Complete UserTable setup!");
+            System.out.println("setting up Auth Table....");
+            DatabaseAuthDAO.setup();
+            System.out.println("Complete AuthTable setup!");
+            System.out.println("setting up GameData Table....");
+            DatabaseGameDAO.setup();
+            System.out.println("Complete GameDatTable setup!");
+
+            DatabaseManager.printAllTables();
+//            DatabaseManager.dropDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error: failed to create database", e);
+        }
     }
 }

@@ -32,13 +32,31 @@ public class DatabaseUserDAO implements UserDAO {
     }
 
     @Override
-    public void putUser(UserData userData) {
-        throw new RuntimeException("not yet implemented");
+    public void putUser(UserData userData) throws DatabaseAccessException {
+        String insertString = "INSERT INTO User_Data (username, password, email) VALUES (?, ?, ?)";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insertString)) {
+            statement.setString(1, userData.username());
+            statement.setString(2, userData.password());
+            statement.setString(3, userData.email());
+
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException("Database access failed", e);
+        }
     }
 
     @Override
-    public void clearDB() {
-        throw new RuntimeException("not yet implemented");
+    public void clearDB() throws DatabaseAccessException {
+        String clear_string = "DROP TABLE AuthData";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException("Database access failed", e);
+        }
     }
 
     private final String createStatement = """
@@ -48,6 +66,7 @@ public class DatabaseUserDAO implements UserDAO {
                 password VARCHAR(60) NOT NULL
                 );
             """;
+
 
     private void setup() {
         try (var conn = DatabaseManager.getConnection()) {

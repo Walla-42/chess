@@ -2,6 +2,8 @@ package dataaccess;
 
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DatabaseAccessException;
+import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 
 import java.util.HashMap;
@@ -31,7 +33,7 @@ public class MemoryAuthDAO implements AuthDAO {
      *
      * @param authToken authToken given by their current session.
      */
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException {
 
         AuthData data = tokenAuthDatabase.remove(authToken);
         if (data != null) {
@@ -53,7 +55,7 @@ public class MemoryAuthDAO implements AuthDAO {
      * @param authToken authToken given by users current session
      * @return AuthData obtained from the database including authToken and username
      */
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DatabaseAccessException {
         return tokenAuthDatabase.get(authToken);
     }
 

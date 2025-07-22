@@ -31,37 +31,29 @@ public class DatabaseAuthDAO implements AuthDAO {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException, BadRequestException {
-        AuthData currAuth = getAuth(authToken);
-        if (currAuth == null) {
+    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException {
+        if (authToken == null) {
             throw new UnauthorizedAccessException("Error: invalid auth Token");
         }
 
-        String username = currAuth.username();
-
-        String deleteString = "DELETE FROM authdatabase WHERE username = ?";
+        String deleteString = "DELETE FROM authdatabase WHERE auth_token = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(deleteString)) {
-            statement.setString(1, username);
+            statement.setString(1, authToken);
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DatabaseAccessException, BadRequestException {
-        if (authToken == null) {
-            throw new BadRequestException("Error: invalid auth token");
-        }
+    public AuthData getAuth(String authToken) throws DatabaseAccessException {
         String getString = "SELECT * FROM authdatabase WHERE auth_token = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
@@ -74,13 +66,12 @@ public class DatabaseAuthDAO implements AuthDAO {
             return null;
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
 
     @Override
-    public boolean tokenAlreadyExists(String authToken) throws DatabaseAccessException, BadRequestException {
+    public boolean tokenAlreadyExists(String authToken) throws DatabaseAccessException {
         return (getAuth(authToken) != null);
     }
 
@@ -93,7 +84,6 @@ public class DatabaseAuthDAO implements AuthDAO {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
@@ -110,7 +100,6 @@ public class DatabaseAuthDAO implements AuthDAO {
             createTable.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new RuntimeException("Error: failed to create Auth Table", e);
         }
     }

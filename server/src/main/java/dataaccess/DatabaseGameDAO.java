@@ -34,7 +34,6 @@ public class DatabaseGameDAO implements GameDAO {
                 return activeGames;
             }
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
@@ -65,13 +64,12 @@ public class DatabaseGameDAO implements GameDAO {
             return new GameData(generatedGameID, null, null, gameName, newChessGame);
 
         } catch (SQLException | DataAccessException e) {
-            e.printStackTrace();
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
 
     @Override
-    public GameData getGame(Integer gameID) {
+    public GameData getGame(Integer gameID) throws DatabaseAccessException {
         Gson gson = new Gson();
         String getString = "SELECT * FROM gamedatabase WHERE gameID = ?";
 
@@ -90,12 +88,12 @@ public class DatabaseGameDAO implements GameDAO {
             }
             return null;
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
 
     @Override
-    public void updateGame(GameData updatedGameData) {
+    public void updateGame(GameData updatedGameData) throws DatabaseAccessException {
         Gson gson = new Gson();
 
         int gameID = updatedGameData.gameID();
@@ -115,7 +113,7 @@ public class DatabaseGameDAO implements GameDAO {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
 

@@ -3,8 +3,8 @@ package service;
 import dataaccess.*;
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.Interfaces.GameDAO;
-import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;
+import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ public class ClearDbServiceTests {
     }
 
     @Test
-    void clearPositive() throws DatabaseAccessException, BadRequestException {
+    void clearPositive() throws DatabaseAccessException, UnauthorizedAccessException {
         assertNotNull(authDAO.getAuth("authToken"));
         assertFalse(gameDAO.listGames().isEmpty());
         assertNotNull(userDAO.getUser("user"));

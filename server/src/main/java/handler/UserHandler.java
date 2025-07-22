@@ -50,7 +50,7 @@ public class UserHandler {
             registerResp.status(400);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (Exception e) {
+        } catch (DatabaseAccessException e) {
             registerResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
@@ -81,7 +81,7 @@ public class UserHandler {
             loginResp.status(401);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (Exception e) {
+        } catch (DatabaseAccessException e) {
             loginResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }
@@ -108,7 +108,7 @@ public class UserHandler {
             logoutResp.status(401);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
 
-        } catch (Exception e) {
+        } catch (DatabaseAccessException e) {
             logoutResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
         }

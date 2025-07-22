@@ -4,6 +4,7 @@ import dataaccess.Interfaces.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;
+import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class AuthServiceTests {
 
     //--------------------------------------------------addAuth Tests----------------------------------------------------
     @Test
-    void createAuthPositive() throws DatabaseAccessException, BadRequestException {
+    void createAuthPositive() throws DatabaseAccessException, UnauthorizedAccessException {
         AuthData authData = new AuthData(validAuthToken, validUsername);
 
         assertDoesNotThrow(() -> authService.createAuth(authData));

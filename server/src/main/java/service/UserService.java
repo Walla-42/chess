@@ -30,7 +30,7 @@ public class UserService {
      * @throws BadRequestException    Missing Data in Request
      * @throws Exception              all other exceptions
      */
-    public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, Exception {
+    public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, DatabaseAccessException {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new BadRequestException("Error: Missing Data in Request");
         }
@@ -61,7 +61,7 @@ public class UserService {
      * @throws UnauthorizedAccessException Username or Password are incorrect
      * @throws Exception                   all other exceptions
      */
-    public LoginResponse loginUser(LoginRequest loginRequest) throws BadRequestException, UnauthorizedAccessException, Exception {
+    public LoginResponse loginUser(LoginRequest loginRequest) throws BadRequestException, UnauthorizedAccessException, DatabaseAccessException {
         if (loginRequest.username() == null || loginRequest.password() == null) {
             throw new BadRequestException("Error: Must enter username and password");
         }
@@ -91,7 +91,7 @@ public class UserService {
      * @return LogoutResponse object
      * @throws UnauthorizedAccessException Invalid authToken sent with request
      */
-    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException, DatabaseAccessException, BadRequestException {
+    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException, DatabaseAccessException {
         String authToken = logoutRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {

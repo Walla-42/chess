@@ -11,9 +11,9 @@ public interface GameDAO {
 
     GameData createGame(String gameName) throws DatabaseAccessException;
 
-    GameData getGame(Integer gameID);
+    GameData getGame(Integer gameID) throws DatabaseAccessException;
 
-    void updateGame(GameData updatedGameData);
+    void updateGame(GameData updatedGameData) throws DatabaseAccessException;
 
     void clearDB() throws DatabaseAccessException;
 }

@@ -32,7 +32,7 @@ public class AuthService {
      * @param authToken authToken given by the users session
      * @return AuthData Object containing the authToken and the associated username
      */
-    public AuthData getAuth(String authToken) throws DatabaseAccessException, BadRequestException {
+    public AuthData getAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException {
         return authDAO.getAuth(authToken);
     }
 
@@ -42,7 +42,7 @@ public class AuthService {
      *
      * @param authToken authToken given by the users session
      */
-    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException, BadRequestException {
+    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException {
         authDAO.deleteAuth(authToken);
     }
 

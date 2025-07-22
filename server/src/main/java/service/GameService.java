@@ -37,13 +37,14 @@ public class GameService {
      * @param listGamesRequest ListGamesRequest Object containing the authToken of the users session
      * @return ListGamesResponse object containing an array of available games on the server
      * @throws UnauthorizedAccessException invalid authToken given
-     * @throws Exception                   all other exceptions
+     * @throws DatabaseAccessException     unable to access database
+     * @throws BadRequestException         input is invalid
      */
-    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, Exception {
+    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, DatabaseAccessException, BadRequestException {
         String authToken = listGamesRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {
-            throw new UnauthorizedAccessException("Error: Unauthorized Access");
+            throw new UnauthorizedAccessException("Error: Invalid Auth Token");
         }
 
         Collection<GamesObject> games = gameDAO.listGames();
@@ -86,10 +87,10 @@ public class GameService {
      * @throws BadRequestException         gameID or playerColor not provided in request
      * @throws UnauthorizedAccessException Invalid authToken provided with request
      * @throws GameTakenException          game is already taken
-     * @throws Exception                   all other exceptions
+     * @throws DatabaseAccessException     Unable to access database
      */
     public JoinGameResponse joinGame(JoinGameRequest joinGameRequest) throws BadRequestException,
-            UnauthorizedAccessException, GameTakenException, Exception {
+            UnauthorizedAccessException, GameTakenException, DatabaseAccessException {
 
         if (joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null) {
             throw new BadRequestException("Error: bad request");

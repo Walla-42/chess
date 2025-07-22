@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class DatabaseAuthDAO implements AuthDAO {
 
     public DatabaseAuthDAO() {
-        setupDB();
+        setup();
     }
 
     /**
@@ -97,7 +97,7 @@ public class DatabaseAuthDAO implements AuthDAO {
         }
     }
 
-    private void setupDB() {
+    private void setup() {
         try (var conn = DatabaseManager.getConnection()) {
             var createTable = conn.prepareStatement(createStatement);
             createTable.executeUpdate();

@@ -2,6 +2,7 @@ package dataaccess;
 
 import dataaccess.Interfaces.GameDAO;
 import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DatabaseAccessException;
 import model.GameData;
 import model.GamesObject;
 
@@ -31,8 +32,15 @@ public class DatabaseGameDAO implements GameDAO {
     }
 
     @Override
-    public void clearDB() {
-        throw new RuntimeException("not yet implemented");
+    public void clearDB() throws DatabaseAccessException {
+        String clear_string = "TRUNCATE TABLE gamedatabase";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException("Error: Database access failed", e);
+        }
     }
 
     public static void setup() {

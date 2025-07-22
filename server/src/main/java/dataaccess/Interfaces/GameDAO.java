@@ -1,5 +1,6 @@
 package dataaccess.Interfaces;
 
+import dataaccess.exceptions.DatabaseAccessException;
 import model.GamesObject;
 import model.GameData;
 
@@ -14,5 +15,5 @@ public interface GameDAO {
 
     void updateGame(GameData updatedGameData);
 
-    void clearDB();
+    void clearDB() throws DatabaseAccessException;
 }

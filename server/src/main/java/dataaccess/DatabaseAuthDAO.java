@@ -64,6 +64,7 @@ public class DatabaseAuthDAO implements AuthDAO {
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
             statement.setString(1, authToken);
+            DatabaseManager.printAllTables();
             var authQuery = statement.executeQuery();
 
             if (authQuery.next()) {
@@ -85,7 +86,7 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clear_string = "DROP TABLE IF EXISTS authdatabase";
+        String clear_string = "TRUNCATE TABLE IF EXISTS authdatabase";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
             statement.executeUpdate();

@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.Interfaces.AuthDAO;
+import dataaccess.interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
@@ -78,9 +78,9 @@ public class DatabaseAuthDAO implements AuthDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clear_string = "DELETE FROM authdatabase";
+        String clearString = "DELETE FROM authdatabase";
 
-        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clearString)) {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {

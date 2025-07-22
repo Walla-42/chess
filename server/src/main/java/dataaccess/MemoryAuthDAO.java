@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.Interfaces.AuthDAO;
+import dataaccess.interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.UnauthorizedAccessException;

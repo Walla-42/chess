@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.Interfaces.AuthDAO;
-import dataaccess.Interfaces.GameDAO;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDataDAO;
 import dataaccess.exceptions.BadRequestException;

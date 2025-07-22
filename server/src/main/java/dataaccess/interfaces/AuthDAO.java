@@ -1,4 +1,4 @@
-package dataaccess.Interfaces;
+package dataaccess.interfaces;
 
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;

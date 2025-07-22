@@ -2,13 +2,12 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.Interfaces.GameDAO;
+import dataaccess.interfaces.GameDAO;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.GameData;
 import model.GamesObject;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -54,11 +53,11 @@ public class DatabaseGameDAO implements GameDAO {
 
             statement.executeUpdate();
 
-            var GameID = statement.getGeneratedKeys();
+            var gameID = statement.getGeneratedKeys();
 
             int generatedGameID = 1;
-            if (GameID.next()) {
-                generatedGameID = GameID.getInt(1);
+            if (gameID.next()) {
+                generatedGameID = gameID.getInt(1);
             }
 
             return new GameData(generatedGameID, null, null, gameName, newChessGame);
@@ -96,7 +95,7 @@ public class DatabaseGameDAO implements GameDAO {
     public void updateGame(GameData updatedGameData) throws DatabaseAccessException {
         Gson gson = new Gson();
 
-        int gameID = updatedGameData.gameID();
+        int gameId = updatedGameData.gameID();
         String whiteUsername = updatedGameData.whiteUserName();
         String blackUsername = updatedGameData.blackUserName();
         String gameName = updatedGameData.gameName();
@@ -109,7 +108,7 @@ public class DatabaseGameDAO implements GameDAO {
             statement.setString(2, blackUsername);
             statement.setString(3, gameName);
             statement.setString(4, chessGame);
-            statement.setInt(5, gameID);
+            statement.setInt(5, gameId);
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
@@ -120,9 +119,9 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clear_string = "TRUNCATE TABLE gamedatabase";
+        String clearString = "TRUNCATE TABLE gamedatabase";
 
-        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clearString)) {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {

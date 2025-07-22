@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.Interfaces.UserDAO;
+import dataaccess.interfaces.UserDAO;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.UserData;
@@ -45,9 +45,9 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clear_string = "DELETE FROM userdatabase";
+        String clearString = "DELETE FROM userdatabase";
 
-        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clearString)) {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {

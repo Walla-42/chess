@@ -1,8 +1,8 @@
 package service;
 
-import dataaccess.Interfaces.AuthDAO;
-import dataaccess.Interfaces.GameDAO;
-import dataaccess.Interfaces.UserDAO;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
+import dataaccess.interfaces.UserDAO;
 import dataaccess.exceptions.DatabaseAccessException;
 import requests.ClearRequest;
 import responses.ClearResponse;

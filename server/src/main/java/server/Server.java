@@ -1,11 +1,10 @@
 package server;
 
 import dataaccess.*;
-import dataaccess.Interfaces.AuthDAO;
-import dataaccess.Interfaces.GameDAO;
-import dataaccess.Interfaces.UserDAO;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
+import dataaccess.interfaces.UserDAO;
 import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.DatabaseAccessException;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
@@ -14,9 +13,6 @@ import service.ClearDbService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-
-import javax.xml.crypto.Data;
-import java.sql.SQLException;
 
 
 public class Server {
@@ -91,12 +87,6 @@ public class Server {
             System.out.println("setting up GameData Table....");
             DatabaseGameDAO.setup();
             System.out.println("Complete GameDatTable setup!");
-
-//            DatabaseManager.printAllTables();
-//            DatabaseManager.dropDatabase();
-//            DatabaseManager.printTableContents("userdatabase");
-//            DatabaseManager.printTableContents("gamedatabase");
-//            DatabaseManager.printTableContents("authdatabase");
         } catch (DataAccessException e) {
             throw new RuntimeException("Error: failed to create database", e);
         }

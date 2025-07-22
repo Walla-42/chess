@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.Interfaces.AuthDAO;
+import dataaccess.interfaces.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;

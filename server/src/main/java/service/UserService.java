@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.Interfaces.UserDAO;
+import dataaccess.interfaces.UserDAO;
 import dataaccess.exceptions.*;
 import model.AuthData;
 import model.UserData;
@@ -30,7 +30,8 @@ public class UserService {
      * @throws BadRequestException    Missing Data in Request
      * @throws Exception              all other exceptions
      */
-    public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException, BadRequestException, DatabaseAccessException {
+    public RegisterResponse registerUser(RegisterRequest registerRequest) throws UsernameTakenException,
+            BadRequestException, DatabaseAccessException {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new BadRequestException("Error: Missing Data in Request");
         }

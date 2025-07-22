@@ -13,7 +13,7 @@ import responses.CreateGameResponse;
 import responses.JoinGameResponse;
 import responses.ListGamesResponse;
 import chess.ChessGame;
-import dataaccess.Interfaces.GameDAO;
+import dataaccess.interfaces.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
@@ -40,7 +40,8 @@ public class GameService {
      * @throws DatabaseAccessException     unable to access database
      * @throws BadRequestException         input is invalid
      */
-    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException, DatabaseAccessException, BadRequestException {
+    public ListGamesResponse listGames(ListGamesRequest listGamesRequest) throws UnauthorizedAccessException,
+            DatabaseAccessException, BadRequestException {
         String authToken = listGamesRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {
@@ -61,7 +62,8 @@ public class GameService {
      * @throws BadRequestException         Missing gameName
      * @throws UnauthorizedAccessException Invalid authToken provided with request
      */
-    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException, DatabaseAccessException {
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException,
+            UnauthorizedAccessException, DatabaseAccessException {
         if (createGameRequest.gameName() == null) {
             throw new BadRequestException("Error:must provide a game name");
         }

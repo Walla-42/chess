@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.Interfaces.GameDAO;
+import dataaccess.interfaces.GameDAO;
 import model.GamesObject;
 import chess.ChessGame;
 import model.GameData;

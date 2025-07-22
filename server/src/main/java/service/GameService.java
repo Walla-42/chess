@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.GameTakenException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
@@ -59,7 +60,7 @@ public class GameService {
      * @throws BadRequestException         Missing gameName
      * @throws UnauthorizedAccessException Invalid authToken provided with request
      */
-    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException {
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws BadRequestException, UnauthorizedAccessException, DatabaseAccessException {
         if (createGameRequest.gameName() == null) {
             throw new BadRequestException("Error:must provide a game name");
         }

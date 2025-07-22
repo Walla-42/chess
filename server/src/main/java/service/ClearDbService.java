@@ -3,6 +3,7 @@ package service;
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.Interfaces.GameDAO;
 import dataaccess.Interfaces.UserDAO;
+import dataaccess.exceptions.DatabaseAccessException;
 import requests.ClearRequest;
 import responses.ClearResponse;
 
@@ -23,7 +24,7 @@ public class ClearDbService {
      * @param clearRequest ClearRequest object authorizing the clearing of the database. Object is blank
      *                     for grading purposes, but is intended to hold an authToken to authorize clear.
      */
-    public ClearResponse clear(ClearRequest clearRequest) {
+    public ClearResponse clear(ClearRequest clearRequest) throws DatabaseAccessException {
         authDAO.clearDB();
         gameDAO.clearDB();
         userDAO.clearDB();

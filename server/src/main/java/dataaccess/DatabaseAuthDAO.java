@@ -4,6 +4,7 @@ import dataaccess.Interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
+import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 
 import java.sql.SQLException;
@@ -11,13 +12,7 @@ import java.sql.SQLException;
 public class DatabaseAuthDAO implements AuthDAO {
 
     public DatabaseAuthDAO() {
-        try (var conn = DatabaseManager.getConnection()) {
-            var createTable = conn.prepareStatement(createStatement);
-            createTable.executeUpdate();
-
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        setupDB();
     }
 
     /**
@@ -28,10 +23,10 @@ public class DatabaseAuthDAO implements AuthDAO {
     @Override
     public void addAuth(AuthData authData) throws BadRequestException, DatabaseAccessException {
         if (authData.authToken() == null || authData.username() == null) {
-            throw new BadRequestException("Error: missing authToken or username");
+            throw new BadRequestException("Error: missing auth Token or username");
         }
 
-        String insertString = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+        String insertString = "INSERT INTO AuthData (auth_token, username) VALUES (?, ?)";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insertString)) {
             statement.setString(1, authData.authToken());
@@ -40,26 +35,36 @@ public class DatabaseAuthDAO implements AuthDAO {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            throw new DatabaseAccessException(e.getMessage());
+            throw new DatabaseAccessException("Database access failed", e);
         }
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DatabaseAccessException {
-        String deleteString = "DELETE FROM AuthData WHERE auth_token EQUALS ?";
+    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException, BadRequestException {
+        AuthData currAuth = getAuth(authToken);
+        if (currAuth == null) {
+            throw new UnauthorizedAccessException("invalid auth Token");
+        }
+
+        String username = currAuth.username();
+
+        String deleteString = "DELETE FROM AuthData WHERE username = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(deleteString)) {
-            statement.setString(1, authToken);
+            statement.setString(1, username);
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
-            throw new DatabaseAccessException(e.getMessage());
+            throw new DatabaseAccessException("Database access failed", e);
         }
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DatabaseAccessException {
-        String getString = "SELECT FROM authData WHERE auth_token EQUALS ?";
+    public AuthData getAuth(String authToken) throws DatabaseAccessException, BadRequestException {
+        if (authToken == null) {
+            throw new BadRequestException("invalid auth token");
+        }
+        String getString = "SELECT * FROM AuthData WHERE auth_token = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
             statement.setString(1, authToken);
@@ -70,19 +75,36 @@ public class DatabaseAuthDAO implements AuthDAO {
             return null;
 
         } catch (SQLException | DataAccessException e) {
-            throw new DatabaseAccessException(e.getMessage());
+            throw new DatabaseAccessException("Database access failed", e);
         }
     }
 
     @Override
-    public boolean tokenAlreadyExists(String authToken) {
-        throw new RuntimeException("not yet implemented");
+    public boolean tokenAlreadyExists(String authToken) throws DatabaseAccessException, BadRequestException {
+        return (getAuth(authToken) != null);
     }
 
 
     @Override
-    public void clearDB() {
-        throw new RuntimeException("not yet implemented");
+    public void clearDB() throws DatabaseAccessException {
+        String clear_string = "DROP TABLE AuthData";
+
+        try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
+            statement.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DatabaseAccessException("Database access failed", e);
+        }
+    }
+
+    private void setupDB() {
+        try (var conn = DatabaseManager.getConnection()) {
+            var createTable = conn.prepareStatement(createStatement);
+            createTable.executeUpdate();
+
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private final String createStatement = """

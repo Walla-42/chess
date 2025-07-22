@@ -91,7 +91,7 @@ public class UserService {
      * @return LogoutResponse object
      * @throws UnauthorizedAccessException Invalid authToken sent with request
      */
-    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException, DatabaseAccessException {
+    public LogoutResponse logoutUser(LogoutRequest logoutRequest) throws UnauthorizedAccessException, DatabaseAccessException, BadRequestException {
         String authToken = logoutRequest.authToken();
 
         if (authToken == null || authService.getAuth(authToken) == null) {

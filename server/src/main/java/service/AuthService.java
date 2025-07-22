@@ -3,6 +3,7 @@ package service;
 import dataaccess.Interfaces.AuthDAO;
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DatabaseAccessException;
+import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class AuthService {
      * @param authToken authToken given by the users session
      * @return AuthData Object containing the authToken and the associated username
      */
-    public AuthData getAuth(String authToken) throws DatabaseAccessException {
+    public AuthData getAuth(String authToken) throws DatabaseAccessException, BadRequestException {
         return authDAO.getAuth(authToken);
     }
 
@@ -41,16 +42,16 @@ public class AuthService {
      *
      * @param authToken authToken given by the users session
      */
-    public void deleteAuth(String authToken) throws DatabaseAccessException {
+    public void deleteAuth(String authToken) throws DatabaseAccessException, UnauthorizedAccessException, BadRequestException {
         authDAO.deleteAuth(authToken);
     }
 
     /**
-     * Service method for generating a random authToken. Checks that the generated token doesn't already exists.
+     * Service method for generating a random authToken. Checks that the generated token doesn't already exist.
      *
      * @return random generated authToken
      */
-    public String generateAuth() {
+    public String generateAuth() throws DatabaseAccessException, BadRequestException {
         String authToken;
         do {
             authToken = UUID.randomUUID().toString();

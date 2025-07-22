@@ -101,4 +101,35 @@ public class DatabaseManager {
             throw new DataAccessException("failed to drop database", ex);
         }
     }
+
+    public static void printTableContents(String tableName) {
+        String query = "SELECT * FROM " + tableName;
+
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            ResultSetMetaData meta = rs.getMetaData();
+            int columnCount = meta.getColumnCount();
+
+            // Print column headers
+            for (int i = 1; i <= columnCount; i++) {
+                System.out.print(meta.getColumnName(i) + "\t");
+            }
+            System.out.println();
+
+            // Print rows
+            while (rs.next()) {
+                for (int i = 1; i <= columnCount; i++) {
+                    Object value = rs.getObject(i);
+                    System.out.print(value + "\t");
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error printing table " + tableName + ": " + e.getMessage());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -45,7 +45,7 @@ public class DatabaseUserDAO implements UserDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clear_string = "TRUNCATE TABLE userdatabase";
+        String clear_string = "DELETE FROM userdatabase";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clear_string)) {
             statement.executeUpdate();

@@ -15,6 +15,7 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 
@@ -80,6 +81,7 @@ public class Server {
     private void databaseSetup() throws DataAccessException {
         try {
             DatabaseManager.createDatabase();
+
             System.out.println("setting up User Table....");
             DatabaseUserDAO.setup();
             System.out.println("Complete UserTable setup!");
@@ -90,8 +92,11 @@ public class Server {
             DatabaseGameDAO.setup();
             System.out.println("Complete GameDatTable setup!");
 
-            DatabaseManager.printAllTables();
+//            DatabaseManager.printAllTables();
 //            DatabaseManager.dropDatabase();
+//            DatabaseManager.printTableContents("userdatabase");
+//            DatabaseManager.printTableContents("gamedatabase");
+//            DatabaseManager.printTableContents("authdatabase");
         } catch (DataAccessException e) {
             throw new RuntimeException("Error: failed to create database", e);
         }

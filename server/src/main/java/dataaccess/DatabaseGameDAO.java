@@ -109,8 +109,13 @@ public class DatabaseGameDAO implements GameDAO {
             statement.setString(3, gameName);
             statement.setString(4, chessGame);
             statement.setInt(5, gameId);
-            statement.executeUpdate();
 
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DatabaseAccessException("Error: No game found with gameID " + gameId);
+            }
+
+            
         } catch (SQLException | DataAccessException e) {
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
@@ -119,7 +124,7 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public void clearDB() throws DatabaseAccessException {
-        String clearString = "TRUNCATE TABLE gamedatabase";
+        String clearString = "DELETE FROM gamedatabase";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(clearString)) {
             statement.executeUpdate();

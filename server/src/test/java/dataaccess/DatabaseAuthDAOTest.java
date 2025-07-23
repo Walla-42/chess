@@ -2,9 +2,6 @@ package dataaccess;
 
 import dataaccess.exceptions.BadRequestException;
 import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.DatabaseAccessException;
-import dataaccess.interfaces.AuthDAO;
-import dataaccess.interfaces.UserDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -14,12 +11,12 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DatabaseAuthDAOTest {
-    private static DatabaseAuthDAO authDAO = new DatabaseAuthDAO();
-    private static DatabaseUserDAO userDAO = new DatabaseUserDAO();
+    private static DatabaseAuthDAO authDao = new DatabaseAuthDAO();
+    private static DatabaseUserDAO userDao = new DatabaseUserDAO();
     private final String validAuth = "validAuthToken";
     private final String validUsername = "username";
     private final String validPassword = "password";
-
+    
     @BeforeAll
     public static void databaseSetup() {
         try {
@@ -40,7 +37,7 @@ class DatabaseAuthDAOTest {
             statement.executeUpdate("DELETE FROM authdatabase");
             statement.executeUpdate("DELETE FROM userdatabase");
             UserData user = new UserData(validUsername, validPassword, "email@example.com");
-            userDAO.putUser(user);
+            userDao.putUser(user);
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to clear the database", e);
@@ -65,9 +62,9 @@ class DatabaseAuthDAOTest {
     @Test
     void addAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        authDAO.addAuth(auth);
+        authDao.addAuth(auth);
 
-        AuthData result = authDAO.getAuth(validAuth);
+        AuthData result = authDao.getAuth(validAuth);
         assertNotNull(result);
         assertEquals(validUsername, result.username());
     }
@@ -77,24 +74,24 @@ class DatabaseAuthDAOTest {
         AuthData badAuth1 = new AuthData(null, validUsername);
         AuthData badAuth2 = new AuthData(validAuth, null);
 
-        assertThrows(BadRequestException.class, () -> authDAO.addAuth(badAuth1));
-        assertThrows(BadRequestException.class, () -> authDAO.addAuth(badAuth2));
+        assertThrows(BadRequestException.class, () -> authDao.addAuth(badAuth1));
+        assertThrows(BadRequestException.class, () -> authDao.addAuth(badAuth2));
     }
 
     @Test
     public void addAuthDuplicateFails() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        authDAO.addAuth(auth);
+        authDao.addAuth(auth);
 
-        assertThrows(DataAccessException.class, () -> authDAO.addAuth(auth));
+        assertThrows(DataAccessException.class, () -> authDao.addAuth(auth));
     }
 
     @Test
     void getAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        authDAO.addAuth(auth);
+        authDao.addAuth(auth);
 
-        AuthData result = authDAO.getAuth(validAuth);
+        AuthData result = authDao.getAuth(validAuth);
         assertNotNull(result);
         assertEquals(validAuth, result.authToken());
         assertEquals(validUsername, result.username());
@@ -102,31 +99,31 @@ class DatabaseAuthDAOTest {
 
     @Test
     void getAuthNegative() throws DataAccessException {
-        AuthData result = authDAO.getAuth("nonexistentToken");
+        AuthData result = authDao.getAuth("nonexistentToken");
         assertNull(result);
     }
 
     @Test
     void deleteAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        authDAO.addAuth(auth);
+        authDao.addAuth(auth);
 
-        authDAO.deleteAuth(validAuth);
-        AuthData result = authDAO.getAuth(validAuth);
+        authDao.deleteAuth(validAuth);
+        AuthData result = authDao.getAuth(validAuth);
         assertNull(result);
     }
 
     @Test
     void deleteAuthNegative() throws DataAccessException {
-        authDAO.deleteAuth("nonexistentToken");
+        authDao.deleteAuth("nonexistentToken");
     }
 
     @Test
     void tokenAlreadyExistsPositive() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        assertDoesNotThrow(() -> authDAO.addAuth(auth));
+        assertDoesNotThrow(() -> authDao.addAuth(auth));
 
-        AuthData retrieved = authDAO.getAuth(validAuth);
+        AuthData retrieved = authDao.getAuth(validAuth);
         assertNotNull(retrieved);
         assertEquals(validUsername, retrieved.username());
 
@@ -135,21 +132,21 @@ class DatabaseAuthDAOTest {
     @Test
     void tokenAlreadyExistsNegative() throws DataAccessException {
         AuthData auth = new AuthData(validAuth, validUsername);
-        authDAO.addAuth(auth);
+        authDao.addAuth(auth);
 
         AuthData duplicate = new AuthData(validAuth, validUsername);
-        assertThrows(DataAccessException.class, () -> authDAO.addAuth(duplicate));
+        assertThrows(DataAccessException.class, () -> authDao.addAuth(duplicate));
     }
 
     @Test
     void clearDBPositive() throws DataAccessException {
-        authDAO.addAuth(new AuthData(validAuth, validUsername));
-        authDAO.addAuth(new AuthData("anotherAuth", validUsername));
+        authDao.addAuth(new AuthData(validAuth, validUsername));
+        authDao.addAuth(new AuthData("anotherAuth", validUsername));
 
-        authDAO.clearDB();
+        authDao.clearDB();
 
-        assertNull(authDAO.getAuth(validAuth));
-        assertNull(authDAO.getAuth("anotherAuth"));
+        assertNull(authDao.getAuth(validAuth));
+        assertNull(authDao.getAuth("anotherAuth"));
     }
 
 
@@ -166,12 +163,12 @@ class DatabaseAuthDAOTest {
         assertDoesNotThrow(DatabaseAuthDAO::setup);
 
         AuthData newAuth = new AuthData("newToken", validUsername);
-        assertDoesNotThrow(() -> authDAO.addAuth(newAuth));
+        assertDoesNotThrow(() -> authDao.addAuth(newAuth));
     }
 
     @Test
     void setupNegative() {
-        assertDoesNotThrow(() -> authDAO.setup());
+        assertDoesNotThrow(() -> authDao.setup());
     }
 
 }

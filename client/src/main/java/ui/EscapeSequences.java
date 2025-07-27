@@ -11,6 +11,7 @@ public class EscapeSequences {
     public static final String ERASE_SCREEN = UNICODE_ESCAPE + "[H" + UNICODE_ESCAPE + "[2J";
     public static final String ERASE_LINE = UNICODE_ESCAPE + "[2K";
 
+    // text effects
     public static final String SET_TEXT_BOLD = UNICODE_ESCAPE + "[1m";
     public static final String SET_TEXT_FAINT = UNICODE_ESCAPE + "[2m";
     public static final String RESET_TEXT_BOLD_FAINT = UNICODE_ESCAPE + "[22m";
@@ -24,6 +25,7 @@ public class EscapeSequences {
     private static final String SET_TEXT_COLOR = UNICODE_ESCAPE + "[38;5;";
     private static final String SET_BG_COLOR = UNICODE_ESCAPE + "[48;5;";
 
+    // text colors
     public static final String SET_TEXT_COLOR_BLACK = SET_TEXT_COLOR + "0m";
     public static final String SET_TEXT_COLOR_LIGHT_GREY = SET_TEXT_COLOR + "242m";
     public static final String SET_TEXT_COLOR_DARK_GREY = SET_TEXT_COLOR + "235m";
@@ -35,6 +37,7 @@ public class EscapeSequences {
     public static final String SET_TEXT_COLOR_WHITE = SET_TEXT_COLOR + "15m";
     public static final String RESET_TEXT_COLOR = UNICODE_ESCAPE + "[39m";
 
+    // background colors
     public static final String SET_BG_COLOR_BLACK = SET_BG_COLOR + "0m";
     public static final String SET_BG_COLOR_LIGHT_GREY = SET_BG_COLOR + "242m";
     public static final String SET_BG_COLOR_DARK_GREY = SET_BG_COLOR + "235m";
@@ -47,6 +50,7 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
 
+    // chess pieces
     public static final String WHITE_KING = " ♔ ";
     public static final String WHITE_QUEEN = " ♕ ";
     public static final String WHITE_BISHOP = " ♗ ";
@@ -61,5 +65,12 @@ public class EscapeSequences {
     public static final String BLACK_PAWN = " ♟ ";
     public static final String EMPTY = " \u2003 ";
 
-    public static String moveCursorToLocation(int x, int y) { return UNICODE_ESCAPE + "[" + y + ";" + x + "H"; }
+    //Emoji
+    public static final String CROSSED_SWORDS = "\u2694\uFE0F";
+    public static final String CROWN = "\uD83D\uDC51";
+
+
+    public static String moveCursorToLocation(int x, int y) {
+        return UNICODE_ESCAPE + "[" + y + ";" + x + "H";
+    }
 }

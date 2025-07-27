@@ -16,6 +16,7 @@ import spark.Response;
 
 public class GameHandler {
     private final GameService gameService;
+    private static final Gson gson = new Gson();
 
     public GameHandler(GameService gameService) {
         this.gameService = gameService;
@@ -30,7 +31,6 @@ public class GameHandler {
      * @return a Json string representing a listGamesResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleListGames(Request listGamesReq, Response listGamesResp) {
-        Gson gson = new Gson();
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(listGamesReq.headers("Authorization"));
             ListGamesResponse listGamesResponse = gameService.listGames(listGamesRequest);
@@ -42,7 +42,7 @@ public class GameHandler {
         } catch (DatabaseAccessException e) {
             listGamesResp.status(500);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
-            
+
         } catch (DataAccessException e) {
             listGamesResp.status(401);
             return gson.toJson(new ErrorResponseClass(e.getMessage()));
@@ -59,8 +59,6 @@ public class GameHandler {
      * @return a JSON string representing either a CreateGameResponse object on success, or an ErrorResponseClass on failure
      */
     public Object handleCreateGame(Request createGameReq, Response createGameResp) {
-        Gson gson = new Gson();
-
         try {
             CreateGameRequest requestBody = gson.fromJson(createGameReq.body(), CreateGameRequest.class);
             CreateGameRequest createGameRequest = new CreateGameRequest(createGameReq.headers("Authorization"), requestBody.gameName());
@@ -92,8 +90,6 @@ public class GameHandler {
      * @return a Json string representing a joinGameResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleJoinGame(Request joinGameReq, Response joinGameResp) {
-        Gson gson = new Gson();
-
         try {
             String authToken = joinGameReq.headers("Authorization");
 

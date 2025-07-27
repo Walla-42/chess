@@ -20,6 +20,7 @@ import service.UserService;
 
 public class UserHandler {
     private final UserService userService;
+    private static final Gson gson = new Gson();
 
     public UserHandler(UserService userService) {
         this.userService = userService;
@@ -34,7 +35,6 @@ public class UserHandler {
      * @return a Json string representing a RegisterResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleRegister(Request registerReq, Response registerResp) {
-        Gson gson = new Gson();
         try {
             RegisterRequest registerRequest = gson.fromJson(registerReq.body(), RegisterRequest.class);
             RegisterResponse registerResponse = userService.registerUser(registerRequest);
@@ -65,7 +65,6 @@ public class UserHandler {
      * @return a Json string representing a LoginResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleLogin(Request loginReq, Response loginResp) {
-        Gson gson = new Gson();
         try {
             LoginRequest loginRequest = gson.fromJson(loginReq.body(), LoginRequest.class);
             LoginResponse loginResponse = userService.loginUser(loginRequest);
@@ -96,7 +95,6 @@ public class UserHandler {
      * @return a Json string representing a LogoutResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleLogout(Request logoutReq, Response logoutResp) {
-        Gson gson = new Gson();
         try {
             LogoutRequest logoutRequest = new LogoutRequest(logoutReq.headers("Authorization"));
             LogoutResponse logoutResponse = userService.logoutUser(logoutRequest);

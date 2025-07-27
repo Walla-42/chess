@@ -22,42 +22,42 @@ public class ServerFacade {
         baseUrl = url;
     }
 
-    public ClearResponse clearCall(ClearRequest request) {
+    public ClearResponseBody clearCall(ClearRequestBody request) {
         var path = "/db";
-        return this.sendRequest("DELETE", path, null, request, ClearResponse.class);
+        return this.sendRequest("DELETE", path, null, request, ClearResponseBody.class);
     }
 
-    public RegisterResponse registerCall(RegisterRequest request) {
+    public RegisterResponseBody registerCall(RegisterRequestBody request) {
         var path = "/user";
-        return this.sendRequest("POST", path, null, request, RegisterResponse.class);
+        return this.sendRequest("POST", path, null, request, RegisterResponseBody.class);
     }
 
-    public LoginResponse loginCall(LoginRequest request) {
+    public LoginResponseBody loginCall(LoginRequestBody request) {
         var path = "/session";
-        return this.sendRequest("POST", path, null, request, LoginResponse.class);
+        return this.sendRequest("POST", path, null, request, LoginResponseBody.class);
     }
 
-    public JoinGameResponse joinGameCall(JoinGameRequest request, String authToken) {
+    public JoinGameResponseBody joinGameCall(JoinGameRequestBody request, String authToken) {
         var path = "/game";
-        return this.sendRequest("PUT", path, authToken, request, JoinGameResponse.class);
+        return this.sendRequest("PUT", path, authToken, request, JoinGameResponseBody.class);
 
     }
 
-    public ListGamesResponse listGamesCall(String authToken) {
+    public ListGamesResponseBody listGamesCall(String authToken) {
         var path = "/game";
-        return this.sendRequest("GET", path, authToken, null, ListGamesResponse.class);
+        return this.sendRequest("GET", path, authToken, null, ListGamesResponseBody.class);
 
     }
 
-    public LogoutResponse logoutCall(LogoutRequest request, String authToken) {
+    public LogoutResponseBody logoutCall(LogoutRequestBody request, String authToken) {
         var path = "/session";
-        return this.sendRequest("DELETE", path, authToken, request, LogoutResponse.class);
+        return this.sendRequest("DELETE", path, authToken, request, LogoutResponseBody.class);
 
     }
 
-    public CreateGameResponse createGameCall(CreateGameRequest request, String authToken) {
+    public CreateGameResponseBody createGameCall(CreateGameRequestBody request, String authToken) {
         var path = "/game";
-        return this.sendRequest("POST", path, authToken, request, CreateGameResponse.class);
+        return this.sendRequest("POST", path, authToken, request, CreateGameResponseBody.class);
 
     }
 

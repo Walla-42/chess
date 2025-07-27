@@ -39,8 +39,8 @@ public class ServerFacadeTests {
 
     @BeforeEach
     public void setupUser() {
-        serverFacade.clearCall(new ClearRequest());
-        var request = new RegisterRequest(testUsername, testPassword, testEmail);
+        serverFacade.clearCall(new ClearRequestBody());
+        var request = new RegisterRequestBody(testUsername, testPassword, testEmail);
         var response = serverFacade.registerCall(request);
         authToken = response.authToken();
     }
@@ -49,7 +49,7 @@ public class ServerFacadeTests {
 
     @Test
     public void register_valid_returnsAuthToken() {
-        var request = new RegisterRequest("newUsername", "newPassword", "newemil@email.com");
+        var request = new RegisterRequestBody("newUsername", "newPassword", "newemil@email.com");
         var response = serverFacade.registerCall(request);
         assertNotNull(response.authToken());
         assertEquals("newUsername", response.username());
@@ -57,7 +57,7 @@ public class ServerFacadeTests {
 
     @Test
     public void register_duplicateUsername_throws() {
-        var request = new RegisterRequest(testUsername, "anotherPassword", "anotheremail@email.com");
+        var request = new RegisterRequestBody(testUsername, "anotherPassword", "anotheremail@email.com");
         assertThrows(RuntimeException.class, () -> serverFacade.registerCall(request));
     }
 
@@ -65,7 +65,7 @@ public class ServerFacadeTests {
 
     @Test
     public void login_valid_returnsAuthToken() {
-        var request = new LoginRequest(testUsername, testPassword);
+        var request = new LoginRequestBody(testUsername, testPassword);
         var response = serverFacade.loginCall(request);
         assertNotNull(response.authToken());
         assertEquals(testUsername, response.username());
@@ -73,7 +73,7 @@ public class ServerFacadeTests {
 
     @Test
     public void login_invalidPassword_throws() {
-        var request = new LoginRequest(testUsername, "wrongPassword");
+        var request = new LoginRequestBody(testUsername, "wrongPassword");
         assertThrows(RuntimeException.class, () -> serverFacade.loginCall(request));
     }
 
@@ -81,18 +81,18 @@ public class ServerFacadeTests {
 
     @Test
     public void clear_database_isCleared() {
-        var response = serverFacade.clearCall(new ClearRequest());
+        var response = serverFacade.clearCall(new ClearRequestBody());
         assertNotNull(response);
 
         // Try to log in after clearing (should fail)
-        var request = new LoginRequest(testUsername, testPassword);
+        var request = new LoginRequestBody(testUsername, testPassword);
         assertThrows(RuntimeException.class, () -> serverFacade.loginCall(request));
     }
 
     @Test
     public void clear_multipleTimes_stillSucceeds() {
-        serverFacade.clearCall(new ClearRequest());
-        var response = serverFacade.clearCall(new ClearRequest());
+        serverFacade.clearCall(new ClearRequestBody());
+        var response = serverFacade.clearCall(new ClearRequestBody());
         assertNotNull(response);
     }
 
@@ -115,7 +115,7 @@ public class ServerFacadeTests {
 
     @Test
     public void logout_validToken_succeeds() {
-        var request = new LogoutRequest(testUsername);
+        var request = new LogoutRequestBody(testUsername);
         var response = serverFacade.logoutCall(request, authToken);
         assertNotNull(response);
 
@@ -125,7 +125,7 @@ public class ServerFacadeTests {
 
     @Test
     public void logout_invalidToken_throws() {
-        var request = new LogoutRequest(testUsername);
+        var request = new LogoutRequestBody(testUsername);
         assertThrows(RuntimeException.class, () -> serverFacade.logoutCall(request, "fake-token"));
     }
 }

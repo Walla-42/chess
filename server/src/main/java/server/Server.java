@@ -81,12 +81,15 @@ public class Server {
             System.out.println("setting up User Table....");
             DatabaseUserDAO.setup();
             System.out.println("Complete UserTable setup!");
+
             System.out.println("setting up Auth Table....");
             DatabaseAuthDAO.setup();
             System.out.println("Complete AuthTable setup!");
+
             System.out.println("setting up GameData Table....");
             DatabaseGameDAO.setup();
             System.out.println("Complete GameDatTable setup!");
+
         } catch (DataAccessException e) {
             throw new RuntimeException("Error: failed to create database", e);
         }

@@ -11,6 +11,8 @@ public class EscapeSequences {
     public static final String ERASE_SCREEN = UNICODE_ESCAPE + "[H" + UNICODE_ESCAPE + "[2J";
     public static final String ERASE_LINE = UNICODE_ESCAPE + "[2K";
 
+    public static final String RESET_ALL = UNICODE_ESCAPE + "[0m";
+
     // text effects
     public static final String SET_TEXT_BOLD = UNICODE_ESCAPE + "[1m";
     public static final String SET_TEXT_FAINT = UNICODE_ESCAPE + "[2m";
@@ -51,9 +53,13 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_BLUE = SET_BG_COLOR + "12m";
     public static final String SET_BG_COLOR_MAGENTA = SET_BG_COLOR + "5m";
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
-    public static final String SET_BG_COLOR_TAN = SET_BG_COLOR + "43m";
+    public static final String SET_BG_COLOR_TAN = SET_BG_COLOR + "94m";
+    public static final String SET_BG_COLOR_ASPARAGUS = SET_BG_COLOR + "107m";
+    public static final String SET_BG_COLOR_BRONZE = SET_BG_COLOR + "137m";
+    public static final String SET_BG_COLOR_POLISHED_PINE = SET_BG_COLOR + "72m";
+    public static final String SET_BG_COLOR_AVOCADO = SET_BG_COLOR + "65m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
-    public static final String SET_BG_COLOR_LIGHT_GREEN = SET_BG_COLOR + "[92m";
+
 
     // chess pieces
     public static final String WHITE_KING = " ♔ ";

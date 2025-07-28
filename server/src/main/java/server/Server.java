@@ -19,14 +19,14 @@ public class Server {
 
     //use this to toggle in memory or Database usage;
     private final boolean useMemory = false;
-    private final boolean testMode = true;
+    private final boolean manualTestMode = false;
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
     public Server() {
-        if (testMode) {
+        if (manualTestMode) {
             System.out.println("\u001b[38;5;160m" + "MANUAL TEST MODE IS ACTIVE. REMOVING DATABASE TABLES.");
             try {
                 DatabaseManager.dropDatabase();

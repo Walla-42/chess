@@ -121,6 +121,6 @@ public class LogoutREPL {
 
     public void printWelcome() {
 
-        System.out.println(entryEmoji + crown + blue + " Welcome to 240 Chess! Type " + red + "'help'" + blue + " to get started " + reset + crown + entryEmoji);
+        System.out.println(entryEmoji + crown + blue + " Welcome to 240 Chess! Type " + green + "'help'" + blue + " to get started " + reset + crown + entryEmoji);
     }
 }

@@ -45,25 +45,17 @@ public class LoginREPL {
                     logoutSequence();
                     return false;
                 case "list":
-                    ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
-
-                    System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", yellow, "Game ID",
-                            "Game Name", "White Username", "Black Username", reset);
-
-                    int gameID = 0;
-                    for (GamesObject gameObject : response.games()) {
-                        gameID += 1;
-                        String gameName = gameObject.gameName();
-                        String blackUsername = gameObject.blackUsername();
-                        String whiteUsername = gameObject.whiteUsername();
-                        System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", yellow, gameID,
-                                blue, gameName, whiteUsername, blackUsername, reset);
-                    }
+                    listGamesSequence();
                     break;
-
                 case "join":
-                    // put join game call here
-                    new LoginREPL(server, session).run();
+                    if (userInput.length != 3) {
+                        System.out.println(red + "Invalid input for join. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+                        break;
+                    }
+                    boolean joined = joinGameSequence(userInput);
+                    if (joined) {
+                        new InGameREPL().run();
+                    }
                     break;
                 case "create":
                     if (userInput.length != 2) {
@@ -71,14 +63,10 @@ public class LoginREPL {
                         break;
                     }
 
-                    String gameName = userInput[1];
-
-                    CreateGameRequestBody request = new CreateGameRequestBody(gameName);
-                    server.createGameCall(request, session.getAuthToken());
-
-                    System.out.println(yellow + "Successfully create a game with name: " + green + gameName + reset);
+                    createGameSequence(userInput);
                     break;
                 case "observe":
+                    // implement observe here
                     break;
                 case "quit":
                     logoutSequence();
@@ -101,7 +89,7 @@ public class LoginREPL {
     }
 
     private void printWelcome() {
-        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + red + "'help'" + blue + " for more commands." + reset);
+        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
     }
 
     private void logoutSequence() {
@@ -110,6 +98,58 @@ public class LoginREPL {
 
         System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
         session.clearSession();
+    }
+
+    private void listGamesSequence() {
+        ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
+
+        System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", yellow, "Game ID",
+                "Game Name", "White Username", "Black Username", reset);
+
+        session.clearMap();
+        int gameID = 0;
+        for (GamesObject gameObject : response.games()) {
+            gameID += 1;
+            String gameName = gameObject.gameName();
+            String blackUsername = gameObject.blackUsername();
+            String whiteUsername = gameObject.whiteUsername();
+
+            session.addMapValue(gameID, gameObject.gameID());
+            System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", yellow, gameID,
+                    blue, gameName, whiteUsername, blackUsername, reset);
+        }
+    }
+
+    private boolean joinGameSequence(String[] userInput) {
+        try {
+            String playerColor = userInput[2];
+            int userFacingGameID = Integer.parseInt(userInput[1]);
+
+            Integer gameID = session.getGameID(userFacingGameID);
+
+            if (gameID == null) {
+                System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
+                return false;
+            }
+            JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
+            server.joinGameCall(request, session.getAuthToken());
+
+            System.out.println(yellow + "Successfully joined game " + green + userFacingGameID + reset);
+            return true;
+        } catch (Throwable e) {
+            var msg = e.getMessage();
+            System.out.print(red + msg + "\n" + reset);
+            return false;
+        }
+    }
+
+    private void createGameSequence(String[] userInput) {
+        String gameName = userInput[1];
+
+        CreateGameRequestBody request = new CreateGameRequestBody(gameName);
+        server.createGameCall(request, session.getAuthToken());
+
+        System.out.println(yellow + "Successfully create a game with name: " + green + gameName + reset);
     }
 }
 

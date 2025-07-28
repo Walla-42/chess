@@ -2,6 +2,7 @@ package ui;
 
 import java.util.Scanner;
 
+import requests.LogoutRequestBody;
 import server.ClientSession;
 import server.ServerFacade;
 
@@ -12,6 +13,8 @@ public class LoginREPL {
     private final String blue = EscapeSequences.SET_TEXT_COLOR_BLUE;
     private final String reset = EscapeSequences.RESET_TEXT_COLOR;
     private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
+    private final String yellow = EscapeSequences.SET_TEXT_COLOR_YELLOW;
+    private final String green = EscapeSequences.SET_TEXT_COLOR_GREEN;
 
 
     public LoginREPL(ServerFacade server, ClientSession session) {
@@ -25,7 +28,7 @@ public class LoginREPL {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.print("[Logged In] >>> ");
+            System.out.print("[" + green + session.getUsername() + reset + "] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
                 System.out.println("please type a valid command or 'help' for more information");
@@ -37,7 +40,8 @@ public class LoginREPL {
                     printHelp();
                     break;
                 case "logout":
-                    // put logout call here
+                    LogoutRequestBody logoutRequest = new LogoutRequestBody(session.getAuthToken());
+                    server.loginCall(logoutRequest);
                     System.out.println("Logging out...");
                     return;
                 case "list":

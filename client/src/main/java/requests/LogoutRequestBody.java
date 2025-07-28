@@ -1,4 +1,4 @@
 package requests;
 
-public record LogoutRequestBody(String authToken) {
+public record LogoutRequestBody() {
 }

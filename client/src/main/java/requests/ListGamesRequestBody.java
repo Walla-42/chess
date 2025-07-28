@@ -1,4 +1,4 @@
 package requests;
 
-public record ListGamesRequestBody(String authToken) {
+public record ListGamesRequestBody() {
 }

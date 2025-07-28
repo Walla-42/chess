@@ -9,9 +9,16 @@ public class LoginREPL {
     private ServerFacade server;
     private ClientSession session;
 
+    private final String blue = EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private final String reset = EscapeSequences.RESET_TEXT_COLOR;
+    private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
+
+
     public LoginREPL(ServerFacade server, ClientSession session) {
         this.server = server;
         this.session = session;
+
+        printWelcome();
     }
 
     public void run() {
@@ -19,7 +26,11 @@ public class LoginREPL {
 
         while (true) {
             System.out.print("[Logged In] >>> ");
-            String command = scanner.nextLine().trim().toLowerCase();
+            String[] userInput = scanner.nextLine().trim().split("\\s+");
+            if (userInput.length == 0) {
+                System.out.println("please type a valid command or 'help' for more information");
+            }
+            String command = userInput[0].toLowerCase();
 
             switch (command) {
                 case "help":
@@ -29,17 +40,19 @@ public class LoginREPL {
                     // put logout call here
                     System.out.println("Logging out...");
                     return;
-                case "list games":
+                case "list":
                     // put list games call here
                     break;
-                case "play game":
+                case "join":
                     // put join game call here
                     new LoginREPL(server, session).run();
                     break;
-                case "create game":
+                case "create":
                     // put create game call here
                     break;
-                case "observe game":
+                case "observe":
+                    break;
+                case "quit":
                     break;
                 default:
                     System.out.println("Unknown command.");
@@ -49,6 +62,16 @@ public class LoginREPL {
     }
 
     private void printHelp() {
-        throw new RuntimeException("not yet implemented");
+        System.out.println("\t" + blue + "create <NAME> " + red + "- to create a game");
+        System.out.println("\t" + blue + "list " + red + "- to list all games");
+        System.out.println("\t" + blue + "join <ID> [WHITE|BLACK] " + red + "- to join a game");
+        System.out.println("\t" + blue + "observe <ID> " + red + "- to observe a game");
+        System.out.println("\t" + blue + "logout " + red + "- to logout");
+        System.out.println("\t" + blue + "quit " + red + "- to quit the application");
+        System.out.println("\t" + blue + "help " + red + "- display possible commands" + reset);
+    }
+
+    private void printWelcome() {
+        System.out.println("Welcome " + session.getUsername() + "!" + blue + " type " + red + "'help'" + blue + " for more commands." + reset);
     }
 }

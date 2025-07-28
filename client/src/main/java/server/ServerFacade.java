@@ -18,8 +18,8 @@ public class ServerFacade {
     private static final Gson gson = new Gson();
 
 
-    public ServerFacade(String url) {
-        baseUrl = url;
+    public ServerFacade(Integer port) {
+        baseUrl = "http://localhost:" + port;
     }
 
     public ClearResponseBody clearCall(ClearRequestBody request) {
@@ -40,25 +40,21 @@ public class ServerFacade {
     public JoinGameResponseBody joinGameCall(JoinGameRequestBody request, String authToken) {
         var path = "/game";
         return this.sendRequest("PUT", path, authToken, request, JoinGameResponseBody.class);
-
     }
 
     public ListGamesResponseBody listGamesCall(String authToken) {
         var path = "/game";
         return this.sendRequest("GET", path, authToken, null, ListGamesResponseBody.class);
-
     }
 
     public LogoutResponseBody logoutCall(LogoutRequestBody request, String authToken) {
         var path = "/session";
         return this.sendRequest("DELETE", path, authToken, request, LogoutResponseBody.class);
-
     }
 
     public CreateGameResponseBody createGameCall(CreateGameRequestBody request, String authToken) {
         var path = "/game";
         return this.sendRequest("POST", path, authToken, request, CreateGameResponseBody.class);
-
     }
 
     private <T> T sendRequest(String method, String route, String token, Object reqBody, Class<T> responseType) {

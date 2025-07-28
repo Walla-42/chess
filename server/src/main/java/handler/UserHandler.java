@@ -44,15 +44,15 @@ public class UserHandler {
 
         } catch (UsernameTakenException e) {
             registerResp.status(403);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 403));
 
         } catch (BadRequestException e) {
             registerResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (DatabaseAccessException e) {
             registerResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 
@@ -74,15 +74,15 @@ public class UserHandler {
 
         } catch (BadRequestException e) {
             loginResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (UnauthorizedAccessException e) {
             loginResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (DatabaseAccessException e) {
             loginResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 
@@ -104,11 +104,11 @@ public class UserHandler {
 
         } catch (UnauthorizedAccessException e) {
             logoutResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (DatabaseAccessException e) {
             logoutResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 

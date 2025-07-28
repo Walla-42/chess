@@ -3,13 +3,18 @@ import server.ClientSession;
 import server.ServerFacade;
 import ui.LogoutREPL;
 
+
 public class Main {
+    private static ServerFacade facade;
+
     public static void main(String[] args) {
-        String serverURL = "https://localhost:8080";
-//        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-//        System.out.println("♕ 240 Chess Client: " + piece);
+        int serverPort = 8080;
+
+        System.out.println("Started HTTP server on " + serverPort);
+        facade = new ServerFacade(serverPort);
+
         ClientSession session = new ClientSession();
-        ServerFacade server = new ServerFacade(serverURL);
+        ServerFacade server = new ServerFacade(serverPort);
 
         LogoutREPL preloginUI = new LogoutREPL(server, session);
         preloginUI.run();

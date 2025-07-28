@@ -19,12 +19,26 @@ public class Server {
 
     //use this to toggle in memory or Database usage;
     private final boolean useMemory = false;
+    private final boolean testMode = true;
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
     public Server() {
+        if (testMode) {
+            System.out.println("\u001b[38;5;160m" + "MANUAL TEST MODE IS ACTIVE. REMOVING DATABASE TABLES.");
+            try {
+                DatabaseManager.dropDatabase();
+                System.out.println("DATABASE TABLES WERE DROPPED." + "\u001b[39m");
+            } catch (DataAccessException e) {
+                System.out.println("System was unable to drop database. Current database tables:");
+                DatabaseManager.printTableContents("userdatabase");
+                DatabaseManager.printTableContents("gamedatabase");
+                DatabaseManager.printTableContents("authdatabase");
+            }
+        }
+
         if (!useMemory) {
             try {
                 databaseSetup();

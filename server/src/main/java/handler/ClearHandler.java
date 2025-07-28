@@ -36,7 +36,7 @@ public class ClearHandler {
 
         } catch (DatabaseAccessException e) {
             clearResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 }

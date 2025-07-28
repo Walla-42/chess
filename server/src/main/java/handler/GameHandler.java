@@ -41,11 +41,11 @@ public class GameHandler {
 
         } catch (DatabaseAccessException e) {
             listGamesResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
 
         } catch (DataAccessException e) {
             listGamesResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         }
     }
@@ -69,15 +69,15 @@ public class GameHandler {
 
         } catch (BadRequestException e) {
             createGameResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (UnauthorizedAccessException e) {
             createGameResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (DatabaseAccessException e) {
             createGameResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 
@@ -102,19 +102,19 @@ public class GameHandler {
 
         } catch (BadRequestException e) {
             joinGameResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (UnauthorizedAccessException e) {
             joinGameResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (GameTakenException e) {
             joinGameResp.status(403);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 403));
 
         } catch (DatabaseAccessException e) {
             joinGameResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage()));
+            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 }

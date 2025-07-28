@@ -1,5 +1,8 @@
 package ui;
 
+import requests.LoginRequestBody;
+import requests.RegisterRequestBody;
+import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
 
@@ -26,21 +29,71 @@ public class LogoutREPL {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
+            String username;
+            String password;
+
             System.out.print("[Logged Out] >>> ");
-            String command = scanner.nextLine().trim().toLowerCase();
+            String[] userInput = scanner.nextLine().trim().split("\\s+");
+            if (userInput.length == 0) {
+                System.out.println("please type a valid command or 'help' for more information");
+            }
+            String command = userInput[0].toLowerCase();
+
 
             switch (command) {
                 case "help":
                     printHelp();
                     break;
-                case "login":
-                    // put login call here
-                    new LoginREPL(server, session).run();
-                    break;
                 case "register":
-                    // put register call here
-                    new LoginREPL(server, session).run();
+                    if (userInput.length != 4) {
+                        System.out.println("Invalid input for register. Type help for more information.");
+                        break;
+                    }
+
+                    username = userInput[1];
+                    password = userInput[2];
+                    String email = userInput[3];
+
+                    try {
+                        RegisterRequestBody request = new RegisterRequestBody(username, password, email);
+                        RegisterResponseBody response = server.registerCall(request);
+
+                        session.setAuthToken(response.authToken());
+                        session.setUsername(response.username());
+
+                        new LoginREPL(server, session).run();
+                        break;
+                    } catch (Throwable e) {
+                        var msg = e.getMessage();
+                        System.out.print(msg + "\n");
+                    }
                     break;
+
+                case "login":
+                    if (userInput.length != 3) {
+                        System.out.println("Invalid input for register. Type help for more information.");
+                        break;
+                    }
+
+                    username = userInput[1];
+                    password = userInput[2];
+
+                    try {
+                        LoginRequestBody request = new LoginRequestBody(username, password);
+                        LoginResponseBody response = server.loginCall(request);
+
+                        session.setUsername(response.username());
+                        session.setAuthToken(response.authToken());
+
+                        new LoginREPL(server, session).run();
+                        break;
+
+                    } catch (Throwable e) {
+                        var msg = e.toString();
+                        System.out.print(msg + "\n");
+                    }
+                    break;
+
                 case "quit":
                     System.out.println("Exiting...");
                     return;

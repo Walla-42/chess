@@ -2,7 +2,8 @@ package ui;
 
 import java.util.Scanner;
 
-import requests.LogoutRequestBody;
+import model.GamesObject;
+import requests.*;
 import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
@@ -48,14 +49,38 @@ public class LoginREPL {
                     session.clearSession();
                     return;
                 case "list":
-                    // put list games call here
+                    ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
+
+                    System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", yellow, "Game ID",
+                            "Game Name", "White Username", "Black Username", reset);
+
+                    int gameID = 0;
+                    for (GamesObject gameObject : response.games()) {
+                        gameID += 1;
+                        String gameName = gameObject.gameName();
+                        String blackUsername = gameObject.blackUsername();
+                        String whiteUsername = gameObject.whiteUsername();
+                        System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", yellow, gameID,
+                                blue, gameName, whiteUsername, blackUsername, reset);
+                    }
                     break;
+
                 case "join":
                     // put join game call here
                     new LoginREPL(server, session).run();
                     break;
                 case "create":
-                    // put create game call here
+                    if (userInput.length != 2) {
+                        System.out.println(red + "Invalid input for create. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+                        break;
+                    }
+
+                    String gameName = userInput[1];
+
+                    CreateGameRequestBody request = new CreateGameRequestBody(gameName);
+                    server.createGameCall(request, session.getAuthToken());
+
+                    System.out.println(yellow + "Successfully create a game with name: " + green + gameName + reset);
                     break;
                 case "observe":
                     break;

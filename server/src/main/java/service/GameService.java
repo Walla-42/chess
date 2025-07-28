@@ -48,7 +48,7 @@ public class GameService {
             throw new UnauthorizedAccessException("Error: Invalid Auth Token");
         }
 
-        Collection<GamesObject> games = gameDAO.listGames();
+        Collection<GameData> games = gameDAO.listGames();
 
         return new ListGamesResponse(games);
 

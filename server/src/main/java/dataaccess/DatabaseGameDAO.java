@@ -16,19 +16,21 @@ import java.util.HashSet;
 public class DatabaseGameDAO implements GameDAO {
 
     @Override
-    public Collection<GamesObject> listGames() throws DatabaseAccessException {
-        String getString = "SELECT gameID, white_username, black_username, game_name FROM gamedatabase";
+    public Collection<GameData> listGames() throws DatabaseAccessException {
+        Gson gson = new Gson();
+        String getString = "SELECT gameID, white_username, black_username, game_name, chess_game FROM gamedatabase";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
             try (var gameQuery = statement.executeQuery()) {
-                HashSet<GamesObject> activeGames = new HashSet<>();
+                HashSet<GameData> activeGames = new HashSet<>();
                 while (gameQuery.next()) {
                     var gameID = gameQuery.getInt("gameID");
                     var whiteUsername = gameQuery.getString("white_username");
                     var blackUsername = gameQuery.getString("black_username");
                     var gameName = gameQuery.getString("game_name");
+                    var game = gson.fromJson(gameQuery.getString("chess_game"), ChessGame.class);
 
-                    activeGames.add(new GamesObject(gameID, whiteUsername, blackUsername, gameName));
+                    activeGames.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
                 }
                 return activeGames;
             }
@@ -115,7 +117,7 @@ public class DatabaseGameDAO implements GameDAO {
                 throw new DatabaseAccessException("Error: No game found with gameID " + gameId);
             }
 
-            
+
         } catch (SQLException | DataAccessException e) {
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }

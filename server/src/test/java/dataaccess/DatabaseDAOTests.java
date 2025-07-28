@@ -119,7 +119,7 @@ class CombinedDatabaseDAOTests {
     @Test
     void listGamesNegative() {
         assertDoesNotThrow(() -> {
-            Collection<GamesObject> games = gameDao.listGames();
+            Collection<GameData> games = gameDao.listGames();
             assertNotNull(games);
         });
     }

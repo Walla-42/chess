@@ -19,15 +19,16 @@ public class MemoryGameDataDAO implements GameDAO {
      *
      * @return Collectin of GamesObject that can be used by the UserHandlerClass
      */
-    public Collection<GamesObject> listGames() {
-        HashSet<GamesObject> activeGames = new HashSet<>();
+    public Collection<GameData> listGames() {
+        HashSet<GameData> activeGames = new HashSet<>();
 
         for (Integer gameID : gameIDs) {
             GameData gameData = gameDatabase.get(gameID);
-            GamesObject game = new GamesObject(gameData.gameID(),
+            GameData game = new GameData(gameData.gameID(),
                     gameData.whiteUserName(),
                     gameData.blackUserName(),
-                    gameData.gameName());
+                    gameData.gameName(),
+                    gameData.game());
 
             activeGames.add(game);
         }

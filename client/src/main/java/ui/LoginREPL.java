@@ -2,7 +2,8 @@ package ui;
 
 import java.util.Scanner;
 
-import model.GamesObject;
+import chess.ChessGame;
+import model.GameData;
 import requests.*;
 import responses.*;
 import server.ClientSession;
@@ -87,13 +88,14 @@ public class LoginREPL {
 
         session.clearMap();
         int gameID = 0;
-        for (GamesObject gameObject : response.games()) {
+        for (GameData gameData : response.games()) {
             gameID += 1;
-            String gameName = gameObject.gameName();
-            String blackUsername = gameObject.blackUsername();
-            String whiteUsername = gameObject.whiteUsername();
+            String gameName = gameData.gameName();
+            String blackUsername = gameData.blackUserName();
+            String whiteUsername = gameData.whiteUserName();
 
-            session.addMapValue(gameID, gameObject.gameID());
+            session.addGameDataMapValue(gameID, gameData);
+            session.addLookupMapValue(gameID, gameData.gameID());
             System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", yellow, gameID,
                     blue, gameName, whiteUsername, blackUsername, reset);
         }
@@ -111,7 +113,8 @@ public class LoginREPL {
             int userFacingGameID = Integer.parseInt(userInput[1]);
 
             Integer gameID = session.getGameID(userFacingGameID);
-            // need to get gameData for game session
+
+            GameData chessGame = session.getChessGame(userFacingGameID);
 
             if (gameID == null) {
                 System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
@@ -120,8 +123,9 @@ public class LoginREPL {
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
             server.joinGameCall(request, session.getAuthToken());
 
-            new InGameREPL(server, session, null, playerColor).run();
             System.out.println(yellow + "Joining game " + green + userFacingGameID + reset);
+            new InGameREPL(server, session, chessGame, playerColor).run();
+
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(red + msg + "\n" + reset);

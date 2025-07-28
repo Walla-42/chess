@@ -19,7 +19,7 @@ public class Server {
 
     //use this to toggle in memory or Database usage;
     private final boolean useMemory = false;
-    private final boolean manualTestMode = false;
+    private final boolean manualTestMode = true;
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;

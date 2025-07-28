@@ -67,7 +67,8 @@ public class LoginREPL {
     }
 
     private void printWelcome() {
-        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
+        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " +
+                green + "'help'" + blue + " for more commands." + reset);
     }
 
     private void logoutSequence() {
@@ -100,7 +101,8 @@ public class LoginREPL {
 
     private void joinGameSequence(String[] userInput) {
         if (userInput.length != 3) {
-            System.out.println(red + "Invalid input for join. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            System.out.println(red + "Invalid input for join. " +
+                    reset + "Type " + green + "'help'" + reset + " for more information.");
             return;
         }
 
@@ -109,6 +111,7 @@ public class LoginREPL {
             int userFacingGameID = Integer.parseInt(userInput[1]);
 
             Integer gameID = session.getGameID(userFacingGameID);
+            // need to get gameData for game session
 
             if (gameID == null) {
                 System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
@@ -117,7 +120,7 @@ public class LoginREPL {
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
             server.joinGameCall(request, session.getAuthToken());
 
-            new InGameREPL().run();
+            new InGameREPL(server, session, null, playerColor).run();
             System.out.println(yellow + "Joining game " + green + userFacingGameID + reset);
         } catch (Throwable e) {
             var msg = e.getMessage();
@@ -131,7 +134,8 @@ public class LoginREPL {
 
     private void createGameSequence(String[] userInput) {
         if (userInput.length != 2) {
-            System.out.println(red + "Invalid input for create. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            System.out.println(red + "Invalid input for create. " + reset
+                    + "Type " + green + "'help'" + reset + " for more information.");
             return;
         }
 

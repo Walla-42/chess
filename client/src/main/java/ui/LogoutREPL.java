@@ -33,7 +33,8 @@ public class LogoutREPL {
             System.out.print("[Logged Out] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
-                System.out.println(red + "Invalid input. " + reset + "Type " + green + "'help'" + reset + " for a list of commands.");
+                System.out.println(red + "Invalid input. " + reset + "Type " +
+                        green + "'help'" + reset + " for a list of commands.");
             }
             String command = userInput[0].toLowerCase();
 
@@ -56,8 +57,8 @@ public class LogoutREPL {
                     System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
                     return;
                 }
-                default ->
-                        System.out.println(red + "Invalid command. " + reset + "Type " + green + "'help'" + reset + " for list of commands.");
+                default -> System.out.println(red + "Invalid command. " + reset + "Type " +
+                        green + "'help'" + reset + " for list of commands.");
             }
         }
     }
@@ -70,12 +71,14 @@ public class LogoutREPL {
     }
 
     private void printWelcome() {
-        System.out.println(entryEmoji + crown + blue + " Welcome to 240 Chess! Type " + green + "'help'" + blue + " to get started " + reset + crown + entryEmoji);
+        System.out.println(entryEmoji + crown + blue + " Welcome to 240 Chess! Type " +
+                green + "'help'" + blue + " to get started " + reset + crown + entryEmoji);
     }
 
     private boolean registerSequence(String[] userInput) {
         if (userInput.length != 4) {
-            System.out.println(red + "Invalid input for register. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            System.out.println(red + "Invalid input for register. " + reset + "Type " +
+                    green + "'help'" + reset + " for more information.");
             return false;
         }
 
@@ -105,7 +108,8 @@ public class LogoutREPL {
 
     private boolean loginSequence(String[] userInput) {
         if (userInput.length != 3) {
-            System.out.println(red + "Invalid input for login. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            System.out.println(red + "Invalid input for login. " + reset + "Type " +
+                    green + "'help'" + reset + " for more information.");
             return false;
         }
 
@@ -128,7 +132,6 @@ public class LogoutREPL {
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(red + msg + "\n" + reset);
-            ;
         }
         return false;
     }

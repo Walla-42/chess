@@ -38,42 +38,14 @@ public class LoginREPL {
             String command = userInput[0].toLowerCase();
 
             switch (command) {
-                case "help":
-                    printHelp();
-                    break;
-                case "logout":
-                    logoutSequence();
-                    return false;
-                case "list":
-                    listGamesSequence();
-                    break;
-                case "join":
-                    if (userInput.length != 3) {
-                        System.out.println(red + "Invalid input for join. " + reset + "Type " + green + "'help'" + reset + " for more information.");
-                        break;
-                    }
-                    boolean joined = joinGameSequence(userInput);
-                    if (joined) {
-                        new InGameREPL().run();
-                    }
-                    break;
-                case "create":
-                    if (userInput.length != 2) {
-                        System.out.println(red + "Invalid input for create. " + reset + "Type " + green + "'help'" + reset + " for more information.");
-                        break;
-                    }
-
-                    createGameSequence(userInput);
-                    break;
-                case "observe":
-                    // implement observe here
-                    break;
-                case "quit":
-                    logoutSequence();
-                    return true;
-                default:
-                    System.out.println("Unknown command.");
-                    printHelp();
+                case "help" -> printHelp();
+                case "logout" -> logoutSequence(false);
+                case "list" -> listGamesSequence();
+                case "join" -> joinGameSequence(userInput);
+                case "create" -> createGameSequence(userInput);
+                case "observe" -> observerSequence();
+                case "quit" -> logoutSequence(true);
+                default -> System.out.println("Unknown command.");
             }
         }
     }
@@ -92,12 +64,14 @@ public class LoginREPL {
         System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
     }
 
-    private void logoutSequence() {
+    private boolean logoutSequence(boolean quit) {
         LogoutRequestBody logoutRequest = new LogoutRequestBody();
         server.logoutCall(logoutRequest, session.getAuthToken());
 
         System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
         session.clearSession();
+
+        return quit;
     }
 
     private void listGamesSequence() {
@@ -120,7 +94,12 @@ public class LoginREPL {
         }
     }
 
-    private boolean joinGameSequence(String[] userInput) {
+    private void joinGameSequence(String[] userInput) {
+        if (userInput.length != 3) {
+            System.out.println(red + "Invalid input for join. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            return;
+        }
+
         try {
             String playerColor = userInput[2];
             int userFacingGameID = Integer.parseInt(userInput[1]);
@@ -129,21 +108,29 @@ public class LoginREPL {
 
             if (gameID == null) {
                 System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
-                return false;
+                return;
             }
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
             server.joinGameCall(request, session.getAuthToken());
 
-            System.out.println(yellow + "Successfully joined game " + green + userFacingGameID + reset);
-            return true;
+            new InGameREPL().run();
+            System.out.println(yellow + "Joining game " + green + userFacingGameID + reset);
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(red + msg + "\n" + reset);
-            return false;
         }
     }
 
+    private void observerSequence() {
+        throw new RuntimeException("not yet implemented");
+    }
+
     private void createGameSequence(String[] userInput) {
+        if (userInput.length != 2) {
+            System.out.println(red + "Invalid input for create. " + reset + "Type " + green + "'help'" + reset + " for more information.");
+            return;
+        }
+
         String gameName = userInput[1];
 
         CreateGameRequestBody request = new CreateGameRequestBody(gameName);

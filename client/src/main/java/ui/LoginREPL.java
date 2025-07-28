@@ -3,6 +3,7 @@ package ui;
 import java.util.Scanner;
 
 import requests.LogoutRequestBody;
+import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
 
@@ -40,9 +41,11 @@ public class LoginREPL {
                     printHelp();
                     break;
                 case "logout":
-                    LogoutRequestBody logoutRequest = new LogoutRequestBody(session.getAuthToken());
-                    server.loginCall(logoutRequest);
-                    System.out.println("Logging out...");
+                    LogoutRequestBody logoutRequest = new LogoutRequestBody();
+                    server.logoutCall(logoutRequest, session.getAuthToken());
+
+                    System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
+                    session.clearSession();
                     return;
                 case "list":
                     // put list games call here
@@ -76,6 +79,6 @@ public class LoginREPL {
     }
 
     private void printWelcome() {
-        System.out.println("Welcome " + session.getUsername() + "!" + blue + " type " + red + "'help'" + blue + " for more commands." + reset);
+        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + red + "'help'" + blue + " for more commands." + reset);
     }
 }

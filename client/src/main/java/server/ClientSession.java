@@ -19,4 +19,9 @@ public class ClientSession {
     public String getAuthToken() {
         return this.authToken;
     }
+
+    public void clearSession() {
+        this.username = null;
+        this.authToken = null;
+    }
 }

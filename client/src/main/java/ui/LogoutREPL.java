@@ -63,8 +63,12 @@ public class LogoutREPL {
                         session.setAuthToken(response.authToken());
                         session.setUsername(response.username());
 
-                        new LoginREPL(server, session).run();
-                        break;
+                        boolean quit = new LoginREPL(server, session).run();
+                        if (quit) {
+                            System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
+                            return;
+                        }
+
                     } catch (Throwable e) {
                         var msg = e.getMessage();
                         System.out.print(red + msg + "\n" + reset);
@@ -87,8 +91,11 @@ public class LogoutREPL {
                         session.setUsername(response.username());
                         session.setAuthToken(response.authToken());
 
-                        new LoginREPL(server, session).run();
-                        break;
+                        boolean quit = new LoginREPL(server, session).run();
+                        if (quit) {
+                            System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
+                            return;
+                        }
 
                     } catch (Throwable e) {
                         var msg = e.getMessage();

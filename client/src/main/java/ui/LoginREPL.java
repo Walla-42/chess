@@ -26,7 +26,7 @@ public class LoginREPL {
         printWelcome();
     }
 
-    public void run() {
+    public boolean run() {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -42,12 +42,8 @@ public class LoginREPL {
                     printHelp();
                     break;
                 case "logout":
-                    LogoutRequestBody logoutRequest = new LogoutRequestBody();
-                    server.logoutCall(logoutRequest, session.getAuthToken());
-
-                    System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
-                    session.clearSession();
-                    return;
+                    logoutSequence();
+                    return false;
                 case "list":
                     ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
 
@@ -85,7 +81,8 @@ public class LoginREPL {
                 case "observe":
                     break;
                 case "quit":
-                    break;
+                    logoutSequence();
+                    return true;
                 default:
                     System.out.println("Unknown command.");
                     printHelp();
@@ -106,4 +103,14 @@ public class LoginREPL {
     private void printWelcome() {
         System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + red + "'help'" + blue + " for more commands." + reset);
     }
+
+    private void logoutSequence() {
+        LogoutRequestBody logoutRequest = new LogoutRequestBody();
+        server.logoutCall(logoutRequest, session.getAuthToken());
+
+        System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
+        session.clearSession();
+    }
 }
+
+

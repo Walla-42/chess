@@ -39,12 +39,18 @@ public class LoginREPL {
 
             switch (command) {
                 case "help" -> printHelp();
-                case "logout" -> logoutSequence(false);
+                case "logout" -> {
+                    logoutSequence();
+                    return false;
+                }
                 case "list" -> listGamesSequence();
                 case "join" -> joinGameSequence(userInput);
                 case "create" -> createGameSequence(userInput);
                 case "observe" -> observerSequence();
-                case "quit" -> logoutSequence(true);
+                case "quit" -> {
+                    logoutSequence();
+                    return true;
+                }
                 default -> System.out.println("Unknown command.");
             }
         }
@@ -64,14 +70,12 @@ public class LoginREPL {
         System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
     }
 
-    private boolean logoutSequence(boolean quit) {
+    private void logoutSequence() {
         LogoutRequestBody logoutRequest = new LogoutRequestBody();
         server.logoutCall(logoutRequest, session.getAuthToken());
 
         System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
         session.clearSession();
-
-        return quit;
     }
 
     private void listGamesSequence() {

@@ -23,6 +23,13 @@ public class GameBoardPrinter {
     private static final String BORDER_BACKGROUND = SET_BG_COLOR_AVOCADO;
     private static final String BORDER_TEXT = SET_TEXT_COLOR_WHITE;
 
+    /**
+     * Prints the current state of a chess game board to the given output stream, with appropriate orientation and coloring.
+     *
+     * @param game  the {@code ChessGame} object containing the board state
+     * @param color the perspective to render from; if "white", shows white at the bottom, otherwise black
+     * @param out   the PrintStream to print the board to (supports UTF-8)
+     */
     public static void printGameBoard(ChessGame game, String color, PrintStream out) {
         ChessBoard board = game.getBoard();
 
@@ -68,6 +75,12 @@ public class GameBoardPrinter {
         out.println("\n");
     }
 
+    /**
+     * Prints the column labels (letters a–h or h–a depending on perspective) above and below the board.
+     *
+     * @param out              the {@code PrintStream} to print to
+     * @param whitePerspective true if rendering from white's perspective, false for black's perspective
+     */
     private static void printLetters(PrintStream out, boolean whitePerspective) {
         int padding = (SQUARE_WIDTH - 1) / 2;
         out.print(BORDER_BACKGROUND + BORDER_TEXT + "  ");
@@ -86,6 +99,13 @@ public class GameBoardPrinter {
         out.print("    " + RESET);
     }
 
+    /**
+     * Prints the row labels (numbers 1–8 or 8–1 depending on perspective) alongside the board.
+     *
+     * @param out  the PrintSteam to print to
+     * @param line the line index within the square height
+     * @param row  the current row number
+     */
     private static void printNumbers(PrintStream out, int line, int row) {
         out.print(BORDER_BACKGROUND + BORDER_TEXT);
         if (line == SQUARE_HEIGHT / 2) {
@@ -96,6 +116,12 @@ public class GameBoardPrinter {
         out.print(RESET);
     }
 
+    /**
+     * Returns the Unicode character representing the given chess piece.
+     *
+     * @param piece the {@code ChessPiece} to represent
+     * @return a string with the Unicode symbol for the piece, or an empty string if the square is empty
+     */
     private static String getPieceSymbol(ChessPiece piece) {
         if (piece == null) {
             return EMPTY;

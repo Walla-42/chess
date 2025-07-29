@@ -33,7 +33,6 @@ public class DatabaseGameDAO implements GameDAO {
 
                     activeGames.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
                 }
-                System.out.println("Exiting ListGamesDAO method. Returning:" + activeGames);
                 return activeGames;
             }
         } catch (SQLException | DataAccessException e) {

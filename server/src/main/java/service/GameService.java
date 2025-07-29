@@ -43,9 +43,6 @@ public class GameService {
             DatabaseAccessException, BadRequestException {
         String authToken = listGamesRequest.authToken();
 
-        //test statemnts:
-        System.out.println("Entering ListGamesService Method. ListGamesRequest:" + listGamesRequest);
-
         if (authToken == null || authService.getAuth(authToken) == null) {
             throw new UnauthorizedAccessException("Error: Invalid Auth Token");
         }
@@ -53,7 +50,6 @@ public class GameService {
         Collection<GameData> games = gameDAO.listGames();
         ListGamesResponse response = new ListGamesResponse(games);
 
-        System.out.println("Exiting List Games Service Method. ListGamesResponse:" + response);
         return response;
 
     }

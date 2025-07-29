@@ -17,11 +17,16 @@ public class LoginREPL {
     private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
     private final String yellow = EscapeSequences.SET_TEXT_COLOR_YELLOW;
     private final String green = EscapeSequences.SET_TEXT_COLOR_GREEN;
+    private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
+    ;
 
 
     public LoginREPL(ServerFacade server, ClientSession session) {
         this.server = server;
         this.session = session;
+
+        System.out.print(ERASE_SCREEN);
+        System.out.flush();
 
         printWelcome();
     }
@@ -127,6 +132,9 @@ public class LoginREPL {
                     " as " + green + playerColor + reset);
             new InGameREPL(server, session, chessGame, playerColor).run();
 
+            System.out.println(yellow + "You have successfully exited game view. " + blue + "Type " + green +
+                    "'help'" + blue + " for list of available commands.");
+
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(red + msg + "\n" + reset);
@@ -152,6 +160,9 @@ public class LoginREPL {
             }
 
             new InGameREPL(server, session, chessGame, "white").run();
+
+            System.out.println(yellow + "You have successfully exited game view. " + blue + "Type " + green +
+                    "'help'" + blue + " for list of available commands.");
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(red + msg + "\n" + reset);

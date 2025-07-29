@@ -9,6 +9,8 @@ import model.GameData;
 import server.ClientSession;
 import server.ServerFacade;
 
+import static ui.EscapeSequences.*;
+
 public class InGameREPL {
     private ServerFacade server;
     private ClientSession session;
@@ -17,10 +19,10 @@ public class InGameREPL {
     private String gameName;
 
 
-    private final String blue = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private final String reset = EscapeSequences.RESET_TEXT_COLOR;
-    private final String green = EscapeSequences.SET_TEXT_COLOR_GREEN;
-    private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
+    private final String BLUE = SET_TEXT_COLOR_BLUE;
+    private final String RESET = RESET_TEXT_COLOR;
+    private final String GREEN = SET_TEXT_COLOR_GREEN;
+    private final String RED = SET_TEXT_COLOR_RED;
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
 
 
@@ -45,7 +47,7 @@ public class InGameREPL {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.print("[" + green + session.getUsername() + reset + "] >>> ");
+            System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
                 System.out.println("please type a valid command or 'help' for more information");
@@ -59,18 +61,19 @@ public class InGameREPL {
                     System.out.flush();
                     return true;
                 }
-                default -> System.out.println("Unknown command.");
+                default -> System.out.println(RED + "Invalid command. " + RESET + "Type " +
+                        GREEN + "'help'" + RESET + " for list of commands.");
             }
         }
     }
 
     private void printHelp() {
-        System.out.println("\t" + blue + "exit " + red + "- to exit gameboard display" + reset);
-        System.out.println("\t" + blue + "help " + red + "- display possible commands" + reset);
+        System.out.println("\t" + BLUE + "exit " + RED + "- to exit gameboard display" + RESET);
+        System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 
     private void printWelcome() {
-        System.out.println(blue + "You have joined " + green + gameName + blue + " as " + green +
-                color + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
+        System.out.println(BLUE + "You have joined " + GREEN + gameName + BLUE + " as " + GREEN +
+                color + BLUE + "!" + " type " + GREEN + "'help'" + BLUE + " for more commands." + RESET);
     }
 }

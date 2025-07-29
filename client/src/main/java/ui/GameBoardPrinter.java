@@ -37,6 +37,7 @@ public class GameBoardPrinter {
         int colStep = whitePerspective ? 1 : -1;
 
         printLetters(out, whitePerspective);
+        out.println();
 
         for (int row = rowStart; row != rowEnd; row += rowStep) {
             for (int line = 0; line < SQUARE_HEIGHT; line++) {
@@ -83,7 +84,6 @@ public class GameBoardPrinter {
 
         }
         out.print("    " + RESET);
-        out.println();
     }
 
     private static void printNumbers(PrintStream out, int line, int row) {

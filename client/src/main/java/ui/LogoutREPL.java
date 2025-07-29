@@ -8,16 +8,18 @@ import server.ServerFacade;
 
 import java.util.Scanner;
 
+import static ui.EscapeSequences.*;
+
 public class LogoutREPL {
     private final ServerFacade server;
     private final ClientSession session;
-    private final String blue = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private final String reset = EscapeSequences.RESET_TEXT_COLOR;
-    private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
-    private final String entryEmoji = EscapeSequences.CROSSED_SWORDS;
-    private final String crown = EscapeSequences.CROWN;
-    private final String green = EscapeSequences.SET_TEXT_COLOR_GREEN;
-    private final String yellow = EscapeSequences.SET_TEXT_COLOR_YELLOW;
+    private static final String BLUE = SET_TEXT_COLOR_BLUE;
+    private static final String RESET = RESET_TEXT_COLOR;
+    private static final String RED = SET_TEXT_COLOR_RED;
+    private static final String ENTRY_EMOJI = CROSSED_SWORDS;
+    private static final String CROWN = EscapeSequences.CROWN;
+    private static final String GREEN = SET_TEXT_COLOR_GREEN;
+    private static final String YELLOW = SET_TEXT_COLOR_YELLOW;
 
     public LogoutREPL(ServerFacade server, ClientSession session) {
         this.server = server;
@@ -33,8 +35,8 @@ public class LogoutREPL {
             System.out.print("[Logged Out] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
-                System.out.println(red + "Invalid input. " + reset + "Type " +
-                        green + "'help'" + reset + " for a list of commands.");
+                System.out.println(RED + "Invalid input. " + RESET + "Type " +
+                        GREEN + "'help'" + RESET + " for a list of commands.");
             }
             String command = userInput[0].toLowerCase();
 
@@ -54,31 +56,31 @@ public class LogoutREPL {
                     }
                 }
                 case "quit" -> {
-                    System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
+                    System.out.println(YELLOW + "Thank you for playing! Exiting now..." + RESET);
                     return;
                 }
-                default -> System.out.println(red + "Invalid command. " + reset + "Type " +
-                        green + "'help'" + reset + " for list of commands.");
+                default -> System.out.println(RED + "Invalid command. " + RESET + "Type " +
+                        GREEN + "'help'" + RESET + " for list of commands.");
             }
         }
     }
 
     private void printHelp() {
-        System.out.println("\t" + blue + "register <USERNAME> <PASSWORD> <EMAIL> " + red + "- to create an account");
-        System.out.println("\t" + blue + "login <USERNAME> <PASSWORD> " + red + "- to play chess");
-        System.out.println("\t" + blue + "quit " + red + "- to exit application");
-        System.out.println("\t" + blue + "help " + red + "- display possible commands" + reset);
+        System.out.println("\t" + BLUE + "register <USERNAME> <PASSWORD> <EMAIL> " + RED + "- to create an account");
+        System.out.println("\t" + BLUE + "login <USERNAME> <PASSWORD> " + RED + "- to play chess");
+        System.out.println("\t" + BLUE + "quit " + RED + "- to exit application");
+        System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 
     private void printWelcome() {
-        System.out.println(entryEmoji + crown + blue + " Welcome to 240 Chess! Type " +
-                green + "'help'" + blue + " to get started " + reset + crown + entryEmoji);
+        System.out.println(ENTRY_EMOJI + CROWN + BLUE + " Welcome to 240 Chess! Type " +
+                GREEN + "'help'" + BLUE + " to get started " + RESET + CROWN + ENTRY_EMOJI);
     }
 
     private boolean registerSequence(String[] userInput) {
         if (userInput.length != 4) {
-            System.out.println(red + "Invalid input for register. " + reset + "Type " +
-                    green + "'help'" + reset + " for more information.");
+            System.out.println(RED + "Invalid input for register. " + RESET + "Type " +
+                    GREEN + "'help'" + RESET + " for more information.");
             return false;
         }
 
@@ -95,21 +97,21 @@ public class LogoutREPL {
 
             boolean quit = new LoginREPL(server, session).run();
             if (quit) {
-                System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
+                System.out.println(YELLOW + "Thank you for playing! Exiting now..." + RESET);
                 return true;
             }
 
         } catch (Throwable e) {
             var msg = e.getMessage();
-            System.out.print(red + msg + "\n" + reset);
+            System.out.print(RED + msg + "\n" + RESET);
         }
         return false;
     }
 
     private boolean loginSequence(String[] userInput) {
         if (userInput.length != 3) {
-            System.out.println(red + "Invalid input for login. " + reset + "Type " +
-                    green + "'help'" + reset + " for more information.");
+            System.out.println(RED + "Invalid input for login. " + RESET + "Type " +
+                    GREEN + "'help'" + RESET + " for more information.");
             return false;
         }
 
@@ -125,13 +127,13 @@ public class LogoutREPL {
 
             boolean quit = new LoginREPL(server, session).run();
             if (quit) {
-                System.out.println(yellow + "Thank you for playing! Exiting now..." + reset);
+                System.out.println(YELLOW + "Thank you for playing! Exiting now..." + RESET);
                 return true;
             }
 
         } catch (Throwable e) {
             var msg = e.getMessage();
-            System.out.print(red + msg + "\n" + reset);
+            System.out.print(RED + msg + "\n" + RESET);
         }
         return false;
     }

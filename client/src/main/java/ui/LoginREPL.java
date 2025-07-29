@@ -8,15 +8,17 @@ import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
 
+import static ui.EscapeSequences.*;
+
 public class LoginREPL {
     private ServerFacade server;
     private ClientSession session;
 
-    private final String blue = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private final String reset = EscapeSequences.RESET_TEXT_COLOR;
-    private final String red = EscapeSequences.SET_TEXT_COLOR_RED;
-    private final String yellow = EscapeSequences.SET_TEXT_COLOR_YELLOW;
-    private final String green = EscapeSequences.SET_TEXT_COLOR_GREEN;
+    private static final String BLUE = SET_TEXT_COLOR_BLUE;
+    private static final String RESET = RESET_TEXT_COLOR;
+    private static final String RED = SET_TEXT_COLOR_RED;
+    private static final String YELLOW = SET_TEXT_COLOR_YELLOW;
+    private static final String GREEN = SET_TEXT_COLOR_GREEN;
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
     ;
 
@@ -35,8 +37,9 @@ public class LoginREPL {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.print("[" + green + session.getUsername() + reset + "] >>> ");
+            System.out.print("[" + SET_TEXT_COLOR_GREEN + session.getUsername() + RESET_TEXT_COLOR + "] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
+
             if (userInput.length == 0) {
                 System.out.println("please type a valid command or 'help' for more information");
             }
@@ -56,39 +59,40 @@ public class LoginREPL {
                     logoutSequence();
                     return true;
                 }
-                default -> System.out.println("Unknown command.");
+                default -> printBasicMessage(RED, "Invalid command. ", " 'help' ", "for list of commands.");
             }
         }
     }
 
     private void printHelp() {
-        System.out.println("\t" + blue + "create <NAME> " + red + "- to create a game");
-        System.out.println("\t" + blue + "list " + red + "- to list all games");
-        System.out.println("\t" + blue + "join <ID> [WHITE|BLACK] " + red + "- to join a game");
-        System.out.println("\t" + blue + "observe <ID> " + red + "- to observe a game");
-        System.out.println("\t" + blue + "logout " + red + "- to logout");
-        System.out.println("\t" + blue + "quit " + red + "- to quit the application");
-        System.out.println("\t" + blue + "help " + red + "- display possible commands" + reset);
+        printCommandFormat("create <NAME> ", "- to create a game");
+        printCommandFormat("list ", "- to list all games");
+        printCommandFormat("join <ID> [WHITE|BLACK] ", "- to join a game");
+        printCommandFormat("observe <ID> ", "- to observe a game");
+        printCommandFormat("logout ", "- to logout");
+        printCommandFormat("quit ", "- to quit the application");
+        printCommandFormat("help ", "- display possible commands");
     }
 
     private void printWelcome() {
-        System.out.println(blue + "Welcome " + green + session.getUsername() + blue + "!" + " type " +
-                green + "'help'" + blue + " for more commands." + reset);
+        System.out.println(BLUE + "Welcome " + SET_TEXT_COLOR_GREEN + session.getUsername()
+                + BLUE + "!" + " type " + SET_TEXT_COLOR_GREEN + "'help'" +
+                BLUE + " for more commands." + RESET_TEXT_COLOR);
     }
 
     private void logoutSequence() {
         LogoutRequestBody logoutRequest = new LogoutRequestBody();
         server.logoutCall(logoutRequest, session.getAuthToken());
 
-        System.out.println(yellow + "Logging " + green + session.getUsername() + yellow + " out. " + reset);
+        System.out.println(YELLOW + "Logging " + GREEN + session.getUsername() + YELLOW + " out. " + RESET);
         session.clearSession();
     }
 
     private void listGamesSequence() {
         ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
 
-        System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", yellow, "Game ID",
-                "Game Name", "White Username", "Black Username", reset);
+        System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", YELLOW, "Game ID",
+                "Game Name", "White Username", "Black Username", RESET);
 
         session.clearMap();
         int gameID = 0;
@@ -100,80 +104,82 @@ public class LoginREPL {
 
             session.addGameDataMapValue(gameID, gameData);
             session.addLookupMapValue(gameID, gameData.gameID());
-            System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", yellow, gameID,
-                    blue, gameName, whiteUsername, blackUsername, reset);
+            System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", YELLOW, gameID,
+                    BLUE, gameName, whiteUsername, blackUsername, RESET);
         }
     }
 
     private void joinGameSequence(String[] userInput) {
         if (userInput.length != 3) {
-            System.out.println(red + "Invalid input for join. " +
-                    reset + "Type " + green + "'help'" + reset + " for more information.");
+            printUsageError("join", "<GAME ID> [WHITE|BLACK]");
             return;
         }
 
         try {
             String playerColor = userInput[2].toLowerCase();
-            int userFacingGameID = Integer.parseInt(userInput[1]);
-
+            Integer userFacingGameID = Integer.parseInt(userInput[1]);
             Integer gameID = session.getGameID(userFacingGameID);
-
             GameData chessGame = session.getChessGame(userFacingGameID);
 
             if (gameID == null) {
-                System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
+                printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
                 return;
             }
+
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
-            System.out.println(request);
             server.joinGameCall(request, session.getAuthToken());
 
-            System.out.println(yellow + "Joining game " + green + userFacingGameID + yellow +
-                    " as " + green + playerColor + reset);
+            // Join Game Success
+            System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
+                    " as " + GREEN + playerColor + RESET);
             new InGameREPL(server, session, chessGame, playerColor).run();
 
-            System.out.println(yellow + "You have successfully exited game view. " + blue + "Type " + green +
-                    "'help'" + blue + " for list of available commands.");
+            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                    " for list of available commands.");
+
+
+        } catch (NumberFormatException e) {
+            printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
 
         } catch (Throwable e) {
-            var msg = e.getMessage();
-            System.out.print(red + msg + "\n" + reset);
+            printCatchMessage(e);
         }
     }
 
     private void observerSequence(String[] userInput) {
         if (userInput.length != 2) {
-            System.out.println(red + "Invalid input for observe. " + reset
-                    + "Type " + green + "'help'" + reset + " for more information.");
+            printUsageError("observe", "<GAME ID>");
             return;
         }
+
         try {
-            int userFacingGameID = Integer.parseInt(userInput[1]);
-
+            Integer userFacingGameID = Integer.parseInt(userInput[1]);
             Integer gameID = session.getGameID(userFacingGameID);
-
             GameData chessGame = session.getChessGame(userFacingGameID);
 
             if (gameID == null) {
-                System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
+                printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
                 return;
             }
 
+            // Enter inGame REPL
             new InGameREPL(server, session, chessGame, "white").run();
 
-            System.out.println(yellow + "You have successfully exited game view. " + blue + "Type " + green +
-                    "'help'" + blue + " for list of available commands.");
+            // Success Message
+            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                    " for list of available commands.");
+
+        } catch (NumberFormatException e) {
+            printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
         } catch (Throwable e) {
-            var msg = e.getMessage();
-            System.out.print(red + msg + "\n" + reset);
+            printCatchMessage(e);
         }
 
     }
 
     private void createGameSequence(String[] userInput) {
         if (userInput.length != 2) {
-            System.out.println(red + "Invalid input for create. " + reset
-                    + "Type " + green + "'help'" + reset + " for more information.");
+            printUsageError("create", "<GAME NAME>");
             return;
         }
 
@@ -182,8 +188,35 @@ public class LoginREPL {
         CreateGameRequestBody request = new CreateGameRequestBody(gameName);
         server.createGameCall(request, session.getAuthToken());
 
-        System.out.println(yellow + "Successfully create a game with name: " + green + gameName + reset);
+        printSystemMessage("Successfully created a game with name: ", gameName);
     }
+
+
+    // messages:
+    private void printCommandFormat(String usage, String description) {
+        System.out.println(BLUE + usage + RED + description + RESET);
+    }
+
+    private void printUsageError(String command, String usage) {
+        System.out.println(RED + "Error: Invalid input for " + GREEN + command +
+                RED + ". Usage: " + RESET + "'" + command + " " + usage +
+                "'." + "Type " + GREEN + "'help'" + RESET + " for more information.");
+    }
+
+    private void printBasicMessage(String MessageColor, String message, String guideCommand, String helpMessage) {
+        System.out.println(MessageColor + message + RESET + " Type" + GREEN + guideCommand +
+                RESET + helpMessage);
+    }
+
+    private void printSystemMessage(String message, String variable) {
+        System.out.println(YELLOW + message + GREEN + variable + RESET);
+    }
+
+    private void printCatchMessage(Throwable e) {
+        var msg = e.getMessage();
+        System.out.print(RED + msg + "\n" + RESET);
+    }
+
 }
 
 

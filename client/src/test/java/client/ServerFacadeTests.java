@@ -1,7 +1,6 @@
 package client;
 
 import model.GameData;
-import model.GamesObject;
 import org.junit.jupiter.api.*;
 import requests.*;
 import server.Server;
@@ -16,9 +15,9 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
-    private final static String testUsername = "username";
-    private final static String testPassword = "password";
-    private final static String testEmail = "testemail@email.com";
+    private final static String TEST_USERNAME = "username";
+    private final static String TEST_PASSWORD = "password";
+    private final static String TEST_EMAIL = "testemail@email.com";
 
     private static String authToken;
 
@@ -28,7 +27,6 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
-//        String baseURL = "http://localhost:" + port;
         serverFacade = new ServerFacade(port);
     }
 
@@ -41,7 +39,7 @@ public class ServerFacadeTests {
     @BeforeEach
     public void setupUser() {
         serverFacade.clearCall(new ClearRequestBody());
-        var request = new RegisterRequestBody(testUsername, testPassword, testEmail);
+        var request = new RegisterRequestBody(TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL);
         var response = serverFacade.registerCall(request);
         authToken = response.authToken();
     }
@@ -49,7 +47,7 @@ public class ServerFacadeTests {
     // ---------------------------------- Register Tests ---------------------------------------------------------------
 
     @Test
-    public void register_valid_returnsAuthToken() {
+    public void registerValidReturnsAuthToken() {
         var request = new RegisterRequestBody("newUsername", "newPassword", "newemil@email.com");
         var response = serverFacade.registerCall(request);
         assertNotNull(response.authToken());
@@ -57,41 +55,41 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void register_duplicateUsername_throws() {
-        var request = new RegisterRequestBody(testUsername, "anotherPassword", "anotheremail@email.com");
+    public void registerDuplicateUsernameThrows() {
+        var request = new RegisterRequestBody(TEST_USERNAME, "anotherPassword", "anotheremail@email.com");
         assertThrows(RuntimeException.class, () -> serverFacade.registerCall(request));
     }
 
     // ------------------------------------ Login Tests ----------------------------------------------------------------
 
     @Test
-    public void login_valid_returnsAuthToken() {
-        var request = new LoginRequestBody(testUsername, testPassword);
+    public void loginValidReturnsAuthToken() {
+        var request = new LoginRequestBody(TEST_USERNAME, TEST_PASSWORD);
         var response = serverFacade.loginCall(request);
         assertNotNull(response.authToken());
-        assertEquals(testUsername, response.username());
+        assertEquals(TEST_USERNAME, response.username());
     }
 
     @Test
-    public void login_invalidPassword_throws() {
-        var request = new LoginRequestBody(testUsername, "wrongPassword");
+    public void loginInvalidPasswordThrows() {
+        var request = new LoginRequestBody(TEST_USERNAME, "wrongPassword");
         assertThrows(RuntimeException.class, () -> serverFacade.loginCall(request));
     }
 
     // -------------------------------------- Clear Tests --------------------------------------------------------------
 
     @Test
-    public void clear_database_isCleared() {
+    public void clearDatabaseIsCleared() {
         var response = serverFacade.clearCall(new ClearRequestBody());
         assertNotNull(response);
 
         // Try to log in after clearing (should fail)
-        var request = new LoginRequestBody(testUsername, testPassword);
+        var request = new LoginRequestBody(TEST_USERNAME, TEST_PASSWORD);
         assertThrows(RuntimeException.class, () -> serverFacade.loginCall(request));
     }
 
     @Test
-    public void clear_multipleTimes_stillSucceeds() {
+    public void clearMultipleTimesStillSucceeds() {
         serverFacade.clearCall(new ClearRequestBody());
         var response = serverFacade.clearCall(new ClearRequestBody());
         assertNotNull(response);
@@ -100,7 +98,7 @@ public class ServerFacadeTests {
     // -------------------------------------- ListGames Tests ----------------------------------------------------------
 
     @Test
-    public void listGames_validToken_returnsEmptyList() {
+    public void listGamesValidTokenReturnsEmptyList() {
         var response = serverFacade.listGamesCall(authToken);
         Collection<GameData> games = response.games();
         assertNotNull(games);
@@ -108,14 +106,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGames_invalidToken_throws() {
+    public void listGamesInvalidTokenThrows() {
         assertThrows(RuntimeException.class, () -> serverFacade.listGamesCall("badToken"));
     }
 
     // --------------------------------------- Logout Tests ------------------------------------------------------------
 
     @Test
-    public void logout_validToken_succeeds() {
+    public void logoutValidTokenSucceeds() {
         var request = new LogoutRequestBody();
         var response = serverFacade.logoutCall(request, authToken);
         assertNotNull(response);
@@ -125,9 +123,55 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logout_invalidToken_throws() {
+    public void logoutInvalidTokenThrows() {
         var request = new LogoutRequestBody();
         assertThrows(RuntimeException.class, () -> serverFacade.logoutCall(request, "fake-token"));
     }
+
+
+// --------------------------------------- Create Game Tests -----------------------------------------------------------
+
+    @Test
+    public void testCreateGameSuccess() {
+        var request = new CreateGameRequestBody("Cool_Game");
+        var response = serverFacade.createGameCall(request, authToken);
+
+        assertNotNull(response);
+        assertTrue(response.gameID() > 0);
+    }
+
+    @Test
+    public void testCreateGameFailsWithNullAuth() {
+        var request = new CreateGameRequestBody("Invalid Game");
+
+        var exception = assertThrows(RuntimeException.class, () -> {
+            serverFacade.createGameCall(request, null);
+        });
+
+        assertTrue(exception.getMessage().toLowerCase().contains("unauthorized"));
+    }
+
+// --------------------------------------- Join Game Tests -----------------------------------------------------------
+
+    @Test
+    public void testJoinGameSuccess() {
+        var createRequest = new CreateGameRequestBody("Joinable Game");
+        var createResponse = serverFacade.createGameCall(createRequest, authToken);
+
+        var joinRequest = new JoinGameRequestBody("WHITE", createResponse.gameID());
+        var joinResponse = serverFacade.joinGameCall(joinRequest, authToken);
+
+        assertNotNull(joinResponse);
+    }
+
+    @Test
+    public void testJoinGameFailsInvalidGameID() {
+        var joinRequest = new JoinGameRequestBody("BLACK", -800);
+
+        assertThrows(RuntimeException.class, () -> serverFacade.joinGameCall(joinRequest, authToken));
+
+    }
+
+
 }
 

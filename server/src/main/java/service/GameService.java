@@ -113,7 +113,13 @@ public class GameService {
             throw new BadRequestException("Error: invalid player color");
         }
 
+
         GameData requestedGame = gameDAO.getGame(joinGameRequest.gameID());
+
+        if (requestedGame == null) {
+            throw new BadRequestException("Error: Game does not exist");
+        }
+
         checkColorAvailability(requestedGame, requestedColor);
 
         GameData updatedGame = (requestedColor == BLACK)

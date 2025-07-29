@@ -23,13 +23,6 @@ public class GameBoardPrinter {
     private static final String BORDER_BACKGROUND = SET_BG_COLOR_AVOCADO;
     private static final String BORDER_TEXT = SET_TEXT_COLOR_WHITE;
 
-//    public static void main(String[] args) {
-//        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-//        ChessGame game = new ChessGame();
-//        printGameBoard(game, "black", out);
-//        printGameBoard(game, "white", out);
-//    }
-
     public static void printGameBoard(ChessGame game, String color, PrintStream out) {
         ChessBoard board = game.getBoard();
 

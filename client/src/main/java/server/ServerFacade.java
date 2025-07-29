@@ -1,6 +1,6 @@
 package server;
 
-import Exceptions.ResponseException;
+import exceptions.ResponseException;
 import com.google.gson.Gson;
 import requests.*;
 import responses.*;
@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class ServerFacade {
     private final String baseUrl;
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
 
     public ServerFacade(Integer port) {
@@ -94,7 +94,7 @@ public class ServerFacade {
     private void writeJson(HttpURLConnection conn, Object data) throws IOException {
         conn.setRequestProperty("Content-Type", "application/json");
         try (OutputStream output = conn.getOutputStream()) {
-            String json = gson.toJson(data);
+            String json = GSON.toJson(data);
             output.write(json.getBytes());
         }
     }
@@ -106,7 +106,7 @@ public class ServerFacade {
 
         try (InputStream body = conn.getInputStream()) {
             InputStreamReader reader = new InputStreamReader(body);
-            return gson.fromJson(reader, type);
+            return GSON.fromJson(reader, type);
         }
     }
 

@@ -20,7 +20,7 @@ import service.UserService;
 
 public class UserHandler {
     private final UserService userService;
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public UserHandler(UserService userService) {
         this.userService = userService;
@@ -36,23 +36,23 @@ public class UserHandler {
      */
     public Object handleRegister(Request registerReq, Response registerResp) {
         try {
-            RegisterRequest registerRequest = gson.fromJson(registerReq.body(), RegisterRequest.class);
+            RegisterRequest registerRequest = GSON.fromJson(registerReq.body(), RegisterRequest.class);
             RegisterResponse registerResponse = userService.registerUser(registerRequest);
 
             registerResp.status(200);
-            return gson.toJson(registerResponse);
+            return GSON.toJson(registerResponse);
 
         } catch (UsernameTakenException e) {
             registerResp.status(403);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 403));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 403));
 
         } catch (BadRequestException e) {
             registerResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (DatabaseAccessException e) {
             registerResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 
@@ -66,23 +66,23 @@ public class UserHandler {
      */
     public Object handleLogin(Request loginReq, Response loginResp) {
         try {
-            LoginRequest loginRequest = gson.fromJson(loginReq.body(), LoginRequest.class);
+            LoginRequest loginRequest = GSON.fromJson(loginReq.body(), LoginRequest.class);
             LoginResponse loginResponse = userService.loginUser(loginRequest);
 
             loginResp.status(200);
-            return gson.toJson(loginResponse);
+            return GSON.toJson(loginResponse);
 
         } catch (BadRequestException e) {
             loginResp.status(400);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 400));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 400));
 
         } catch (UnauthorizedAccessException e) {
             loginResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (DatabaseAccessException e) {
             loginResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 
@@ -100,15 +100,15 @@ public class UserHandler {
             LogoutResponse logoutResponse = userService.logoutUser(logoutRequest);
 
             logoutResp.status(200);
-            return gson.toJson(logoutResponse);
+            return GSON.toJson(logoutResponse);
 
         } catch (UnauthorizedAccessException e) {
             logoutResp.status(401);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 401));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 401));
 
         } catch (DatabaseAccessException e) {
             logoutResp.status(500);
-            return gson.toJson(new ErrorResponseClass(e.getMessage(), 500));
+            return GSON.toJson(new ErrorResponseClass(e.getMessage(), 500));
         }
     }
 

@@ -10,7 +10,6 @@ import dataaccess.exceptions.GameTakenException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
 import model.GameData;
-import model.GamesObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import requests.CreateGameRequest;
@@ -102,7 +101,7 @@ public class GameServiceTests {
         gameService.joinGame(request);
 
         GameData updated = gameDAO.getGame(gameID);
-        assertEquals(username, updated.whiteUserName());
+        assertEquals(username, updated.whiteUsername());
     }
 
     @Test
@@ -113,7 +112,7 @@ public class GameServiceTests {
         gameService.joinGame(request);
 
         GameData updated = gameDAO.getGame(gameID);
-        assertEquals(username, updated.blackUserName());
+        assertEquals(username, updated.blackUsername());
     }
 
     @Test
@@ -132,8 +131,8 @@ public class GameServiceTests {
 
         GameData gameData = gameDAO.getGame(gameID);
 
-        assertEquals(username, gameData.whiteUserName());
-        assertEquals(newUsername, gameData.blackUserName());
+        assertEquals(username, gameData.whiteUsername());
+        assertEquals(newUsername, gameData.blackUsername());
     }
 
     @Test

@@ -6,7 +6,6 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.AuthData;
 import model.GameData;
-import model.GamesObject;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
@@ -97,8 +96,8 @@ class CombinedDatabaseDAOTests {
         GameData result = gameDao.getGame(original.gameID());
 
         assertEquals("UpdatedGame", result.gameName());
-        assertEquals(validUsername, result.whiteUserName());
-        assertEquals("opponent", result.blackUserName());
+        assertEquals(validUsername, result.whiteUsername());
+        assertEquals("opponent", result.blackUsername());
     }
 
 

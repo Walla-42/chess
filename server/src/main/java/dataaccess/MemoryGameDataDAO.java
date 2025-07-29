@@ -1,7 +1,6 @@
 package dataaccess;
 
 import dataaccess.interfaces.GameDAO;
-import model.GamesObject;
 import chess.ChessGame;
 import model.GameData;
 
@@ -25,8 +24,8 @@ public class MemoryGameDataDAO implements GameDAO {
         for (Integer gameID : gameIDs) {
             GameData gameData = gameDatabase.get(gameID);
             GameData game = new GameData(gameData.gameID(),
-                    gameData.whiteUserName(),
-                    gameData.blackUserName(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
                     gameData.gameName(),
                     gameData.game());
 

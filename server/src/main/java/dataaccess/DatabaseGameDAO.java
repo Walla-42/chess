@@ -6,7 +6,6 @@ import dataaccess.interfaces.GameDAO;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DatabaseAccessException;
 import model.GameData;
-import model.GamesObject;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -101,8 +100,8 @@ public class DatabaseGameDAO implements GameDAO {
         Gson gson = new Gson();
 
         int gameId = updatedGameData.gameID();
-        String whiteUsername = updatedGameData.whiteUserName();
-        String blackUsername = updatedGameData.blackUserName();
+        String whiteUsername = updatedGameData.whiteUsername();
+        String blackUsername = updatedGameData.blackUsername();
         String gameName = updatedGameData.gameName();
         String chessGame = gson.toJson(updatedGameData.game());
 

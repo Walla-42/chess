@@ -2,7 +2,6 @@ package ui;
 
 import java.util.Scanner;
 
-import chess.ChessGame;
 import model.GameData;
 import requests.*;
 import responses.*;
@@ -91,8 +90,8 @@ public class LoginREPL {
         for (GameData gameData : response.games()) {
             gameID += 1;
             String gameName = gameData.gameName();
-            String blackUsername = gameData.blackUserName();
-            String whiteUsername = gameData.whiteUserName();
+            String blackUsername = gameData.blackUsername();
+            String whiteUsername = gameData.whiteUsername();
 
             session.addGameDataMapValue(gameID, gameData);
             session.addLookupMapValue(gameID, gameData.gameID());

@@ -5,7 +5,6 @@ import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.GameTakenException;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import model.AuthData;
-import model.GamesObject;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.ListGamesRequest;
@@ -139,11 +138,11 @@ public class GameService {
      * @throws GameTakenException Color already taken by another player
      */
     private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException {
-        if (requestedColor == BLACK && requestedGame.blackUserName() != null) {
+        if (requestedColor == BLACK && requestedGame.blackUsername() != null) {
             throw new GameTakenException("Error: color already taken");
         }
 
-        if (requestedColor == WHITE && requestedGame.whiteUserName() != null) {
+        if (requestedColor == WHITE && requestedGame.whiteUsername() != null) {
             throw new GameTakenException("Error: color already taken");
         }
         ;

@@ -31,12 +31,16 @@ public class GameHandler {
      * @return a Json string representing a listGamesResponse object on success, or an ErrorResponseClass object on failure
      */
     public Object handleListGames(Request listGamesReq, Response listGamesResp) {
+        //test statements:
+        System.out.println("Entering ListGamesHandler");
+
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(listGamesReq.headers("Authorization"));
             ListGamesResponse listGamesResponse = gameService.listGames(listGamesRequest);
 
 
             listGamesResp.status(200);
+            System.out.println("printing ListGamesHandler Response: " + listGamesResponse);
             return gson.toJson(listGamesResponse);
 
         } catch (DatabaseAccessException e) {

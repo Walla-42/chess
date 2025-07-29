@@ -49,6 +49,6 @@ public class InGameREPL {
 
     private void printWelcome() {
         System.out.println(blue + "You have joined " + green + gameName + blue + " as " + green +
-                color + "!" + blue + " type " + green + "'help'" + blue + " for more commands." + reset);
+                color + blue + "!" + " type " + green + "'help'" + blue + " for more commands." + reset);
     }
 }

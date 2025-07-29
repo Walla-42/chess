@@ -1,5 +1,6 @@
 package client;
 
+import model.GameData;
 import model.GamesObject;
 import org.junit.jupiter.api.*;
 import requests.*;
@@ -101,7 +102,7 @@ public class ServerFacadeTests {
     @Test
     public void listGames_validToken_returnsEmptyList() {
         var response = serverFacade.listGamesCall(authToken);
-        Collection<GamesObject> games = response.games();
+        Collection<GameData> games = response.games();
         assertNotNull(games);
         assertEquals(0, games.size());
     }
@@ -115,7 +116,7 @@ public class ServerFacadeTests {
 
     @Test
     public void logout_validToken_succeeds() {
-        var request = new LogoutRequestBody(testUsername);
+        var request = new LogoutRequestBody();
         var response = serverFacade.logoutCall(request, authToken);
         assertNotNull(response);
 
@@ -125,7 +126,7 @@ public class ServerFacadeTests {
 
     @Test
     public void logout_invalidToken_throws() {
-        var request = new LogoutRequestBody(testUsername);
+        var request = new LogoutRequestBody();
         assertThrows(RuntimeException.class, () -> serverFacade.logoutCall(request, "fake-token"));
     }
 }

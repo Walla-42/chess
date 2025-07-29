@@ -6,6 +6,9 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
@@ -20,10 +23,17 @@ public class GameBoardPrinter {
     private static final String BORDER_BACKGROUND = SET_BG_COLOR_AVOCADO;
     private static final String BORDER_TEXT = SET_TEXT_COLOR_WHITE;
 
+//    public static void main(String[] args) {
+//        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+//        ChessGame game = new ChessGame();
+//        printGameBoard(game, "black", out);
+//        printGameBoard(game, "white", out);
+//    }
+
     public static void printGameBoard(ChessGame game, String color, PrintStream out) {
         ChessBoard board = game.getBoard();
 
-        boolean whitePerspective = (color.toLowerCase() == "white");
+        boolean whitePerspective = color != null && color.equalsIgnoreCase("white");
 
         int rowStart = whitePerspective ? 8 : 1;
         int rowEnd = whitePerspective ? 0 : 9;

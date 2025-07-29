@@ -109,7 +109,7 @@ public class LoginREPL {
         }
 
         try {
-            String playerColor = userInput[2];
+            String playerColor = userInput[2].toLowerCase();
             int userFacingGameID = Integer.parseInt(userInput[1]);
 
             Integer gameID = session.getGameID(userFacingGameID);
@@ -121,9 +121,11 @@ public class LoginREPL {
                 return;
             }
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
+            System.out.println(request);
             server.joinGameCall(request, session.getAuthToken());
 
-            System.out.println(yellow + "Joining game " + green + userFacingGameID + reset);
+            System.out.println(yellow + "Joining game " + green + userFacingGameID + yellow +
+                    " as " + green + playerColor + reset);
             new InGameREPL(server, session, chessGame, playerColor).run();
 
         } catch (Throwable e) {

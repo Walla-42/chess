@@ -55,7 +55,7 @@ public class GameServiceTests {
         ListGamesRequest request = new ListGamesRequest(validToken);
         ListGamesResponse response = gameService.listGames(request);
 
-        Collection<GamesObject> games = response.games();
+        Collection<GameData> games = response.games();
         assertEquals(2, games.size());
     }
 

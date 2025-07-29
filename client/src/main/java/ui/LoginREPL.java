@@ -32,9 +32,9 @@ public class LoginREPL {
     }
 
     /**
-     * main method for executing LoginREPL loop.
+     * Starts and runs the REPL loop for logged-in user interactions
      *
-     * @return boolean telling main loop to exit or continue.
+     * @return true if the main application should terminate; false otherwise.
      */
     public boolean run() {
         Scanner scanner = new Scanner(System.in);
@@ -73,6 +73,8 @@ public class LoginREPL {
         }
     }
 
+    // helper methods:
+
     /**
      * helper method to print help menu to the command line.
      */
@@ -88,7 +90,7 @@ public class LoginREPL {
 
 
     /**
-     * Helper method for logging out a user from the server.
+     * Helper method for logging out a user from the server and clearing the client session.
      */
     private boolean logoutSequence(boolean quitLogout) {
         LogoutRequestBody logoutRequest = new LogoutRequestBody();
@@ -100,7 +102,7 @@ public class LoginREPL {
     }
 
     /**
-     * Helper method for listing all available games on the users server. Refreshes current session game lists.
+     * Helper method for listing all available games on the users server. Refreshes clients session mappings.
      */
     private void listGamesSequence() {
         ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
@@ -234,27 +236,56 @@ public class LoginREPL {
 
 
     // messages:
+
+    /**
+     * Prints the welcome message when the REPL is initialized.
+     */
     private void printWelcome() {
         System.out.println(BLUE + "Welcome " + SET_TEXT_COLOR_GREEN + session.getUsername()
                 + BLUE + "!" + " type " + SET_TEXT_COLOR_GREEN + "'help'" +
                 BLUE + " for more commands." + RESET_TEXT_COLOR);
     }
 
+    /**
+     * Prints the format and description for a given command.
+     *
+     * @param usage       The syntax of the command.
+     * @param description A short description of the command's purpose.
+     */
     private void printCommandFormat(String usage, String description) {
         System.out.println(BLUE + usage + RED + description + RESET);
     }
 
+    /**
+     * Prints an error message indicating incorrect command usage.
+     *
+     * @param command The command that was used incorrectly.
+     * @param usage   The correct usage for the command.
+     */
     private void printUsageError(String command, String usage) {
         System.out.println(RED + "Error: Invalid input for " + GREEN + command +
                 RED + ". Usage: " + RESET + "'" + command + " " + usage +
                 "'." + "Type " + GREEN + "'help'" + RESET + " for more information.");
     }
 
-    private void printBasicMessage(String MessageColor, String message, String guideCommand, String helpMessage) {
-        System.out.println(MessageColor + message + RESET + " Type" + GREEN + guideCommand +
+    /**
+     * Prints a simple system message with optional guidance.
+     *
+     * @param messageColor The ANSI color for the message.
+     * @param message      The main content of the message.
+     * @param guideCommand A suggestion or command for help.
+     * @param helpMessage  Additional guidance.
+     */
+    private void printBasicMessage(String messageColor, String message, String guideCommand, String helpMessage) {
+        System.out.println(messageColor + message + RESET + " Type" + GREEN + guideCommand +
                 RESET + helpMessage);
     }
 
+    /**
+     * Prints the message from an exception in red.
+     *
+     * @param e The thrown exception.
+     */
     private void printCatchMessage(Throwable e) {
         var msg = e.getMessage();
         System.out.print(RED + msg + "\n" + RESET);

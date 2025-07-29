@@ -12,11 +12,11 @@ import server.ServerFacade;
 import static ui.EscapeSequences.*;
 
 public class InGameREPL {
-    private ServerFacade server;
-    private ClientSession session;
+    private final ServerFacade server;
+    private final ClientSession session;
     private final String color;
-    private ChessGame chessGame;
-    private String gameName;
+    private final ChessGame chessGame;
+    private final String gameName;
 
 
     private final String BLUE = SET_TEXT_COLOR_BLUE;
@@ -27,7 +27,7 @@ public class InGameREPL {
 
 
     public InGameREPL(ServerFacade server, ClientSession session, GameData game, String color) {
-        this.server = server;
+        this.server = server; // This will be used to track if a user is in a game
         this.session = session;
         this.color = color;
         this.gameName = game.gameName();
@@ -39,7 +39,7 @@ public class InGameREPL {
         printWelcome();
 
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        GameBoardPrinter.printGameBoard(game.game(), color, out);
+        GameBoardPrinter.printGameBoard(chessGame, color, out);
 
     }
 
@@ -50,7 +50,7 @@ public class InGameREPL {
             System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
-                System.out.println("please type a valid command or 'help' for more information");
+                System.out.println("Enter a valid command or type 'help' for more information");
             }
             String command = userInput[0].toLowerCase();
 
@@ -59,6 +59,9 @@ public class InGameREPL {
                 case "exit" -> {
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
+                    return false;
+                }
+                case "quit" -> {
                     return true;
                 }
                 default -> System.out.println(RED + "Invalid command. " + RESET + "Type " +
@@ -69,6 +72,7 @@ public class InGameREPL {
 
     private void printHelp() {
         System.out.println("\t" + BLUE + "exit " + RED + "- to exit gameboard display" + RESET);
+        System.out.println("\t" + BLUE + "quit " + RED + "- to exit the application" + RESET);
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 

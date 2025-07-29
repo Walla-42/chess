@@ -11,8 +11,8 @@ import server.ServerFacade;
 import static ui.EscapeSequences.*;
 
 public class LoginREPL {
-    private ServerFacade server;
-    private ClientSession session;
+    private final ServerFacade server;
+    private final ClientSession session;
 
     private static final String BLUE = SET_TEXT_COLOR_BLUE;
     private static final String RESET = RESET_TEXT_COLOR;
@@ -20,8 +20,6 @@ public class LoginREPL {
     private static final String YELLOW = SET_TEXT_COLOR_YELLOW;
     private static final String GREEN = SET_TEXT_COLOR_GREEN;
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
-    ;
-
 
     public LoginREPL(ServerFacade server, ClientSession session) {
         this.server = server;
@@ -33,6 +31,11 @@ public class LoginREPL {
         printWelcome();
     }
 
+    /**
+     * main method for executing LoginREPL loop.
+     *
+     * @return boolean telling main loop to exit or continue.
+     */
     public boolean run() {
         Scanner scanner = new Scanner(System.in);
 
@@ -41,29 +44,38 @@ public class LoginREPL {
             String[] userInput = scanner.nextLine().trim().split("\\s+");
 
             if (userInput.length == 0) {
-                System.out.println("please type a valid command or 'help' for more information");
+                System.out.println("Enter a valid command or type 'help' for more information");
             }
             String command = userInput[0].toLowerCase();
 
             switch (command) {
                 case "help" -> printHelp();
                 case "logout" -> {
-                    logoutSequence();
-                    return false;
+                    return logoutSequence(false);
                 }
                 case "list" -> listGamesSequence();
-                case "join" -> joinGameSequence(userInput);
+                case "join" -> {
+                    if (joinGameSequence(userInput)) {
+                        return true;
+                    }
+                }
                 case "create" -> createGameSequence(userInput);
-                case "observe" -> observerSequence(userInput);
+                case "observe" -> {
+                    if (observerSequence(userInput)) {
+                        return true;
+                    }
+                }
                 case "quit" -> {
-                    logoutSequence();
-                    return true;
+                    return logoutSequence(true);
                 }
                 default -> printBasicMessage(RED, "Invalid command. ", " 'help' ", "for list of commands.");
             }
         }
     }
 
+    /**
+     * helper method to print help menu to the command line.
+     */
     private void printHelp() {
         printCommandFormat("create <NAME> ", "- to create a game");
         printCommandFormat("list ", "- to list all games");
@@ -74,20 +86,22 @@ public class LoginREPL {
         printCommandFormat("help ", "- display possible commands");
     }
 
-    private void printWelcome() {
-        System.out.println(BLUE + "Welcome " + SET_TEXT_COLOR_GREEN + session.getUsername()
-                + BLUE + "!" + " type " + SET_TEXT_COLOR_GREEN + "'help'" +
-                BLUE + " for more commands." + RESET_TEXT_COLOR);
-    }
 
-    private void logoutSequence() {
+    /**
+     * Helper method for logging out a user from the server.
+     */
+    private boolean logoutSequence(boolean quitLogout) {
         LogoutRequestBody logoutRequest = new LogoutRequestBody();
         server.logoutCall(logoutRequest, session.getAuthToken());
 
         System.out.println(YELLOW + "Logging " + GREEN + session.getUsername() + YELLOW + " out. " + RESET);
         session.clearSession();
+        return quitLogout;
     }
 
+    /**
+     * Helper method for listing all available games on the users server. Refreshes current session game lists.
+     */
     private void listGamesSequence() {
         ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
 
@@ -109,10 +123,16 @@ public class LoginREPL {
         }
     }
 
-    private void joinGameSequence(String[] userInput) {
+    /**
+     * Helper method for joining a game based off of user input to the client.
+     * Uses client session to gather correct game information.
+     *
+     * @param userInput String[] of client command input
+     */
+    private boolean joinGameSequence(String[] userInput) {
         if (userInput.length != 3) {
             printUsageError("join", "<GAME ID> [WHITE|BLACK]");
-            return;
+            return false;
         }
 
         try {
@@ -123,7 +143,7 @@ public class LoginREPL {
 
             if (gameID == null) {
                 printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
-                return;
+                return false;
             }
 
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
@@ -132,11 +152,15 @@ public class LoginREPL {
             // Join Game Success
             System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
                     " as " + GREEN + playerColor + RESET);
-            new InGameREPL(server, session, chessGame, playerColor).run();
+
+            boolean quit = new InGameREPL(server, session, chessGame, playerColor).run();
 
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
                     " for list of available commands.");
 
+            if (quit) {
+                return logoutSequence(true);
+            }
 
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
@@ -144,12 +168,18 @@ public class LoginREPL {
         } catch (Throwable e) {
             printCatchMessage(e);
         }
+        return false;
     }
 
-    private void observerSequence(String[] userInput) {
+    /**
+     * Helper method for observing a game based off of user input to the client.
+     *
+     * @param userInput String[] of client command input
+     */
+    private boolean observerSequence(String[] userInput) {
         if (userInput.length != 2) {
             printUsageError("observe", "<GAME ID>");
-            return;
+            return false;
         }
 
         try {
@@ -159,11 +189,17 @@ public class LoginREPL {
 
             if (gameID == null) {
                 printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
-                return;
+                return false;
             }
 
             // Enter inGame REPL
-            new InGameREPL(server, session, chessGame, "white").run();
+            boolean quit = new InGameREPL(server, session, chessGame, "white").run();
+            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                    " for list of available commands.");
+
+            if (quit) {
+                return logoutSequence(true);
+            }
 
             // Success Message
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
@@ -174,9 +210,14 @@ public class LoginREPL {
         } catch (Throwable e) {
             printCatchMessage(e);
         }
-
+        return false;
     }
 
+    /**
+     * Helper method for creating a game based off of user input to the client.
+     *
+     * @param userInput String[] of client command input
+     */
     private void createGameSequence(String[] userInput) {
         if (userInput.length != 2) {
             printUsageError("create", "<GAME NAME>");
@@ -188,11 +229,17 @@ public class LoginREPL {
         CreateGameRequestBody request = new CreateGameRequestBody(gameName);
         server.createGameCall(request, session.getAuthToken());
 
-        printSystemMessage("Successfully created a game with name: ", gameName);
+        System.out.println(YELLOW + "Successfully created a game with name: " + GREEN + gameName + RESET);
     }
 
 
     // messages:
+    private void printWelcome() {
+        System.out.println(BLUE + "Welcome " + SET_TEXT_COLOR_GREEN + session.getUsername()
+                + BLUE + "!" + " type " + SET_TEXT_COLOR_GREEN + "'help'" +
+                BLUE + " for more commands." + RESET_TEXT_COLOR);
+    }
+
     private void printCommandFormat(String usage, String description) {
         System.out.println(BLUE + usage + RED + description + RESET);
     }
@@ -206,10 +253,6 @@ public class LoginREPL {
     private void printBasicMessage(String MessageColor, String message, String guideCommand, String helpMessage) {
         System.out.println(MessageColor + message + RESET + " Type" + GREEN + guideCommand +
                 RESET + helpMessage);
-    }
-
-    private void printSystemMessage(String message, String variable) {
-        System.out.println(YELLOW + message + GREEN + variable + RESET);
     }
 
     private void printCatchMessage(Throwable e) {

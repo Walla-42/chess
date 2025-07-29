@@ -35,6 +35,8 @@ public class LoginREPL {
      * Starts and runs the REPL loop for logged-in user interactions
      *
      * @return true if the main application should terminate; false otherwise.
+     * Accepts commands {@code help}, {@code logout}, {@code list}, {@code join}, {@code create},
+     * {@code observe} and {@code quit}
      */
     public boolean run() {
         Scanner scanner = new Scanner(System.in);

@@ -13,6 +13,7 @@ import static ui.EscapeSequences.*;
 public class LogoutREPL {
     private final ServerFacade server;
     private final ClientSession session;
+
     private static final String BLUE = SET_TEXT_COLOR_BLUE;
     private static final String RESET = RESET_TEXT_COLOR;
     private static final String RED = SET_TEXT_COLOR_RED;
@@ -28,6 +29,10 @@ public class LogoutREPL {
         printWelcome();
     }
 
+    /**
+     * Starts the REPL loop, allowing user to input commands while logged out.
+     * Accepts commands: {@code register}, {@code login}, {@code help}, and {@code quit}.
+     */
     public void run() {
         Scanner scanner = new Scanner(System.in);
 
@@ -65,6 +70,9 @@ public class LogoutREPL {
         }
     }
 
+    /**
+     * helper method to print help menu to the command line.
+     */
     private void printHelp() {
         System.out.println("\t" + BLUE + "register <USERNAME> <PASSWORD> <EMAIL> " + RED + "- to create an account");
         System.out.println("\t" + BLUE + "login <USERNAME> <PASSWORD> " + RED + "- to play chess");
@@ -72,11 +80,20 @@ public class LogoutREPL {
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 
+    /**
+     * Prints the welcome message to the console.
+     */
     private void printWelcome() {
         System.out.println(ENTRY_EMOJI + CROWN + BLUE + " Welcome to 240 Chess! Type " +
                 GREEN + "'help'" + BLUE + " to get started " + RESET + CROWN + ENTRY_EMOJI);
     }
 
+    /**
+     * Attempts to register a new user given user command line input.
+     *
+     * @param userInput A string array containing the command and user credentials.
+     * @return true if the user exits after registration and login, false otherwise.
+     */
     private boolean registerSequence(String[] userInput) {
         if (userInput.length != 4) {
             System.out.println(RED + "Invalid input for register. " + RESET + "Type " +
@@ -108,6 +125,12 @@ public class LogoutREPL {
         return false;
     }
 
+    /**
+     * Attempts to log in an existing user.
+     *
+     * @param userInput A string array containing the command and user credentials.
+     * @return true if the user exits after login, false otherwise.
+     */
     private boolean loginSequence(String[] userInput) {
         if (userInput.length != 3) {
             System.out.println(RED + "Invalid input for login. " + RESET + "Type " +

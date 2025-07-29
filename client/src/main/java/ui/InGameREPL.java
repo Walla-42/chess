@@ -43,6 +43,12 @@ public class InGameREPL {
 
     }
 
+    /**
+     * Starts the REPL loop, allowing the player to interact with the game session.
+     *
+     * @return true if the user chooses to quit the application, false if they just exit the game view.
+     * Accepts commands {@code help}, {@code exit}, and {@code quit}
+     */
     public boolean run() {
         Scanner scanner = new Scanner(System.in);
 
@@ -70,12 +76,18 @@ public class InGameREPL {
         }
     }
 
+    /**
+     * helper method to print help menu to the command line.
+     */
     private void printHelp() {
         System.out.println("\t" + BLUE + "exit " + RED + "- to exit gameboard display" + RESET);
         System.out.println("\t" + BLUE + "quit " + RED + "- to exit the application" + RESET);
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 
+    /**
+     * helper method to print the welcome message to teh command line
+     */
     private void printWelcome() {
         System.out.println(BLUE + "You have joined " + GREEN + gameName + BLUE + " as " + GREEN +
                 color + BLUE + "!" + " type " + GREEN + "'help'" + BLUE + " for more commands." + RESET);

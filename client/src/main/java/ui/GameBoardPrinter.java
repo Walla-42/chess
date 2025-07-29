@@ -43,15 +43,15 @@ public class GameBoardPrinter {
         int colEnd = whitePerspective ? 8 : -1;
         int colStep = whitePerspective ? 1 : -1;
 
-        printLetters(out);
+        printLetters(out, whitePerspective);
 
         for (int row = rowStart; row != rowEnd; row += rowStep) {
             for (int line = 0; line < SQUARE_HEIGHT; line++) {
                 printNumbers(out, line, row);
 
                 for (int col = colStart; col != colEnd; col += colStep) {
-                    boolean isLightSquare = (row + col) % 2 == 0;
-                    String bgColor = isLightSquare ? WHITE_BACKGROUND : BLACK_BACKGROUND;
+                    boolean isDarkSquare = (row + col) % 2 == 0;
+                    String bgColor = isDarkSquare ? BLACK_BACKGROUND : WHITE_BACKGROUND;
 
                     ChessPosition position = new ChessPosition(row, col + 1);
                     ChessPiece piece = board.getPiece(position);
@@ -70,17 +70,24 @@ public class GameBoardPrinter {
             }
         }
 
-        printLetters(out);
+        printLetters(out, whitePerspective);
         out.println("\n");
     }
 
-    private static void printLetters(PrintStream out) {
+    private static void printLetters(PrintStream out, boolean whitePerspective) {
         int padding = (SQUARE_WIDTH - 1) / 2;
         out.print(BORDER_BACKGROUND + BORDER_TEXT + "  ");
         for (int col = 0; col < 8; col++) {
             out.print(" ".repeat(padding + 1));
-            out.print((char) ('a' + col));
-            out.print(" ".repeat(SQUARE_WIDTH - padding - 2));
+
+            if (whitePerspective) {
+                out.print((char) ('a' + col));
+                out.print(" ".repeat(SQUARE_WIDTH - padding - 2));
+            } else {
+                out.print((char) ('h' - col));
+                out.print(" ".repeat(SQUARE_WIDTH - padding - 2));
+            }
+
         }
         out.print("    " + RESET);
         out.println();

@@ -46,7 +46,7 @@ public class LoginREPL {
                 case "list" -> listGamesSequence();
                 case "join" -> joinGameSequence(userInput);
                 case "create" -> createGameSequence(userInput);
-                case "observe" -> observerSequence();
+                case "observe" -> observerSequence(userInput);
                 case "quit" -> {
                     logoutSequence();
                     return true;
@@ -133,8 +133,30 @@ public class LoginREPL {
         }
     }
 
-    private void observerSequence() {
-        throw new RuntimeException("not yet implemented");
+    private void observerSequence(String[] userInput) {
+        if (userInput.length != 2) {
+            System.out.println(red + "Invalid input for observe. " + reset
+                    + "Type " + green + "'help'" + reset + " for more information.");
+            return;
+        }
+        try {
+            int userFacingGameID = Integer.parseInt(userInput[1]);
+
+            Integer gameID = session.getGameID(userFacingGameID);
+
+            GameData chessGame = session.getChessGame(userFacingGameID);
+
+            if (gameID == null) {
+                System.out.println(red + "Error: Invalid Game ID." + blue + " Type 'list' to view available games.");
+                return;
+            }
+
+            new InGameREPL(server, session, chessGame, "white").run();
+        } catch (Throwable e) {
+            var msg = e.getMessage();
+            System.out.print(red + msg + "\n" + reset);
+        }
+
     }
 
     private void createGameSequence(String[] userInput) {

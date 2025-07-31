@@ -205,10 +205,6 @@ public class LoginREPL {
                 return logoutSequence(true);
             }
 
-            // Success Message
-            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
-                    " for list of available commands.");
-
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
         } catch (Throwable e) {

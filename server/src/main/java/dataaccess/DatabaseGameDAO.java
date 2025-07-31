@@ -16,8 +16,6 @@ public class DatabaseGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> listGames() throws DatabaseAccessException {
-        System.out.println("Entering ListGamesDAO Method.");
-
         Gson gson = new Gson();
         String getString = "SELECT gameID, white_username, black_username, game_name, chess_game FROM gamedatabase";
 

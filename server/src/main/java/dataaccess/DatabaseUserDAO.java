@@ -60,7 +60,7 @@ public class DatabaseUserDAO implements UserDAO {
             var createTable = conn.prepareStatement("""
                     CREATE TABLE IF NOT EXISTS userdatabase (
                         username VARCHAR(50) PRIMARY KEY,
-                        email VARCHAR(100) NOT NULL UNIQUE,
+                        email VARCHAR(100) NOT NULL,
                         password VARCHAR(60) NOT NULL
                         );
                     """);

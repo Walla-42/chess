@@ -1,4 +1,5 @@
-package server;
+package server.websocket;
 
 public class WebSocketFacade {
+
 }

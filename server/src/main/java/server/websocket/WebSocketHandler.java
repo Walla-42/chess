@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.exceptions.UnauthorizedAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
+import model.AuthData;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -26,7 +27,7 @@ public class WebSocketHandler {
     private AuthDAO authDAO;
     private GameDAO gameDAO;
 
-    private WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
+    public WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
@@ -35,10 +36,13 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            String username = authDAO.getAuth(command.getAuthToken()).username();
-            int gameID = command.getGameID();
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+            if (authData == null) {
+                throw new UnauthorizedAccessException("Error: Invalid AuthToken");
+            }
 
-            saveSession(gameID, session);
+            String username = authData.username();
+            int gameID = command.getGameID();
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID);
@@ -52,9 +56,6 @@ public class WebSocketHandler {
         }
     }
 
-    private String saveSession(Integer gameID, Session session) {
-        throw new RuntimeException("not yet implemented");
-    }
 
     private void connect(Session session, String username, int gameID) throws IOException {
         connection.add(gameID, username, session);

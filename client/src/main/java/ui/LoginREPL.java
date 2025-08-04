@@ -7,6 +7,7 @@ import requests.*;
 import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
+import server.websocket.WebSocketFacade;
 
 import static ui.EscapeSequences.*;
 
@@ -152,6 +153,8 @@ public class LoginREPL {
 
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
             server.joinGameCall(request, session.getAuthToken());
+
+            session.setCurrentGame(gameID);
 
             // Join Game Success
             System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +

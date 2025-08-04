@@ -22,6 +22,10 @@ public class ServerFacade {
         baseUrl = "http://localhost:" + port;
     }
 
+    public String getBaseURL() {
+        return baseUrl;
+    }
+
     /**
      * Sends a request to clear the server database.
      *

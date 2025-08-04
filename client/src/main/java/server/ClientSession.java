@@ -9,6 +9,7 @@ import java.util.Map;
 public class ClientSession {
     private String username;
     private String authToken;
+    private Integer userCurrentGame;
     private Map<Integer, Integer> gameLookupMap = new HashMap<>();
     private Map<Integer, GameData> gameDataMap = new HashMap<>();
 
@@ -16,6 +17,18 @@ public class ClientSession {
     public void addLookupMapValue(Integer userFacingID, Integer gameID) {
         gameLookupMap.put(userFacingID, gameID);
 
+    }
+
+    public void setCurrentGame(int gameID) {
+        userCurrentGame = gameID;
+    }
+
+    public int getUserCurrentGame() {
+        return userCurrentGame;
+    }
+
+    public void removeCurrentGame() {
+        userCurrentGame = null;
     }
 
     public void addGameDataMapValue(Integer userFacingID, GameData gameData) {

@@ -2,13 +2,19 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import server.ClientSession;
 import server.ServerFacade;
 import server.websocket.NotificationHandler;
+import server.websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
 import static ui.EscapeSequences.*;
@@ -19,7 +25,7 @@ public class InGameREPL implements NotificationHandler {
     private final String color;
     private final ChessGame chessGame;
     private final String gameName;
-
+    private WebSocketFacade ws;
 
     private final String BLUE = SET_TEXT_COLOR_BLUE;
     private final String RESET = RESET_TEXT_COLOR;
@@ -27,15 +33,28 @@ public class InGameREPL implements NotificationHandler {
     private final String RED = SET_TEXT_COLOR_RED;
     private final String YELLOW = SET_TEXT_COLOR_YELLOW;
 
+    private static final Map<Character, Integer> columnMapping = Map.of(
+            'a', 1,
+            'b', 2,
+            'c', 3,
+            'd', 4,
+            'e', 5,
+            'f', 6,
+            'g', 7,
+            'h', 8
+    );
+
+
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
 
 
     public InGameREPL(ServerFacade server, ClientSession session, GameData game, String color) {
-        this.server = server; // This will be used to track if a user is in a game
+        this.server = server;
         this.session = session;
         this.color = color;
         this.gameName = game.gameName();
         this.chessGame = game.game();
+        ws = new WebSocketFacade(server.getBaseURL(), this);
 
         System.out.print(ERASE_SCREEN);
         System.out.flush();
@@ -66,6 +85,9 @@ public class InGameREPL implements NotificationHandler {
 
             switch (command) {
                 case "help" -> printHelp();
+                case "redraw" -> redrawChessBoard();
+                case "leave" -> ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
+                case "move" -> makeMove(userInput);
                 case "exit" -> {
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
@@ -89,6 +111,39 @@ public class InGameREPL implements NotificationHandler {
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
     }
 
+    private void redrawChessBoard() {
+        throw new RuntimeException("not yet implemented");
+    }
+
+    private void makeMove(String[] userInput) {
+        try {
+            int startRow = Integer.parseInt(userInput[2]);
+            int startCol = columnMapping.get(userInput[1]);
+            int endRow = Integer.parseInt(userInput[4]);
+            int endCol = columnMapping.get(userInput[3]);
+            ChessPiece.PieceType promotion = null;
+            ChessPosition startPosition = new ChessPosition(startRow, startCol);
+            ChessPosition endPosition = new ChessPosition(endRow, endCol);
+
+            ChessMove chessMove;
+
+            if (userInput.length == 6) {
+                promotion = ChessPiece.PieceType.valueOf(userInput[5].toUpperCase());
+                chessMove = new ChessMove(startPosition, endPosition, promotion);
+            } else {
+                chessMove = new ChessMove(startPosition, endPosition);
+            }
+
+            ws.onMove(session.getAuthToken(), session.getUserCurrentGame(), chessMove);
+        } catch (NumberFormatException e) {
+            printBasicMessage(RED, "Error: Invalid move coordinate", "help", "for more information");
+        } catch (Throwable e) {
+            var msg = e.getMessage();
+            System.out.print(RED + msg + "\n" + RESET);
+        }
+
+    }
+
     /**
      * helper method to print the welcome message to teh command line
      */
@@ -105,5 +160,18 @@ public class InGameREPL implements NotificationHandler {
 
     private void printPrompt() {
         System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
+    }
+
+    /**
+     * Prints a simple system message with optional guidance.
+     *
+     * @param messageColor The ANSI color for the message.
+     * @param message      The main content of the message.
+     * @param guideCommand A suggestion or command for help.
+     * @param helpMessage  Additional guidance.
+     */
+    private void printBasicMessage(String messageColor, String message, String guideCommand, String helpMessage) {
+        System.out.println(messageColor + message + RESET + " Type" + GREEN + guideCommand +
+                RESET + helpMessage);
     }
 }

@@ -1,8 +1,11 @@
 package server.websocket;
 
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exceptions.ResponseException;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -48,19 +51,40 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    private void enterGame(String username) {
-        throw new RuntimeException("not yet implemented");
+    private void enterGame(String authToken, int gameID) throws ResponseException {
+        try {
+            UserGameCommand enterGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(enterGameCommand));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
-    private void onMove(String username) {
-        throw new RuntimeException("not yet implemented");
+    private void onMove(String authToken, int gameID, ChessMove move) {
+        try {
+            UserGameCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
-    private void onResign(String username) {
-        throw new RuntimeException("not yet implemented");
+    private void onResign(String authToken, int gameID) {
+        try {
+            UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(resignCommand));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
-    private void onLeave(String username) {
-        throw new RuntimeException("not yet implemented");
+    private void onLeave(String authToken, int gameID) {
+        try {
+            UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
+
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 }

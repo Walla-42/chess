@@ -2,6 +2,8 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.exceptions.UnauthorizedAccessException;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -9,7 +11,11 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import responses.ErrorResponseClass;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,24 +23,32 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler {
     private final ConnectionManager connection = new ConnectionManager();
 
+    private AuthDAO authDAO;
+    private GameDAO gameDAO;
+
+    private WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            String username =
+            String username = authDAO.getAuth(command.getAuthToken()).username();
+            int gameID = command.getGameID();
 
-                    saveSession(command.getGameID(), session);
+            saveSession(gameID, session);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username);
+                case CONNECT -> connect(session, username, gameID);
                 case MAKE_MOVE -> makeMove(session, username);
                 case LEAVE -> leaveGame(session, username);
                 case RESIGN -> resign(session, username);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            sendMessage(session.getRemote(), new ErrorResponseClass("Error: " + ex.getMessage()));
+            sendErrorMessage(session, ex.getMessage());
         }
     }
 
@@ -42,8 +56,11 @@ public class WebSocketHandler {
         throw new RuntimeException("not yet implemented");
     }
 
-    private void connect(Session session, String username) {
-        throw new RuntimeException("not yet implementd");
+    private void connect(Session session, String username, int gameID) throws IOException {
+        connection.add(gameID, username, session);
+        var message = String.format("%s has joined the game", username);
+        ServerMessage serverMessage = new NotificationMessage(message);
+        connection.broadcast(username, gameID, serverMessage);
     }
 
     private void makeMove(Session session, String username) {
@@ -64,5 +81,10 @@ public class WebSocketHandler {
 
     private void sendMessage(RemoteEndpoint remote, ErrorResponseClass error) {
         throw new RuntimeException("Not yet implemented");
+    }
+
+    private void sendErrorMessage(Session session, String ErrorMessage) throws IOException {
+        ServerMessage serverMessage = new ErrorMessage(ErrorMessage);
+        session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 }

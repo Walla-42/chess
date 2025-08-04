@@ -8,6 +8,7 @@ import dataaccess.exceptions.DataAccessException;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
+import server.websocket.WebSocketHandler;
 import service.AuthService;
 import service.ClearDbService;
 import service.GameService;
@@ -57,6 +58,9 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
+        // websocket endpoint
+        Spark.webSocket("/connect", WebSocketHandler.class);
+
         Spark.staticFiles.location("web");
 
         // Service Objects:
@@ -70,7 +74,7 @@ public class Server {
         GameHandler gameHandler = new GameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
 
-        // Register your endpoints and handle exceptions here.
+        // http endpoints
         Spark.post("/user", userHandler::handleRegister);
         Spark.post("/session", userHandler::handleLogin);
         Spark.delete("/session", userHandler::handleLogout);

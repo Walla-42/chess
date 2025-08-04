@@ -7,8 +7,10 @@ import java.io.IOException;
 public class Connection {
     public String username;
     public Session session;
+    public int gameID;
 
-    public Connection(String username, Session session) {
+    public Connection(int gameID, String username, Session session) {
+        this.gameID = gameID;
         this.username = username;
         this.session = session;
     }

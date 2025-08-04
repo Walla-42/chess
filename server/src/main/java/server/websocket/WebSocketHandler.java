@@ -16,8 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connection = new ConnectionManager();
-    private final Map<Session, String> sessionToUsername = new ConcurrentHashMap<>();
-    private final Map<Session, Integer> sessionToGame = new ConcurrentHashMap<>();
 
 
     @OnWebSocketMessage

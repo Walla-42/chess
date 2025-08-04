@@ -8,10 +8,12 @@ import chess.ChessGame;
 import model.GameData;
 import server.ClientSession;
 import server.ServerFacade;
+import server.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import static ui.EscapeSequences.*;
 
-public class InGameREPL {
+public class InGameREPL implements NotificationHandler {
     private final ServerFacade server;
     private final ClientSession session;
     private final String color;
@@ -23,6 +25,8 @@ public class InGameREPL {
     private final String RESET = RESET_TEXT_COLOR;
     private final String GREEN = SET_TEXT_COLOR_GREEN;
     private final String RED = SET_TEXT_COLOR_RED;
+    private final String YELLOW = SET_TEXT_COLOR_YELLOW;
+
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
 
 
@@ -91,5 +95,15 @@ public class InGameREPL {
     private void printWelcome() {
         System.out.println(BLUE + "You have joined " + GREEN + gameName + BLUE + " as " + GREEN +
                 color + BLUE + "!" + " type " + GREEN + "'help'" + BLUE + " for more commands." + RESET);
+    }
+
+    @Override
+    public void notify(ServerMessage notification) {
+        System.out.println(YELLOW + notification);
+        printPrompt();
+    }
+
+    private void printPrompt() {
+        System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
     }
 }

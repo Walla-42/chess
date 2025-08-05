@@ -102,6 +102,8 @@ public class InGameREPL implements NotificationHandler {
                     ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
+                    printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                            " for list of available commands.");
                     return false;
                 }
                 case "move" -> makeMove(userInput);
@@ -193,7 +195,7 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void printPrompt() {
-        System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
+        System.out.print("[" + GREEN + session.getUsername() + YELLOW + " (IN GAME) " + RESET + "] >>> ");
     }
 
     /**

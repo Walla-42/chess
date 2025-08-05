@@ -120,7 +120,7 @@ public class GameService {
             throw new BadRequestException("Error: Game does not exist");
         }
 
-        checkColorAvailability(requestedGame, requestedColor);
+        checkColorAvailability(requestedGame, requestedColor, authorization.username());
 
         GameData updatedGame = (requestedColor == BLACK)
                 ? requestedGame.updateBlackUsername(authorization.username())
@@ -139,15 +139,17 @@ public class GameService {
      * @param requestedColor the TeamColor desired by the user
      * @throws GameTakenException Color already taken by another player
      */
-    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor) throws GameTakenException {
-        if (requestedColor == BLACK && requestedGame.blackUsername() != null) {
+    private void checkColorAvailability(GameData requestedGame, ChessGame.TeamColor requestedColor, String username) throws GameTakenException {
+        String whiteUser = requestedGame.whiteUsername();
+        String blackUser = requestedGame.blackUsername();
+
+        if (requestedColor == BLACK && blackUser != null && !blackUser.equals(username)) {
             throw new GameTakenException("Error: color already taken");
         }
 
-        if (requestedColor == WHITE && requestedGame.whiteUsername() != null) {
+        if (requestedColor == WHITE && whiteUser != null && !whiteUser.equals(username)) {
             throw new GameTakenException("Error: color already taken");
         }
-        ;
     }
 
 }

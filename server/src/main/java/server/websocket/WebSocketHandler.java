@@ -26,7 +26,7 @@ import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
-    private final ConnectionManager connection = new ConnectionManager();
+    private static final ConnectionManager connection = new ConnectionManager();
     private static AuthDAO authDAO;
     private static GameDAO gameDAO;
 
@@ -51,7 +51,7 @@ public class WebSocketHandler {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID);
                 case MAKE_MOVE -> makeMove(session, username);
-                case LEAVE -> leaveGame(gameID, username);
+                case LEAVE -> leaveGame(gameID, session, username);
                 case RESIGN -> resign(gameID, session, username);
             }
         } catch (Exception ex) {
@@ -87,11 +87,27 @@ public class WebSocketHandler {
         //
     }
 
-    private void leaveGame(int gameID, String username) throws IOException {
-        connection.remove(username);
-        var message = String.format("%s has left the game", username);
-        ServerMessage serverMessage = new NotificationMessage(message);
-        connection.broadcast(username, gameID, serverMessage);
+    private void leaveGame(int gameID, Session session, String username) throws IOException {
+        try {
+            GameData currentGame = gameDAO.getGame(gameID);
+            GameData updatedGame;
+            if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username)) {
+                String blackUsername = null;
+                updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
+                gameDAO.updateGame(updatedGame);
+            } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username)) {
+                String whiteUsername = null;
+                updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+                gameDAO.updateGame(updatedGame);
+            }
+            connection.remove(username);
+            var message = String.format("%s has left the game", username);
+            ServerMessage serverMessage = new NotificationMessage(message);
+            connection.broadcast(username, gameID, serverMessage);
+        } catch (DatabaseAccessException e) {
+            sendErrorMessage(session, "Error: Unable to update game.");
+        }
+
         // make sure to remove userCurrentGame from client session information in REPL
     }
 
@@ -99,14 +115,14 @@ public class WebSocketHandler {
         try {
             GameData currentGame = gameDAO.getGame(gameID);
             GameData updatedGame;
-            if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username)) {
+            if (currentGame.blackUsername() != null && currentGame.whiteUsername() != null && currentGame.blackUsername().equals(username)) {
                 String blackUsername = null;
                 updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
-            } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username)) {
+            } else if (currentGame.whiteUsername() != null && currentGame.blackUsername() != null && currentGame.whiteUsername().equals(username)) {
                 String whiteUsername = null;
                 updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
             } else {
-                sendErrorMessage(session, "Error: You cannot resign the game as an observer");
+                sendErrorMessage(session, "Error: The game is over or you are an observer. Type 'leave' to exit the game.");
                 return;
             }
             gameDAO.updateGame(updatedGame);
@@ -116,7 +132,6 @@ public class WebSocketHandler {
             connection.broadcast(username, gameID, serverMessage);
         } catch (DatabaseAccessException e) {
             sendErrorMessage(session, "Error: Unable to update game.");
-
         }
     }
 

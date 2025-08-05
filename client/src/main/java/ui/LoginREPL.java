@@ -162,8 +162,6 @@ public class LoginREPL {
 
             boolean quit = new InGameREPL(server, session, chessGame, playerColor).run();
 
-            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
-                    " for list of available commands.");
 
             if (quit) {
                 return logoutSequence(true);

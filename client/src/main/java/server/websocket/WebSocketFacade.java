@@ -35,6 +35,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("this is the server message: " + message);
                     ServerMessage serverMessage = null;
                     if (message.contains("\"serverMessageType\":\"NOTIFICATION\"")) {
                         serverMessage = new Gson().fromJson(message, NotificationMessage.class);

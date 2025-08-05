@@ -15,11 +15,33 @@ import static chess.ChessBoard.availableTeamMoves;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard gameBoard;
+    private Game_State gameState;
 
     public ChessGame() {
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
         setTeamTurn(TeamColor.WHITE);
+        setStartState();
+    }
+
+    public enum Game_State {
+        ONGOING,
+        WHITE_WON,
+        BLACK_WON,
+    }
+
+    public Game_State getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(Game_State state) {
+        this.gameState = state;
+    }
+
+    private void setStartState() {
+        if (gameState != Game_State.WHITE_WON && gameState != Game_State.BLACK_WON) {
+            gameState = Game_State.ONGOING;
+        }
     }
 
     /**
@@ -29,7 +51,7 @@ public class ChessGame {
      * @param teamColor color of team that is currently playing
      * @return boolean true if a player cant escape check, false if a player can escape check.
      */
-    private boolean cantEscapeCheck(TeamColor teamColor){
+    private boolean cantEscapeCheck(TeamColor teamColor) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition fromPos = new ChessPosition(row, col);
@@ -127,16 +149,20 @@ public class ChessGame {
         TeamColor turn = getTeamTurn();
         ChessBoard chessBoard = getBoard();
         ChessPiece piece = chessBoard.getPiece(start);
-        if (piece == null) {throw new InvalidMoveException("Must select a valid piece");}
+        if (piece == null) {
+            throw new InvalidMoveException("Must select a valid piece");
+        }
 
         TeamColor team = piece.getTeamColor();
-        if (team != turn) {throw new InvalidMoveException("Not Your Turn");}
+        if (team != turn) {
+            throw new InvalidMoveException("Not Your Turn");
+        }
         Collection<ChessMove> validMoves = validMoves(start);
 
-        if (validMoves.contains(move)){
+        if (validMoves.contains(move)) {
 
-            if (move.promotionPiece != null){
-                 piece = new ChessPiece(team, move.promotionPiece);
+            if (move.promotionPiece != null) {
+                piece = new ChessPiece(team, move.promotionPiece);
             }
             chessBoard.addPiece(end, piece);
             chessBoard.addPiece(start, null);
@@ -150,8 +176,8 @@ public class ChessGame {
     /**
      * A function for updating the current team
      */
-    public void updateTurn(){
-        if (getTeamTurn() == TeamColor.BLACK){
+    public void updateTurn() {
+        if (getTeamTurn() == TeamColor.BLACK) {
             setTeamTurn(TeamColor.WHITE);
         } else {
             setTeamTurn(TeamColor.BLACK);
@@ -164,15 +190,15 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor){
+    public boolean isInCheck(TeamColor teamColor) {
 
         ChessPosition kingPosition = ChessBoard.findKing(teamColor, gameBoard);
         TeamColor enemy = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
         Collection<ChessMove> availableEnemyMoves = availableTeamMoves(enemy, gameBoard);
-        for (ChessMove chessMove : availableEnemyMoves){
+        for (ChessMove chessMove : availableEnemyMoves) {
             ChessPosition endPosition = chessMove.getEndPosition();
-            if (endPosition.equals(kingPosition)){
+            if (endPosition.equals(kingPosition)) {
                 return true;
             }
         }

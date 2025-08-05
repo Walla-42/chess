@@ -9,10 +9,33 @@ import java.util.Map;
 public class ClientSession {
     private String username;
     private String authToken;
-    private Integer userCurrentGame;
     private Map<Integer, Integer> gameLookupMap = new HashMap<>();
     private Map<Integer, GameData> gameDataMap = new HashMap<>();
+    private Integer userCurrentGame = null;
+    private ChessGame currGameBoard = null;
+    private User_Role userRole = User_Role.NONE;
 
+    public enum User_Role {
+        PLAYER,
+        OBSERVER,
+        NONE
+    }
+
+    public User_Role getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(User_Role role) {
+        userRole = role;
+    }
+
+    public ChessGame getGameBoard() {
+        return currGameBoard;
+    }
+
+    public void updateGameBoard(ChessGame gameBoard) {
+        currGameBoard = gameBoard;
+    }
 
     public void addLookupMapValue(Integer userFacingID, Integer gameID) {
         gameLookupMap.put(userFacingID, gameID);
@@ -29,6 +52,8 @@ public class ClientSession {
 
     public void removeCurrentGame() {
         userCurrentGame = null;
+        currGameBoard = null;
+        userRole = User_Role.NONE;
     }
 
     public void addGameDataMapValue(Integer userFacingID, GameData gameData) {

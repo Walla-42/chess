@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.exceptions.DatabaseAccessException;
 import dataaccess.exceptions.UnauthorizedAccessException;
@@ -94,10 +95,12 @@ public class WebSocketHandler {
             if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username)) {
                 String blackUsername = null;
                 updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
+                updatedGame.game().setGameState(currentGame.game().getGameState());
                 gameDAO.updateGame(updatedGame);
             } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username)) {
                 String whiteUsername = null;
                 updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+                updatedGame.game().setGameState(currentGame.game().getGameState());
                 gameDAO.updateGame(updatedGame);
             }
             connection.remove(username);
@@ -114,22 +117,33 @@ public class WebSocketHandler {
     private void resign(int gameID, Session session, String username) throws IOException {
         try {
             GameData currentGame = gameDAO.getGame(gameID);
-            GameData updatedGame;
-            if (currentGame.blackUsername() != null && currentGame.whiteUsername() != null && currentGame.blackUsername().equals(username)) {
-                String blackUsername = null;
-                updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
-            } else if (currentGame.whiteUsername() != null && currentGame.blackUsername() != null && currentGame.whiteUsername().equals(username)) {
-                String whiteUsername = null;
-                updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+            ChessGame.Game_State gameState = currentGame.game().getGameState();
+            if (currentGame.blackUsername().equals(username) && gameState != ChessGame.Game_State.BLACK_WON) {
+                currentGame.game().setGameState(ChessGame.Game_State.WHITE_WON);
+
+            } else if (currentGame.whiteUsername().equals(username) && gameState != ChessGame.Game_State.WHITE_WON) {
+                currentGame.game().setGameState(ChessGame.Game_State.BLACK_WON);
+
             } else {
-                sendErrorMessage(session, "Error: The game is over or you are an observer. Type 'leave' to exit the game.");
+                sendErrorMessage(session, "Error: The game has ended. Type 'leave' to exit the game.");
                 return;
             }
-            gameDAO.updateGame(updatedGame);
-            var message = String.format("%s has resigned from the game", username);
+
+            String winner = (currentGame.game().getGameState() == ChessGame.Game_State.WHITE_WON) ? "White" : "Black";
+
+            // notify those in game
+            var message = String.format("%s has resigned from the game. %s won the game!", username, winner);
             ServerMessage serverMessage = new NotificationMessage(message);
-            sendUserNotification(session, "You have resigned");
             connection.broadcast(username, gameID, serverMessage);
+
+            // update game
+            ServerMessage updateGame = new LoadGameMessage(currentGame);
+            connection.broadcast(username, gameID, updateGame);
+
+            // notify the user
+            var sessionMessage = String.format("You have resigned. %s won the game. Type 'leave' to exit the game", winner);
+            sendUserNotification(session, sessionMessage);
+
         } catch (DatabaseAccessException e) {
             sendErrorMessage(session, "Error: Unable to update game.");
         }

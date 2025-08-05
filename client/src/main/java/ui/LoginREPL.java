@@ -160,6 +160,7 @@ public class LoginREPL {
             System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
                     " as " + GREEN + playerColor + RESET);
 
+            session.setUserRole(ClientSession.User_Role.PLAYER);
             boolean quit = new InGameREPL(server, session, chessGame, playerColor).run();
 
 
@@ -198,6 +199,7 @@ public class LoginREPL {
             }
 
             // Enter inGame REPL
+            session.setUserRole(ClientSession.User_Role.OBSERVER);
             boolean quit = new InGameREPL(server, session, chessGame, "white").run();
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
                     " for list of available commands.");

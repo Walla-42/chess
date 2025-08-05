@@ -25,7 +25,7 @@ import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class InGameREPL implements NotificationHandler {
     private final ServerFacade server;
-    private final ClientSession session;
+    private final ClientSession clientSession;
     private final String color;
     private final ChessGame chessGame;
     private final String gameName;
@@ -54,9 +54,9 @@ public class InGameREPL implements NotificationHandler {
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
 
 
-    public InGameREPL(ServerFacade server, ClientSession session, GameData game, String color) {
+    public InGameREPL(ServerFacade server, ClientSession clientSession, GameData game, String color) {
         this.server = server;
-        this.session = session;
+        this.clientSession = clientSession;
         this.color = color;
         this.gameName = game.gameName();
         this.chessGame = game.game();
@@ -64,7 +64,7 @@ public class InGameREPL implements NotificationHandler {
         ws = new WebSocketFacade(server.getBaseURL(), this);
 
         try {
-            ws.enterGame(session.getAuthToken(), session.getUserCurrentGame());
+            ws.enterGame(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
         } catch (ResponseException e) {
             System.out.println(RED + "WebSocket connection failed: " + e.getMessage() + RESET);
             return;
@@ -99,7 +99,8 @@ public class InGameREPL implements NotificationHandler {
                 case "help" -> printHelp();
                 case "redraw" -> redrawChessBoard();
                 case "leave" -> {
-                    ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
+                    ws.onLeave(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
+                    clientSession.removeCurrentGame();
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
                     printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
@@ -107,10 +108,32 @@ public class InGameREPL implements NotificationHandler {
                     return false;
                 }
                 case "move" -> makeMove(userInput);
-                case "resign" -> ws.onResign(session.getAuthToken(), session.getUserCurrentGame());
+                case "resign" -> {
+                    if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
+                        System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game.");
+                        break;
+                    }
+
+                    String confirmation;
+                    while (true) {
+                        System.out.println("Are you sure you want to resign? (yes/no)");
+                        printPrompt();
+                        confirmation = scanner.nextLine().trim().toLowerCase();
+
+                        if (confirmation.equals("yes")) {
+                            ws.onResign(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
+                            break;
+                        } else if (confirmation.equals("no")) {
+                            System.out.println("Resignation canceled.");
+                            break;
+                        } else {
+                            System.out.println("Error: Invalid response. Type 'yes' or 'no' to confirm.");
+                        }
+                    }
+                }
                 case "highlight" -> highlight(userInput);
                 case "quit" -> {
-                    ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
+                    ws.onLeave(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
                     return true;
@@ -125,13 +148,18 @@ public class InGameREPL implements NotificationHandler {
      * helper method to print help menu to the command line.
      */
     private void printHelp() {
-        System.out.println("\t" + BLUE + "exit " + RED + "- to exit gameboard display" + RESET);
-        System.out.println("\t" + BLUE + "quit " + RED + "- to exit the application" + RESET);
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
+        System.out.println("\t" + BLUE + "redraw " + RED + "- redraw the current game board" + RESET);
+        System.out.println("\t" + BLUE + "leave " + RED + "- leave the current game" + RESET);
+        System.out.println("\t" + BLUE + "move <start column> <start row> <end column> <end row> " +
+                "[promotion{QUEEN|ROOK|BISHOP|KNIGHT}]" + RED + "- moves the specified game piece" + RESET);
+        System.out.println("\t" + BLUE + "resign " + RED + "- forfeit the game. You still remain in game." + RESET);
+        System.out.println("\t" + BLUE + "highlight <column> <row> " + RED + "- highlights possible moves for the " +
+                "selected game piece" + RESET);
     }
 
     private void redrawChessBoard() {
-        throw new RuntimeException("not yet implemented");
+        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out);
     }
 
     private void makeMove(String[] userInput) {
@@ -153,7 +181,7 @@ public class InGameREPL implements NotificationHandler {
                 chessMove = new ChessMove(startPosition, endPosition);
             }
 
-            ws.onMove(session.getAuthToken(), session.getUserCurrentGame(), chessMove);
+            ws.onMove(clientSession.getAuthToken(), clientSession.getUserCurrentGame(), chessMove);
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid move coordinate", "help", "for more information");
         } catch (Throwable e) {
@@ -183,6 +211,7 @@ public class InGameREPL implements NotificationHandler {
             System.out.println(RED + errorMessage.getErrorMessage() + RESET);
         } else if (notification.getServerMessageType() == LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
+            clientSession.updateGameBoard(loadGameMessage.getGame().game());
             GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out);
         } else if (notification.getServerMessageType() == NOTIFICATION) {
             NotificationMessage notificationMessage = (NotificationMessage) notification;
@@ -195,7 +224,7 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void printPrompt() {
-        System.out.print("[" + GREEN + session.getUsername() + YELLOW + " (IN GAME) " + RESET + "] >>> ");
+        System.out.print("[" + GREEN + clientSession.getUsername() + YELLOW + " (IN GAME) " + RESET + "] >>> ");
     }
 
     /**

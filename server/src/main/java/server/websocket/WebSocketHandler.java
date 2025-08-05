@@ -118,29 +118,33 @@ public class WebSocketHandler {
         try {
             GameData currentGame = gameDAO.getGame(gameID);
             ChessGame.Game_State gameState = currentGame.game().getGameState();
-            if (currentGame.blackUsername().equals(username) && gameState != ChessGame.Game_State.BLACK_WON) {
+            boolean gameOver = gameState != ChessGame.Game_State.ONGOING;
+
+
+            if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username) && !gameOver) {
                 currentGame.game().setGameState(ChessGame.Game_State.WHITE_WON);
-
-            } else if (currentGame.whiteUsername().equals(username) && gameState != ChessGame.Game_State.WHITE_WON) {
+            } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username) && !gameOver) {
                 currentGame.game().setGameState(ChessGame.Game_State.BLACK_WON);
-
             } else {
                 sendErrorMessage(session, "Error: The game has ended. Type 'leave' to exit the game.");
                 return;
             }
 
+            // update game state in server
+            gameDAO.updateGame(currentGame);
+
             String winner = (currentGame.game().getGameState() == ChessGame.Game_State.WHITE_WON) ? "White" : "Black";
 
-            // notify those in game
+            // Send updated game state (includes resigned state) to everyone
+            ServerMessage updateGame = new LoadGameMessage(currentGame);
+            connection.broadcast(null, gameID, updateGame);
+
+            // Notify everyone in the game (except the one resigning)
             var message = String.format("%s has resigned from the game. %s won the game!", username, winner);
             ServerMessage serverMessage = new NotificationMessage(message);
             connection.broadcast(username, gameID, serverMessage);
 
-            // update game
-            ServerMessage updateGame = new LoadGameMessage(currentGame);
-            connection.broadcast(username, gameID, updateGame);
-
-            // notify the user
+            // Notify the resigning user
             var sessionMessage = String.format("You have resigned. %s won the game. Type 'leave' to exit the game", winner);
             sendUserNotification(session, sessionMessage);
 
@@ -149,18 +153,15 @@ public class WebSocketHandler {
         }
     }
 
+
     private void sendUserNotification(Session session, String notification) throws IOException {
         ServerMessage serverMessage = new NotificationMessage(notification);
         String json = new Gson().toJson(serverMessage);
         session.getRemote().sendString(json);
-
-//        ServerMessage serverMessage = new NotificationMessage(notification);
-//        session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 
     private void sendErrorMessage(Session session, String ErrorMessage) throws IOException {
         System.out.println("Sending error notification to session: " + session);
-        System.out.println("Session is open? " + session.isOpen());
 
         ServerMessage serverMessage = new ErrorMessage(ErrorMessage);
         session.getRemote().sendString(new Gson().toJson(serverMessage));

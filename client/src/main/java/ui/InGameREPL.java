@@ -38,6 +38,7 @@ public class InGameREPL implements NotificationHandler {
     private final String RED = SET_TEXT_COLOR_RED;
     private final String YELLOW = SET_TEXT_COLOR_YELLOW;
     private final String ERASE = ERASE_LINE;
+    private boolean inGame = true;
 
     private static final Map<Character, Integer> columnMapping = Map.of(
             'a', 1,
@@ -84,10 +85,10 @@ public class InGameREPL implements NotificationHandler {
      * @return true if the user chooses to quit the application, false if they just exit the game view.
      * Accepts commands {@code help}, {@code exit}, and {@code quit}
      */
-    public boolean run() {
+    public void run() {
         Scanner scanner = new Scanner(System.in);
 
-        while (true) {
+        while (inGame) {
             printPrompt();
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
@@ -98,46 +99,16 @@ public class InGameREPL implements NotificationHandler {
             switch (command) {
                 case "help" -> printHelp();
                 case "redraw" -> redrawChessBoard();
-                case "leave" -> {
-                    ws.onLeave(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
-                    clientSession.removeCurrentGame();
-                    System.out.print(ERASE_SCREEN);
-                    System.out.flush();
-                    printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
-                            " for list of available commands.");
-                    return false;
-                }
+                case "leave" -> leaveGame();
                 case "move" -> makeMove(userInput);
                 case "resign" -> {
                     if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
                         System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game.");
                         break;
                     }
-
-                    String confirmation;
-                    while (true) {
-                        System.out.println("Are you sure you want to resign? (yes/no)");
-                        printPrompt();
-                        confirmation = scanner.nextLine().trim().toLowerCase();
-
-                        if (confirmation.equals("yes")) {
-                            ws.onResign(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
-                            break;
-                        } else if (confirmation.equals("no")) {
-                            System.out.println("Resignation canceled.");
-                            break;
-                        } else {
-                            System.out.println("Error: Invalid response. Type 'yes' or 'no' to confirm.");
-                        }
-                    }
+                    resignPlayer(scanner);
                 }
                 case "highlight" -> highlight(userInput);
-                case "quit" -> {
-                    ws.onLeave(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
-                    System.out.print(ERASE_SCREEN);
-                    System.out.flush();
-                    return true;
-                }
                 default -> System.out.println(RED + "Invalid command. " + RESET + "Type " +
                         GREEN + "'help'" + RESET + " for list of commands.");
             }
@@ -156,6 +127,35 @@ public class InGameREPL implements NotificationHandler {
         System.out.println("\t" + BLUE + "resign " + RED + "- forfeit the game. You still remain in game." + RESET);
         System.out.println("\t" + BLUE + "highlight <column> <row> " + RED + "- highlights possible moves for the " +
                 "selected game piece" + RESET);
+    }
+
+    private void resignPlayer(Scanner scanner) {
+        String confirmation;
+        while (true) {
+            System.out.println("Are you sure you want to resign? (yes/no)");
+            printPrompt();
+            confirmation = scanner.nextLine().trim().toLowerCase();
+
+            if (confirmation.equals("yes")) {
+                ws.onResign(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
+                break;
+            } else if (confirmation.equals("no")) {
+                System.out.println("Resignation canceled.");
+                break;
+            } else {
+                System.out.println("Error: Invalid response. Type 'yes' or 'no' to confirm.");
+            }
+        }
+    }
+
+    private void leaveGame() {
+        ws.onLeave(clientSession.getAuthToken(), clientSession.getUserCurrentGame());
+        clientSession.removeCurrentGame();
+        System.out.print(ERASE_SCREEN);
+        System.out.flush();
+        printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                " for list of available commands.");
+        inGame = false;
     }
 
     private void redrawChessBoard() {
@@ -209,13 +209,21 @@ public class InGameREPL implements NotificationHandler {
         if (notification.getServerMessageType() == ERROR) {
             ErrorMessage errorMessage = (ErrorMessage) notification;
             System.out.println(RED + errorMessage.getErrorMessage() + RESET);
+
         } else if (notification.getServerMessageType() == LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
             clientSession.updateGameBoard(loadGameMessage.getGame().game());
-            GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out);
+
+            if (loadGameMessage.getGame().game().getGameState() == ChessGame.Game_State.ONGOING) {
+                GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out);
+            } else {
+                System.out.println(YELLOW + "Game has ended. Type 'leave' to leave game.");
+            }
+
         } else if (notification.getServerMessageType() == NOTIFICATION) {
             NotificationMessage notificationMessage = (NotificationMessage) notification;
             System.out.println(YELLOW + notificationMessage.message() + RESET);
+
         } else {
             printBasicMessage(RED, "Error: Unable to notify due to invalid notification message", "help",
                     "for more options. You should also probably contact support :)");

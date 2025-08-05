@@ -57,17 +57,9 @@ public class LoginREPL {
                     return logoutSequence(false);
                 }
                 case "list" -> listGamesSequence();
-                case "join" -> {
-                    if (joinGameSequence(userInput)) {
-                        return true;
-                    }
-                }
+                case "join" -> joinGameSequence(userInput);
                 case "create" -> createGameSequence(userInput);
-                case "observe" -> {
-                    if (observerSequence(userInput)) {
-                        return true;
-                    }
-                }
+                case "observe" -> observerSequence(userInput);
                 case "quit" -> {
                     return logoutSequence(true);
                 }
@@ -134,10 +126,10 @@ public class LoginREPL {
      *
      * @param userInput String[] of client command input
      */
-    private boolean joinGameSequence(String[] userInput) {
+    private void joinGameSequence(String[] userInput) {
         if (userInput.length != 3) {
             printUsageError("join", "<GAME ID> [WHITE|BLACK]");
-            return false;
+            return;
         }
 
         try {
@@ -148,7 +140,7 @@ public class LoginREPL {
 
             if (gameID == null) {
                 printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
-                return false;
+                return;
             }
 
             JoinGameRequestBody request = new JoinGameRequestBody(playerColor, gameID);
@@ -161,20 +153,15 @@ public class LoginREPL {
                     " as " + GREEN + playerColor + RESET);
 
             session.setUserRole(ClientSession.User_Role.PLAYER);
-            boolean quit = new InGameREPL(server, session, chessGame, playerColor).run();
 
-
-            if (quit) {
-                return logoutSequence(true);
-            }
-
+            new InGameREPL(server, session, chessGame, playerColor).run();
+            
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
 
         } catch (Throwable e) {
             printCatchMessage(e);
         }
-        return false;
     }
 
     /**
@@ -182,10 +169,10 @@ public class LoginREPL {
      *
      * @param userInput String[] of client command input
      */
-    private boolean observerSequence(String[] userInput) {
+    private void observerSequence(String[] userInput) {
         if (userInput.length != 2) {
             printUsageError("observe", "<GAME ID>");
-            return false;
+            return;
         }
 
         try {
@@ -195,25 +182,20 @@ public class LoginREPL {
 
             if (gameID == null) {
                 printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
-                return false;
+                return;
             }
 
             // Enter inGame REPL
             session.setUserRole(ClientSession.User_Role.OBSERVER);
-            boolean quit = new InGameREPL(server, session, chessGame, "white").run();
+            new InGameREPL(server, session, chessGame, "white").run();
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
                     " for list of available commands.");
-
-            if (quit) {
-                return logoutSequence(true);
-            }
 
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
         } catch (Throwable e) {
             printCatchMessage(e);
         }
-        return false;
     }
 
     /**

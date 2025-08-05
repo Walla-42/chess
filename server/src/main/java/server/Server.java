@@ -58,8 +58,10 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
+        WebSocketHandler.initialize(authDAO, gameDAO);
+        
         // websocket endpoint
-        Spark.webSocket("/connect", WebSocketHandler.class);
+        Spark.webSocket("/ws", WebSocketHandler.class);
 
         Spark.staticFiles.location("web");
 

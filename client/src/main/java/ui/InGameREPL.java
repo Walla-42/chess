@@ -10,6 +10,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import exceptions.ResponseException;
 import model.GameData;
 import server.ClientSession;
 import server.ServerFacade;
@@ -54,7 +55,15 @@ public class InGameREPL implements NotificationHandler {
         this.color = color;
         this.gameName = game.gameName();
         this.chessGame = game.game();
+
         ws = new WebSocketFacade(server.getBaseURL(), this);
+
+        try {
+            ws.enterGame(session.getAuthToken(), session.getUserCurrentGame());
+        } catch (ResponseException e) {
+            System.out.println(RED + "WebSocket connection failed: " + e.getMessage() + RESET);
+            return;
+        }
 
         System.out.print(ERASE_SCREEN);
         System.out.flush();
@@ -88,6 +97,8 @@ public class InGameREPL implements NotificationHandler {
                 case "redraw" -> redrawChessBoard();
                 case "leave" -> ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
                 case "move" -> makeMove(userInput);
+                case "resign" -> ws.onResign(session.getAuthToken(), session.getUserCurrentGame());
+                case "highlight" -> highlight(userInput);
                 case "exit" -> {
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
@@ -142,6 +153,10 @@ public class InGameREPL implements NotificationHandler {
             System.out.print(RED + msg + "\n" + RESET);
         }
 
+    }
+
+    private void highlight(String[] userInput) {
+        throw new RuntimeException("not yet implemented");
     }
 
     /**

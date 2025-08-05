@@ -37,6 +37,7 @@ public class InGameREPL implements NotificationHandler {
     private final String GREEN = SET_TEXT_COLOR_GREEN;
     private final String RED = SET_TEXT_COLOR_RED;
     private final String YELLOW = SET_TEXT_COLOR_YELLOW;
+    private final String ERASE = ERASE_LINE;
 
     private static final Map<Character, Integer> columnMapping = Map.of(
             'a', 1,
@@ -75,8 +76,6 @@ public class InGameREPL implements NotificationHandler {
         printWelcome();
 
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        GameBoardPrinter.printGameBoard(chessGame, color, out);
-
     }
 
     /**
@@ -176,6 +175,7 @@ public class InGameREPL implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
+        System.out.print("\r\u001B[2K");
         if (notification.getServerMessageType() == ERROR) {
             ErrorMessage errorMessage = (ErrorMessage) notification;
             System.out.println(RED + errorMessage.getErrorMessage() + RESET);

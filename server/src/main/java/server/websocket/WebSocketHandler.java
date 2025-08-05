@@ -95,14 +95,14 @@ public class WebSocketHandler {
         // make sure to remove userCurrentGame from client session information in REPL
     }
 
-    private void resign(int gameID, Session session, String username) throws IOException, DatabaseAccessException {
+    private void resign(int gameID, Session session, String username) throws IOException {
         try {
             GameData currentGame = gameDAO.getGame(gameID);
             GameData updatedGame;
-            if (currentGame.blackUsername().equals(username)) {
+            if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username)) {
                 String blackUsername = null;
                 updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
-            } else if (currentGame.whiteUsername().equals(username)) {
+            } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username)) {
                 String whiteUsername = null;
                 updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
             } else {
@@ -122,10 +122,17 @@ public class WebSocketHandler {
 
     private void sendUserNotification(Session session, String notification) throws IOException {
         ServerMessage serverMessage = new NotificationMessage(notification);
-        session.getRemote().sendString(new Gson().toJson(serverMessage));
+        String json = new Gson().toJson(serverMessage);
+        session.getRemote().sendString(json);
+
+//        ServerMessage serverMessage = new NotificationMessage(notification);
+//        session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 
     private void sendErrorMessage(Session session, String ErrorMessage) throws IOException {
+        System.out.println("Sending error notification to session: " + session);
+        System.out.println("Session is open? " + session.isOpen());
+
         ServerMessage serverMessage = new ErrorMessage(ErrorMessage);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }

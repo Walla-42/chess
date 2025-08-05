@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@ClientEndpoint
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
@@ -31,16 +32,19 @@ public class WebSocketFacade extends Endpoint {
             this.session = container.connectToServer(this, socketURI);
 
             //set message handler
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = null;
-                if (message.contains("\"MessageType\":\"NOTIFICATION\"")) {
-                    serverMessage = new Gson().fromJson(message, NotificationMessage.class);
-                } else if (message.contains("\"MessageType\":\"ERROR\"")) {
-                    serverMessage = new Gson().fromJson(message, ErrorMessage.class);
-                } else if (message.contains("\"MessageType\":\"LOAD_GAME\"")) {
-                    serverMessage = new Gson().fromJson(message, LoadGameMessage.class);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    ServerMessage serverMessage = null;
+                    if (message.contains("\"serverMessageType\":\"NOTIFICATION\"")) {
+                        serverMessage = new Gson().fromJson(message, NotificationMessage.class);
+                    } else if (message.contains("\"serverMessageType\":\"ERROR\"")) {
+                        serverMessage = new Gson().fromJson(message, ErrorMessage.class);
+                    } else if (message.contains("\"serverMessageType\":\"LOAD_GAME\"")) {
+                        serverMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                    }
+                    notificationHandler.notify(serverMessage);
                 }
-                notificationHandler.notify(serverMessage);
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());

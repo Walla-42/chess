@@ -51,7 +51,7 @@ public class ConnectionManager {
             Connection conn = connections.get(user);
             if (conn.session.isOpen()) {
                 if (!conn.username.equals(excludeVisitorName)) {
-                    conn.send(new Gson().toJson(message)); // may need to modify this to send a json string instead
+                    conn.send(new Gson().toJson(message));
                 }
             } else {
                 removeList.add(conn);

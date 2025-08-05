@@ -2,7 +2,6 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -16,9 +15,13 @@ import server.ClientSession;
 import server.ServerFacade;
 import server.websocket.NotificationHandler;
 import server.websocket.WebSocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import static ui.EscapeSequences.*;
+import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class InGameREPL implements NotificationHandler {
     private final ServerFacade server;
@@ -27,6 +30,7 @@ public class InGameREPL implements NotificationHandler {
     private final ChessGame chessGame;
     private final String gameName;
     private WebSocketFacade ws;
+    private PrintStream out;
 
     private final String BLUE = SET_TEXT_COLOR_BLUE;
     private final String RESET = RESET_TEXT_COLOR;
@@ -70,7 +74,7 @@ public class InGameREPL implements NotificationHandler {
 
         printWelcome();
 
-        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         GameBoardPrinter.printGameBoard(chessGame, color, out);
 
     }
@@ -85,7 +89,7 @@ public class InGameREPL implements NotificationHandler {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.print("[" + GREEN + session.getUsername() + RESET + "] >>> ");
+            printPrompt();
             String[] userInput = scanner.nextLine().trim().split("\\s+");
             if (userInput.length == 0) {
                 System.out.println("Enter a valid command or type 'help' for more information");
@@ -95,16 +99,19 @@ public class InGameREPL implements NotificationHandler {
             switch (command) {
                 case "help" -> printHelp();
                 case "redraw" -> redrawChessBoard();
-                case "leave" -> ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
-                case "move" -> makeMove(userInput);
-                case "resign" -> ws.onResign(session.getAuthToken(), session.getUserCurrentGame());
-                case "highlight" -> highlight(userInput);
-                case "exit" -> {
+                case "leave" -> {
+                    ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
                     System.out.print(ERASE_SCREEN);
                     System.out.flush();
                     return false;
                 }
+                case "move" -> makeMove(userInput);
+                case "resign" -> ws.onResign(session.getAuthToken(), session.getUserCurrentGame());
+                case "highlight" -> highlight(userInput);
                 case "quit" -> {
+                    ws.onLeave(session.getAuthToken(), session.getUserCurrentGame());
+                    System.out.print(ERASE_SCREEN);
+                    System.out.flush();
                     return true;
                 }
                 default -> System.out.println(RED + "Invalid command. " + RESET + "Type " +
@@ -169,7 +176,19 @@ public class InGameREPL implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        System.out.println(YELLOW + notification);
+        if (notification.getServerMessageType() == ERROR) {
+            ErrorMessage errorMessage = (ErrorMessage) notification;
+            System.out.println(RED + errorMessage.getErrorMessage() + RESET);
+        } else if (notification.getServerMessageType() == LOAD_GAME) {
+            LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
+            GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out);
+        } else if (notification.getServerMessageType() == NOTIFICATION) {
+            NotificationMessage notificationMessage = (NotificationMessage) notification;
+            System.out.println(YELLOW + notificationMessage.message() + RESET);
+        } else {
+            printBasicMessage(RED, "Error: Unable to notify due to invalid notification message", "help",
+                    "for more options. You should also probably contact support :)");
+        }
         printPrompt();
     }
 

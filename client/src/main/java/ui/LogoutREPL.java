@@ -81,7 +81,7 @@ public class LogoutREPL {
     }
 
     /**
-     * Prints the welcome message to the console.
+     * Prints the welcome getErrorMessage to the console.
      */
     private void printWelcome() {
         System.out.println(ENTRY_EMOJI + CROWN + BLUE + " Welcome to 240 Chess! Type " +

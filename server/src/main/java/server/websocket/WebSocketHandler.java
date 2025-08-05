@@ -51,8 +51,8 @@ public class WebSocketHandler {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID);
                 case MAKE_MOVE -> makeMove(session, username);
-                case LEAVE -> leaveGame(session, username);
-                case RESIGN -> resign(session, username);
+                case LEAVE -> leaveGame(gameID, username);
+                case RESIGN -> resign(gameID, session, username);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -87,16 +87,42 @@ public class WebSocketHandler {
         //
     }
 
-    private void leaveGame(Session session, String username) {
-        throw new RuntimeException("Not yet implemented");
+    private void leaveGame(int gameID, String username) throws IOException {
+        connection.remove(username);
+        var message = String.format("%s has left the game", username);
+        ServerMessage serverMessage = new NotificationMessage(message);
+        connection.broadcast(username, gameID, serverMessage);
+        // make sure to remove userCurrentGame from client session information in REPL
     }
 
-    private void resign(Session session, String username) {
-        throw new RuntimeException("Not yet implemented");
+    private void resign(int gameID, Session session, String username) throws IOException, DatabaseAccessException {
+        try {
+            GameData currentGame = gameDAO.getGame(gameID);
+            GameData updatedGame;
+            if (currentGame.blackUsername().equals(username)) {
+                String blackUsername = null;
+                updatedGame = new GameData(gameID, currentGame.whiteUsername(), blackUsername, currentGame.gameName(), currentGame.game());
+            } else if (currentGame.whiteUsername().equals(username)) {
+                String whiteUsername = null;
+                updatedGame = new GameData(gameID, whiteUsername, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+            } else {
+                sendErrorMessage(session, "Error: You cannot resign the game as an observer");
+                return;
+            }
+            gameDAO.updateGame(updatedGame);
+            var message = String.format("%s has resigned from the game", username);
+            ServerMessage serverMessage = new NotificationMessage(message);
+            sendUserNotification(session, "You have resigned");
+            connection.broadcast(username, gameID, serverMessage);
+        } catch (DatabaseAccessException e) {
+            sendErrorMessage(session, "Error: Unable to update game.");
+
+        }
     }
 
-    private void sendMessage(RemoteEndpoint remote, ErrorResponseClass error) {
-        throw new RuntimeException("Not yet implemented");
+    private void sendUserNotification(Session session, String notification) throws IOException {
+        ServerMessage serverMessage = new NotificationMessage(notification);
+        session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 
     private void sendErrorMessage(Session session, String ErrorMessage) throws IOException {

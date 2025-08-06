@@ -106,9 +106,9 @@ public class WebSocketHandler {
 
     private String getPlayerPosition(int gameID, String username) throws DatabaseAccessException {
         GameData gameData = gameDAO.getGame(gameID);
-        if (gameData.whiteUsername().equals(username)) {
+        if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
             return "White";
-        } else if (gameData.blackUsername().equals(username)) {
+        } else if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
             return "Black";
         } else {
             return "Observer";
@@ -129,6 +129,7 @@ public class WebSocketHandler {
                 sendErrorMessage(session, "Error: The game has already ended. Type 'leave' to leave the game.");
                 return;
             }
+
             ChessGame.TeamColor userColor;
             if (userGame.blackUsername().equals(username)) {
                 userColor = ChessGame.TeamColor.BLACK;
@@ -148,6 +149,7 @@ public class WebSocketHandler {
             // make move and update gameboard in database
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             ChessPiece.PieceType pieceType = ChessPiece.PieceType.valueOf(piece.getPieceType().toString());
+
             String endPosition = makeClientCoordinate(move.getEndPosition());
             String nextTurn = (userColor.equals(ChessGame.TeamColor.WHITE)) ? "Black" : "White";
 
@@ -171,6 +173,7 @@ public class WebSocketHandler {
 
 
     }
+
 
     private void checkIfInCheck(GameData gameData, int gameID) throws IOException, DatabaseAccessException {
         ChessGame game = gameData.game();

@@ -2,10 +2,7 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import chess.*;
 import exceptions.ResponseException;
@@ -103,7 +100,7 @@ public class InGameREPL implements NotificationHandler {
                 case "help" -> printHelp();
                 case "redraw" -> redrawChessBoard();
                 case "leave" -> leaveGame();
-                case "move" -> makeMove(userInput);
+                case "move" -> makeMove(userInput, scanner);
                 case "resign" -> {
                     if (clientSession.getUserRole() != ClientSession.UserRole.PLAYER) {
                         System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game." + RESET);
@@ -180,7 +177,7 @@ public class InGameREPL implements NotificationHandler {
         GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, null, null);
     }
 
-    private void makeMove(String[] userInput) {
+    private void makeMove(String[] userInput, Scanner scanner) {
         if (!clientSession.getGameBoard().getGameState().equals(ChessGame.GameState.ONGOING)) {
             System.out.println(RED + "Error: Game has already ended.");
             return;
@@ -201,17 +198,22 @@ public class InGameREPL implements NotificationHandler {
                 return;
             }
 
-            ChessPiece.PieceType promotion = null;
             ChessPosition startPosition = new ChessPosition(startRow, startCol);
             ChessPosition endPosition = new ChessPosition(endRow, endCol);
 
             ChessMove chessMove;
 
-            if (userInput.length == 6) {
-                promotion = ChessPiece.PieceType.valueOf(userInput[5].toUpperCase());
-                chessMove = new ChessMove(startPosition, endPosition, promotion);
-            } else if (userInput.length == 5) {
+            if (userInput.length == 5) {
                 chessMove = new ChessMove(startPosition, endPosition);
+                ChessPiece piece = clientSession.getGameBoard().getBoard().getPiece(startPosition);
+                int endMoveRow = endPosition.getRow();
+                int promotionRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
+
+                if (endMoveRow == promotionRow) {
+                    ChessPiece.PieceType promotionPiece = getPromotionPiece(scanner);
+                    chessMove = new ChessMove(startPosition, endPosition, promotionPiece);
+                }
+
             } else {
                 printUsageError("move", "<start column> <start row> <end column> <end row> [promotion{QUEEN|ROOK|BISHOP|KNIGHT}])");
                 return;
@@ -227,6 +229,21 @@ public class InGameREPL implements NotificationHandler {
             System.out.print(RED + msg + "\n" + RESET);
         }
 
+    }
+
+    private ChessPiece.PieceType getPromotionPiece(Scanner scanner) {
+        String[] promotion;
+        ArrayList<String> promotionPieces = new ArrayList<>(List.of("BISHOP", "ROOK", "KNIGHT", "QUEEN"));
+        while (true) {
+            System.out.println("You can promote! Enter a promotion piece: [BISHOP|ROOK|KNIGHT|QUEEN]");
+            printPrompt();
+            promotion = scanner.nextLine().trim().split("\\s+");
+            if (promotionPieces.contains(promotion[0].toUpperCase())) {
+                return ChessPiece.PieceType.valueOf(promotion[0].toUpperCase());
+            } else {
+                System.out.println(RED + "Error: Invalid Response. [BISHIP|ROOK|KNIGHT|QUEEN]");
+            }
+        }
     }
 
     private void highlight(String[] userInput) {

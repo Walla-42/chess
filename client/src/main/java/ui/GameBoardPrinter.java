@@ -63,7 +63,8 @@ public class GameBoardPrinter {
 
                     boolean isStart = startPosition != null && startPosition.equals(position);
                     boolean isHighlighted = highlight.contains(position);
-                    boolean isCapture = isHighlighted && piece != null && startPiece != null && !startPiece.getTeamColor().equals(piece.getTeamColor());
+                    boolean isCapture = isHighlighted && piece != null && startPiece != null &&
+                            !startPiece.getTeamColor().equals(piece.getTeamColor());
 
                     if (isStart) {
                         bgColor = SET_BG_COLOR_YELLOW;

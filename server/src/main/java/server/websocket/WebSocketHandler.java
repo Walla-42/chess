@@ -14,7 +14,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
-import server.Server;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -28,7 +27,7 @@ import java.util.Map;
 
 @WebSocket
 public class WebSocketHandler {
-    private static final ConnectionManager connection = new ConnectionManager();
+    private static ConnectionManager connection = new ConnectionManager();
     private static AuthDAO authDAO;
     private static GameDAO gameDAO;
 
@@ -126,7 +125,7 @@ public class WebSocketHandler {
         try {
             GameData userGame = gameDAO.getGame(gameID);
             ChessGame game = userGame.game();
-            if (game.getGameState() != ChessGame.Game_State.ONGOING) {
+            if (game.getGameState() != ChessGame.GameState.ONGOING) {
                 sendErrorMessage(session, "Error: The game has already ended. Type 'leave' to leave the game.");
                 return;
             }
@@ -183,7 +182,7 @@ public class WebSocketHandler {
             String checkmateMessage = String.format("%s is in checkmate. Game Over. %s won the game!", username, opponentTurn);
             ServerMessage checkmate = new NotificationMessage(checkmateMessage);
             connection.broadcast(null, gameID, checkmate);
-            game.setGameState((opponentTurn.equals("White") ? ChessGame.Game_State.WHITE_WON : ChessGame.Game_State.BLACK_WON));
+            game.setGameState((opponentTurn.equals("White") ? ChessGame.GameState.WHITE_WON : ChessGame.GameState.BLACK_WON));
             gameDAO.updateGame(gameData);
 
         } else if (game.isInCheck(game.getTeamTurn())) {
@@ -239,8 +238,8 @@ public class WebSocketHandler {
     private void resign(int gameID, Session session, String username) throws IOException {
         try {
             GameData currentGame = gameDAO.getGame(gameID);
-            ChessGame.Game_State gameState = currentGame.game().getGameState();
-            boolean gameOver = gameState != ChessGame.Game_State.ONGOING;
+            ChessGame.GameState gameState = currentGame.game().getGameState();
+            boolean gameOver = gameState != ChessGame.GameState.ONGOING;
 
             if (gameOver) {
                 var message = "Error: The game has ended. Player movement is now disabled. Type 'leave' to exit the game";
@@ -249,9 +248,9 @@ public class WebSocketHandler {
             }
 
             if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username) && !gameOver) {
-                currentGame.game().setGameState(ChessGame.Game_State.WHITE_WON);
+                currentGame.game().setGameState(ChessGame.GameState.WHITE_WON);
             } else if (currentGame.whiteUsername() != null && currentGame.whiteUsername().equals(username) && !gameOver) {
-                currentGame.game().setGameState(ChessGame.Game_State.BLACK_WON);
+                currentGame.game().setGameState(ChessGame.GameState.BLACK_WON);
             } else {
                 sendErrorMessage(session, "Error: The game has ended. Type 'leave' to exit the game.");
                 return;
@@ -260,7 +259,7 @@ public class WebSocketHandler {
             // update game state in server
             gameDAO.updateGame(currentGame);
 
-            String winner = (currentGame.game().getGameState() == ChessGame.Game_State.WHITE_WON) ? "White" : "Black";
+            String winner = (currentGame.game().getGameState() == ChessGame.GameState.WHITE_WON) ? "White" : "Black";
 
             // Notify everyone in the game (except the one resigning)
             var message = String.format("%s has resigned from the game. %s won the game!", username, winner);
@@ -302,10 +301,10 @@ public class WebSocketHandler {
         session.getRemote().sendString(json);
     }
 
-    private void sendErrorMessage(Session session, String ErrorMessage) throws IOException {
+    private void sendErrorMessage(Session session, String errorMessage) throws IOException {
         System.out.println("Sending error notification to session: " + session);
 
-        ServerMessage serverMessage = new ErrorMessage(ErrorMessage);
+        ServerMessage serverMessage = new ErrorMessage(errorMessage);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 

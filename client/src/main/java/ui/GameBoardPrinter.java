@@ -29,7 +29,8 @@ public class GameBoardPrinter {
      * @param color the perspective to render from; if "white", shows white at the bottom, otherwise black
      * @param out   the PrintStream to print the board to (supports UTF-8)
      */
-    public static void printGameBoard(ChessGame game, String color, PrintStream out, Collection<ChessPosition> highlight, ChessPosition startPosition) {
+    public static void printGameBoard(ChessGame game, String color, PrintStream out,
+                                      Collection<ChessPosition> highlight, ChessPosition startPosition) {
         ChessBoard board = game.getBoard();
         highlight = highlight != null ? highlight : new ArrayList<>();
 
@@ -56,28 +57,26 @@ public class GameBoardPrinter {
                     String symbolColor = SET_TEXT_COLOR_WHITE;
                     ChessPosition position = new ChessPosition(row, col + 1);
 
-                    ChessPiece startPiece = null;
-                    if (startPosition != null) {
-                        startPiece = board.getPiece(startPosition);
-                        if (startPosition.equals(position)) {
-                            bgColor = SET_BG_COLOR_YELLOW;
-                            symbolColor = SET_TEXT_COLOR_BLACK;
-                        }
-                    }
-
                     ChessPiece piece = board.getPiece(position);
+                    ChessPiece startPiece = startPosition != null ? board.getPiece(startPosition) : null;
                     String symbol = getPieceSymbol(piece);
 
-                    if (highlight.contains(position)) {
-                        if (piece != null && startPiece != null && !startPiece.getTeamColor().equals(piece.getTeamColor())) {
-                            bgColor = SET_BG_COLOR_ORANGE;
-                            symbolColor = SET_TEXT_COLOR_BLACK;
-                        } else if (bgColor.equals(BLACK_BACKGROUND)) {
-                            bgColor = SET_BG_COLOR_GREEN;
-                        } else {
-                            bgColor = SET_BG_COLOR_LIGHT_GREEN;
-                        }
+                    boolean isStart = startPosition != null && startPosition.equals(position);
+                    boolean isHighlighted = highlight.contains(position);
+                    boolean isCapture = isHighlighted && piece != null && startPiece != null && !startPiece.getTeamColor().equals(piece.getTeamColor());
+
+                    if (isStart) {
+                        bgColor = SET_BG_COLOR_YELLOW;
+                        symbolColor = SET_TEXT_COLOR_BLACK;
+                    } else if (isCapture) {
+                        bgColor = SET_BG_COLOR_ORANGE;
+                        symbolColor = SET_TEXT_COLOR_BLACK;
+                    } else if (isHighlighted && bgColor.equals(BLACK_BACKGROUND)) {
+                        bgColor = SET_BG_COLOR_GREEN;
+                    } else if (isHighlighted) {
+                        bgColor = SET_BG_COLOR_LIGHT_GREEN;
                     }
+
 
                     if (line == SQUARE_HEIGHT / 2) {
                         int padding = ((SQUARE_WIDTH - 1) / 2) - 1;

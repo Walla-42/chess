@@ -15,7 +15,7 @@ import static chess.ChessBoard.availableTeamMoves;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard gameBoard;
-    private Game_State gameState;
+    private GameState gameState;
 
     public ChessGame() {
         gameBoard = new ChessBoard();
@@ -24,23 +24,23 @@ public class ChessGame {
         setStartState();
     }
 
-    public enum Game_State {
+    public enum GameState {
         ONGOING,
         WHITE_WON,
         BLACK_WON,
     }
 
-    public Game_State getGameState() {
+    public GameState getGameState() {
         return gameState;
     }
 
-    public void setGameState(Game_State state) {
+    public void setGameState(GameState state) {
         this.gameState = state;
     }
 
     private void setStartState() {
-        if (gameState != Game_State.WHITE_WON && gameState != Game_State.BLACK_WON) {
-            gameState = Game_State.ONGOING;
+        if (gameState != GameState.WHITE_WON && gameState != GameState.BLACK_WON) {
+            gameState = GameState.ONGOING;
         }
     }
 

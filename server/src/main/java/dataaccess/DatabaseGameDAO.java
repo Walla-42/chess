@@ -45,7 +45,7 @@ public class DatabaseGameDAO implements GameDAO {
         Gson gson = new Gson();
         ChessGame newChessGame = new ChessGame();
         String chessGameString = gson.toJson(newChessGame);
-        String status = (newChessGame.getGameState() == ChessGame.Game_State.ONGOING) ? "active" : "inactive";
+        String status = (newChessGame.getGameState() == ChessGame.GameState.ONGOING) ? "active" : "inactive";
 
         String insertString = "INSERT INTO gamedatabase (white_username, black_username, game_name, chess_game, status) VALUES (?, ?, ?, ?, ?)";
 
@@ -107,9 +107,10 @@ public class DatabaseGameDAO implements GameDAO {
         String blackUsername = updatedGameData.blackUsername();
         String gameName = updatedGameData.gameName();
         String chessGame = gson.toJson(updatedGameData.game());
-        String status = (updatedGameData.game().getGameState() == ChessGame.Game_State.ONGOING) ? "active" : "inactive";
+        String status = (updatedGameData.game().getGameState() == ChessGame.GameState.ONGOING) ? "active" : "inactive";
 
-        String updateString = "UPDATE gamedatabase SET white_username = ?, black_username = ?, game_name = ?, chess_game = ?, status = ? WHERE gameID = ?";
+        String updateString = "UPDATE gamedatabase SET white_username = ?, black_username = ?, game_name = ?, " +
+                "chess_game = ?, status = ? WHERE gameID = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(updateString)) {
             statement.setString(1, whiteUsername);

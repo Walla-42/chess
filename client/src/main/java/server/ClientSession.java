@@ -13,19 +13,19 @@ public class ClientSession {
     private Map<Integer, GameData> gameDataMap = new HashMap<>();
     private Integer userCurrentGame = null;
     private ChessGame currGameBoard = null;
-    private User_Role userRole = User_Role.NONE;
+    private UserRole userRole = UserRole.NONE;
 
-    public enum User_Role {
+    public enum UserRole {
         PLAYER,
         OBSERVER,
         NONE
     }
 
-    public User_Role getUserRole() {
+    public UserRole getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(User_Role role) {
+    public void setUserRole(UserRole role) {
         userRole = role;
     }
 
@@ -52,7 +52,7 @@ public class ClientSession {
     public void removeCurrentGame() {
         userCurrentGame = null;
         currGameBoard = null;
-        userRole = User_Role.NONE;
+        userRole = UserRole.NONE;
     }
 
     public void addGameDataMapValue(Integer userFacingID, GameData gameData) {

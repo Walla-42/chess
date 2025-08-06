@@ -7,7 +7,6 @@ import requests.*;
 import responses.*;
 import server.ClientSession;
 import server.ServerFacade;
-import server.websocket.WebSocketFacade;
 
 import static ui.EscapeSequences.*;
 
@@ -152,7 +151,7 @@ public class LoginREPL {
             System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
                     " as " + GREEN + playerColor + RESET);
 
-            session.setUserRole(ClientSession.User_Role.PLAYER);
+            session.setUserRole(ClientSession.UserRole.PLAYER);
 
             new InGameREPL(server, session, chessGame, playerColor).run();
 
@@ -194,7 +193,7 @@ public class LoginREPL {
             System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
                     " as " + GREEN + "observer" + RESET);
 
-            session.setUserRole(ClientSession.User_Role.OBSERVER);
+            session.setUserRole(ClientSession.UserRole.OBSERVER);
             new InGameREPL(server, session, chessGame, "white").run();
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
                     " for list of available commands.");

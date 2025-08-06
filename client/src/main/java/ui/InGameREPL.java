@@ -31,15 +31,15 @@ public class InGameREPL implements NotificationHandler {
     private WebSocketFacade ws;
     private PrintStream out;
 
-    private final String BLUE = SET_TEXT_COLOR_BLUE;
-    private final String RESET = RESET_TEXT_COLOR;
-    private final String GREEN = SET_TEXT_COLOR_GREEN;
-    private final String RED = SET_TEXT_COLOR_RED;
-    private final String YELLOW = SET_TEXT_COLOR_YELLOW;
-    private final String ERASE = ERASE_LINE;
+    private static final String BLUE = SET_TEXT_COLOR_BLUE;
+    private static final String RESET = RESET_TEXT_COLOR;
+    private static final String GREEN = SET_TEXT_COLOR_GREEN;
+    private static final String RED = SET_TEXT_COLOR_RED;
+    private static final String YELLOW = SET_TEXT_COLOR_YELLOW;
+    private static final String ERASE = ERASE_LINE;
     private boolean inGame = true;
 
-    private static final Map<Character, Integer> columnMapping = Map.of(
+    private final Map<Character, Integer> columnMapping = Map.of(
             'a', 1,
             'b', 2,
             'c', 3,
@@ -72,7 +72,7 @@ public class InGameREPL implements NotificationHandler {
         System.out.print(ERASE_SCREEN);
         System.out.flush();
 
-        if (clientSession.getUserRole() == ClientSession.User_Role.PLAYER) {
+        if (clientSession.getUserRole() == ClientSession.UserRole.PLAYER) {
             printWelcome();
         } else {
             System.out.println(BLUE + "You have joined " + GREEN + gameName + BLUE + " as " + GREEN +
@@ -105,7 +105,7 @@ public class InGameREPL implements NotificationHandler {
                 case "leave" -> leaveGame();
                 case "move" -> makeMove(userInput);
                 case "resign" -> {
-                    if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
+                    if (clientSession.getUserRole() != ClientSession.UserRole.PLAYER) {
                         System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game." + RESET);
                         break;
                     }
@@ -122,7 +122,7 @@ public class InGameREPL implements NotificationHandler {
      * helper method to print help menu to the command line.
      */
     private void printHelp() {
-        if (clientSession.getUserRole() == ClientSession.User_Role.PLAYER) {
+        if (clientSession.getUserRole() == ClientSession.UserRole.PLAYER) {
             playerHelp();
         } else {
             observerHelp();
@@ -181,12 +181,12 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void makeMove(String[] userInput) {
-        if (!clientSession.getGameBoard().getGameState().equals(ChessGame.Game_State.ONGOING)) {
+        if (!clientSession.getGameBoard().getGameState().equals(ChessGame.GameState.ONGOING)) {
             System.out.println(RED + "Error: Game has already ended.");
             return;
         }
 
-        if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
+        if (clientSession.getUserRole() != ClientSession.UserRole.PLAYER) {
             System.out.println(RED + "Error: You cannot make a move as an observer." + RESET);
             return;
         }
@@ -278,7 +278,7 @@ public class InGameREPL implements NotificationHandler {
             LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
             clientSession.updateGameBoard(loadGameMessage.getGame().game());
 
-            if (loadGameMessage.getGame().game().getGameState() == ChessGame.Game_State.ONGOING) {
+            if (loadGameMessage.getGame().game().getGameState() == ChessGame.GameState.ONGOING) {
                 GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out, null, null);
             } else {
                 System.out.println(YELLOW + "Game has ended. Type 'leave' to leave game.");

@@ -208,18 +208,29 @@ public class InGameREPL implements NotificationHandler {
             printUsageError("highlight", "<column> <row>");
             return;
         }
-        char colCharacter = userInput[1].toLowerCase().charAt(0);
-        int column = columnMapping.get(colCharacter);
-        int row = Integer.parseInt(userInput[2]);
 
-        ChessPosition position = new ChessPosition(row, column);
-        Collection<ChessMove> moves = clientSession.getGameBoard().validMoves(position);
-        Collection<ChessPosition> validPositions = new ArrayList<>();
-        for (ChessMove move : moves) {
-            validPositions.add(move.getEndPosition());
+        try {
+            char colCharacter = userInput[1].toLowerCase().charAt(0);
+            Integer column = columnMapping.get(colCharacter);
+            Integer row = Integer.parseInt(userInput[2]);
+
+            if (column == null || (row > 8) || (row < 1)) {
+                System.out.println(RED + "Error: Coordinates provided are invalid. Column values are a-h, row values are 1-8.");
+                return;
+            }
+
+            ChessPosition position = new ChessPosition(row, column);
+            Collection<ChessMove> moves = clientSession.getGameBoard().validMoves(position);
+            Collection<ChessPosition> validPositions = new ArrayList<>();
+            for (ChessMove move : moves) {
+                validPositions.add(move.getEndPosition());
+            }
+
+            GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, validPositions);
+        } catch (NumberFormatException e) {
+            printUsageError("highlight", "<column> <row>");
         }
 
-        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, validPositions);
     }
 
     /**

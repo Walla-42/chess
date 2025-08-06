@@ -135,7 +135,7 @@ public class WebSocketHandler {
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             ChessPiece.PieceType pieceType = ChessPiece.PieceType.valueOf(piece.getPieceType().toString());
             String endPosition = makeClientCoordinate(move.getEndPosition());
-            String nextTurn = (userColor.equals(ChessGame.TeamColor.WHITE)) ? "White" : "Black";
+            String nextTurn = (userColor.equals(ChessGame.TeamColor.WHITE)) ? "Black" : "White";
 
             game.makeMove(move);
             gameDAO.updateGame(userGame);

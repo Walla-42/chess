@@ -122,6 +122,23 @@ public class InGameREPL implements NotificationHandler {
      * helper method to print help menu to the command line.
      */
     private void printHelp() {
+        if (clientSession.getUserRole() == ClientSession.User_Role.PLAYER) {
+            playerHelp();
+        } else {
+            observerHelp();
+        }
+    }
+
+    private void observerHelp() {
+        System.out.println("\t" + BLUE + "highlight <column> <row> " + RED + "- highlights possible moves for the " +
+                "selected game piece" + RESET);
+        System.out.println("\t" + BLUE + "leave " + RED + "- leave the current game" + RESET);
+        System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
+        System.out.println("\t" + BLUE + "redraw " + RED + "- redraw the current game board" + RESET);
+
+    }
+
+    private void playerHelp() {
         System.out.println("\t" + BLUE + "help " + RED + "- display possible commands" + RESET);
         System.out.println("\t" + BLUE + "redraw " + RED + "- redraw the current game board" + RESET);
         System.out.println("\t" + BLUE + "leave " + RED + "- leave the current game" + RESET);

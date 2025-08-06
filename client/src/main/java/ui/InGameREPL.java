@@ -161,17 +161,22 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void redrawChessBoard() {
-        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, null);
+        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, null, null);
     }
 
     private void makeMove(String[] userInput) {
+        if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
+            System.out.println(RED + "Error: You cannot make a move as an observer." + RESET);
+            return;
+        }
+
         try {
             int startRow = Integer.parseInt(userInput[2]);
             int endRow = Integer.parseInt(userInput[4]);
-            Integer startCol = columnMapping.get(userInput[1].toLowerCase());
-            Integer endCol = columnMapping.get(userInput[3].toLowerCase());
+            Integer startCol = columnMapping.get(userInput[1].toLowerCase().charAt(0));
+            Integer endCol = columnMapping.get(userInput[3].toLowerCase().charAt(0));
             if (startCol == null || endCol == null) {
-                printBasicMessage(RED, "Error: Invalid column letter", "help", "for more information");
+                printBasicMessage(RED, "Error: Invalid column letter", " help ", "for more information");
                 return;
             }
 
@@ -226,7 +231,7 @@ public class InGameREPL implements NotificationHandler {
                 validPositions.add(move.getEndPosition());
             }
 
-            GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, validPositions);
+            GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, validPositions, position);
         } catch (NumberFormatException e) {
             printUsageError("highlight", "<column> <row>");
         }
@@ -253,7 +258,7 @@ public class InGameREPL implements NotificationHandler {
             clientSession.updateGameBoard(loadGameMessage.getGame().game());
 
             if (loadGameMessage.getGame().game().getGameState() == ChessGame.Game_State.ONGOING) {
-                GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out, null);
+                GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out, null, null);
             } else {
                 System.out.println(YELLOW + "Game has ended. Type 'leave' to leave game.");
             }

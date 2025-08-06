@@ -1,21 +1,23 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.exceptions.DatabaseAccessException;
-import dataaccess.exceptions.UnauthorizedAccessException;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
-import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import responses.ErrorResponseClass;
 
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -39,27 +41,41 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         try {
-            AuthData authData = authDAO.getAuth(command.getAuthToken());
-            if (authData == null) {
-                throw new UnauthorizedAccessException("Error: Invalid AuthToken");
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            String type = jsonObject.get("commandType").getAsString();
+
+            System.out.println(jsonObject);
+
+            UserGameCommand command;
+
+            switch (UserGameCommand.CommandType.valueOf(type)) {
+                case MAKE_MOVE -> {
+                    command = new Gson().fromJson(jsonObject, MakeMoveCommand.class);
+                    ChessMove userMove = ((MakeMoveCommand) command).getChessMove();
+                    System.out.println(userMove);
+                    handleMakeMove((MakeMoveCommand) command, session, userMove);
+                }
+                case CONNECT -> {
+                    command = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                    handleConnect(command, session);
+                }
+                case LEAVE -> {
+                    command = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                    handleLeave(command, session);
+                }
+                case RESIGN -> {
+                    command = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                    handleResign(command, session);
+                }
             }
 
-            String username = authData.username();
-            int gameID = command.getGameID();
-
-            switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, gameID);
-                case MAKE_MOVE -> makeMove(session, username);
-                case LEAVE -> leaveGame(gameID, session, username);
-                case RESIGN -> resign(gameID, session, username);
-            }
         } catch (Exception ex) {
             ex.printStackTrace();
             sendErrorMessage(session, ex.getMessage());
         }
     }
+
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
@@ -88,8 +104,46 @@ public class WebSocketHandler {
         connection.broadcast(username, gameID, serverMessage);
     }
 
-    private void makeMove(Session session, String username) {
-        //
+    private void makeMove(int gameID, Session session, String username, ChessMove move) throws IOException, DatabaseAccessException {
+        if (move == null) {
+            sendErrorMessage(session, "Error: Invalid move received.");
+            return;
+        }
+        try {
+            GameData userGame = gameDAO.getGame(gameID);
+            ChessGame game = userGame.game();
+            ChessGame.TeamColor userColor;
+            if (userGame.blackUsername().equals(username)) {
+                userColor = ChessGame.TeamColor.BLACK;
+            } else if (userGame.whiteUsername().equals(username)) {
+                userColor = ChessGame.TeamColor.WHITE;
+            } else {
+                sendErrorMessage(session, "Error: You are not playing the game.");
+                return;
+            }
+
+            if (game.getTeamTurn() != userColor) {
+                sendErrorMessage(session, "Error: it is not your turn.");
+            }
+
+            game.makeMove(move);
+            ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+            gameDAO.updateGame(userGame);
+
+            // update game participant gameboards
+            ServerMessage updateGame = new LoadGameMessage(userGame);
+            connection.broadcast(null, gameID, updateGame);
+
+            // notify game participants
+            var message = String.format(username, " moved ", piece.toString(), " to ", move.getEndPosition().toString());
+            ServerMessage serverMessage = new NotificationMessage(message);
+            connection.broadcast(username, gameID, serverMessage);
+
+        } catch (DatabaseAccessException | InvalidMoveException e) {
+            sendErrorMessage(session, e.getMessage());
+        }
+
+
     }
 
     private void leaveGame(int gameID, Session session, String username) throws IOException {
@@ -157,6 +211,25 @@ public class WebSocketHandler {
         }
     }
 
+    private void handleMakeMove(MakeMoveCommand cmd, Session session, ChessMove move) throws IOException, DatabaseAccessException {
+        String username = authDAO.getAuth(cmd.getAuthToken()).username();
+        makeMove(cmd.getGameID(), session, username, move);
+    }
+
+    private void handleConnect(UserGameCommand cmd, Session session) throws IOException, DatabaseAccessException {
+        String username = authDAO.getAuth(cmd.getAuthToken()).username();
+        connect(session, username, cmd.getGameID());
+    }
+
+    private void handleLeave(UserGameCommand cmd, Session session) throws IOException, DatabaseAccessException {
+        String username = authDAO.getAuth(cmd.getAuthToken()).username();
+        leaveGame(cmd.getGameID(), session, username);
+    }
+
+    private void handleResign(UserGameCommand cmd, Session session) throws IOException, DatabaseAccessException {
+        String username = authDAO.getAuth(cmd.getAuthToken()).username();
+        resign(cmd.getGameID(), session, username);
+    }
 
     private void sendUserNotification(Session session, String notification) throws IOException {
         ServerMessage serverMessage = new NotificationMessage(notification);

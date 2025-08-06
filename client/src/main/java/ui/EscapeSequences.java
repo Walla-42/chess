@@ -59,6 +59,7 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_BRONZE = SET_BG_COLOR + "137m";
     public static final String SET_BG_COLOR_POLISHED_PINE = SET_BG_COLOR + "72m";
     public static final String SET_BG_COLOR_AVOCADO = SET_BG_COLOR + "65m";
+    public static final String SET_BG_COLOR_ORANGE = SET_BG_COLOR + "208m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
 
 

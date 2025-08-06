@@ -2,13 +2,12 @@ package ui;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import exceptions.ResponseException;
 import model.GameData;
 import server.ClientSession;
@@ -162,15 +161,20 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void redrawChessBoard() {
-        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out);
+        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, null);
     }
 
     private void makeMove(String[] userInput) {
         try {
             int startRow = Integer.parseInt(userInput[2]);
-            int startCol = columnMapping.get(userInput[1]);
             int endRow = Integer.parseInt(userInput[4]);
-            int endCol = columnMapping.get(userInput[3]);
+            Integer startCol = columnMapping.get(userInput[1].toLowerCase());
+            Integer endCol = columnMapping.get(userInput[3].toLowerCase());
+            if (startCol == null || endCol == null) {
+                printBasicMessage(RED, "Error: Invalid column letter", "help", "for more information");
+                return;
+            }
+
             ChessPiece.PieceType promotion = null;
             ChessPosition startPosition = new ChessPosition(startRow, startCol);
             ChessPosition endPosition = new ChessPosition(endRow, endCol);
@@ -180,13 +184,18 @@ public class InGameREPL implements NotificationHandler {
             if (userInput.length == 6) {
                 promotion = ChessPiece.PieceType.valueOf(userInput[5].toUpperCase());
                 chessMove = new ChessMove(startPosition, endPosition, promotion);
-            } else {
+            } else if (userInput.length == 5) {
                 chessMove = new ChessMove(startPosition, endPosition);
+            } else {
+                printUsageError("move", "<start column> <start row> <end column> <end row> [promotion{QUEEN|ROOK|BISHOP|KNIGHT}])");
+                return;
             }
 
             ws.onMove(clientSession.getAuthToken(), clientSession.getUserCurrentGame(), chessMove);
+
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid move coordinate", "help", "for more information");
+
         } catch (Throwable e) {
             var msg = e.getMessage();
             System.out.print(RED + msg + "\n" + RESET);
@@ -195,7 +204,22 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void highlight(String[] userInput) {
-        throw new RuntimeException("not yet implemented");
+        if (userInput.length != 3) {
+            printUsageError("highlight", "<column> <row>");
+            return;
+        }
+        char colCharacter = userInput[1].toLowerCase().charAt(0);
+        int column = columnMapping.get(colCharacter);
+        int row = Integer.parseInt(userInput[2]);
+
+        ChessPosition position = new ChessPosition(row, column);
+        Collection<ChessMove> moves = clientSession.getGameBoard().validMoves(position);
+        Collection<ChessPosition> validPositions = new ArrayList<>();
+        for (ChessMove move : moves) {
+            validPositions.add(move.getEndPosition());
+        }
+
+        GameBoardPrinter.printGameBoard(clientSession.getGameBoard(), color, out, validPositions);
     }
 
     /**
@@ -218,7 +242,7 @@ public class InGameREPL implements NotificationHandler {
             clientSession.updateGameBoard(loadGameMessage.getGame().game());
 
             if (loadGameMessage.getGame().game().getGameState() == ChessGame.Game_State.ONGOING) {
-                GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out);
+                GameBoardPrinter.printGameBoard(loadGameMessage.getGame().game(), color, out, null);
             } else {
                 System.out.println(YELLOW + "Game has ended. Type 'leave' to leave game.");
             }
@@ -249,5 +273,11 @@ public class InGameREPL implements NotificationHandler {
     private void printBasicMessage(String messageColor, String message, String guideCommand, String helpMessage) {
         System.out.println(messageColor + message + RESET + " Type" + GREEN + guideCommand +
                 RESET + helpMessage);
+    }
+
+    private void printUsageError(String command, String usage) {
+        System.out.println(RED + "Error: Invalid input for " + GREEN + command +
+                RED + ". Usage: " + RESET + "'" + command + " " + usage +
+                "'." + " Type " + GREEN + "'help'" + RESET + " for more information.");
     }
 }

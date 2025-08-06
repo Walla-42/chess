@@ -1,12 +1,11 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -30,8 +29,9 @@ public class GameBoardPrinter {
      * @param color the perspective to render from; if "white", shows white at the bottom, otherwise black
      * @param out   the PrintStream to print the board to (supports UTF-8)
      */
-    public static void printGameBoard(ChessGame game, String color, PrintStream out) {
+    public static void printGameBoard(ChessGame game, String color, PrintStream out, Collection<ChessPosition> highlight) {
         ChessBoard board = game.getBoard();
+        highlight = highlight != null ? highlight : new ArrayList<>();
 
         boolean whitePerspective = color != null && color.equalsIgnoreCase("white");
 
@@ -53,8 +53,16 @@ public class GameBoardPrinter {
                 for (int col = colStart; col != colEnd; col += colStep) {
                     boolean isDarkSquare = (row + col) % 2 == 0;
                     String bgColor = isDarkSquare ? BLACK_BACKGROUND : WHITE_BACKGROUND;
-
                     ChessPosition position = new ChessPosition(row, col + 1);
+                    
+                    if (highlight.contains(position)) {
+                        if (bgColor.equals(BLACK_BACKGROUND)) {
+                            bgColor = SET_BG_COLOR_GREEN;
+                        } else {
+                            bgColor = SET_BG_COLOR_LIGHT_GREEN;
+                        }
+                    }
+
                     ChessPiece piece = board.getPiece(position);
                     String symbol = getPieceSymbol(piece);
 

@@ -39,7 +39,6 @@ public class ClientSession {
 
     public void addLookupMapValue(Integer userFacingID, Integer gameID) {
         gameLookupMap.put(userFacingID, gameID);
-
     }
 
     public void setCurrentGame(int gameID) {

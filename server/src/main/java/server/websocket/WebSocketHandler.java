@@ -1,9 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,6 +14,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+import server.Server;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -25,6 +23,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 @WebSocket
@@ -112,6 +111,10 @@ public class WebSocketHandler {
         try {
             GameData userGame = gameDAO.getGame(gameID);
             ChessGame game = userGame.game();
+            if (game.getGameState() != ChessGame.Game_State.ONGOING) {
+                sendErrorMessage(session, "Error: The game has already ended. Type 'leave' to leave the game.");
+                return;
+            }
             ChessGame.TeamColor userColor;
             if (userGame.blackUsername().equals(username)) {
                 userColor = ChessGame.TeamColor.BLACK;
@@ -122,12 +125,19 @@ public class WebSocketHandler {
                 return;
             }
 
+            // check that it is their turn
             if (game.getTeamTurn() != userColor) {
                 sendErrorMessage(session, "Error: it is not your turn.");
+                return;
             }
 
-            game.makeMove(move);
+            // make move and update gameboard in database
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+            ChessPiece.PieceType pieceType = ChessPiece.PieceType.valueOf(piece.getPieceType().toString());
+            String endPosition = makeClientCoordinate(move.getEndPosition());
+            String nextTurn = (userColor.equals(ChessGame.TeamColor.WHITE)) ? "White" : "Black";
+
+            game.makeMove(move);
             gameDAO.updateGame(userGame);
 
             // update game participant gameboards
@@ -135,7 +145,7 @@ public class WebSocketHandler {
             connection.broadcast(null, gameID, updateGame);
 
             // notify game participants
-            var message = String.format(username, " moved ", piece.toString(), " to ", move.getEndPosition().toString());
+            var message = String.format("%s moved %s to %s. It is now %s's turn.", username, pieceType, endPosition, nextTurn);
             ServerMessage serverMessage = new NotificationMessage(message);
             connection.broadcast(username, gameID, serverMessage);
 
@@ -144,6 +154,23 @@ public class WebSocketHandler {
         }
 
 
+    }
+
+    private String makeClientCoordinate(ChessPosition endPosition) {
+        Map<Integer, String> intToNumber = Map.of(
+                1, "a",
+                2, "b",
+                3, "c",
+                4, "d",
+                5, "e",
+                6, "f",
+                7, "g",
+                8, "h"
+        );
+        int row = endPosition.getRow();
+        int col = endPosition.getColumn();
+        String colChar = intToNumber.get(col);
+        return colChar + row;
     }
 
     private void leaveGame(int gameID, Session session, String username) throws IOException {
@@ -178,6 +205,11 @@ public class WebSocketHandler {
             ChessGame.Game_State gameState = currentGame.game().getGameState();
             boolean gameOver = gameState != ChessGame.Game_State.ONGOING;
 
+            if (gameOver) {
+                var message = "Error: The game has ended. Player movement is now disabled. Type 'leave' to exit the game";
+                sendErrorMessage(session, message);
+                return;
+            }
 
             if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username) && !gameOver) {
                 currentGame.game().setGameState(ChessGame.Game_State.WHITE_WON);
@@ -192,10 +224,6 @@ public class WebSocketHandler {
             gameDAO.updateGame(currentGame);
 
             String winner = (currentGame.game().getGameState() == ChessGame.Game_State.WHITE_WON) ? "White" : "Black";
-
-            // Send updated game state (includes resigned state) to everyone
-            ServerMessage updateGame = new LoadGameMessage(currentGame);
-            connection.broadcast(null, gameID, updateGame);
 
             // Notify everyone in the game (except the one resigning)
             var message = String.format("%s has resigned from the game. %s won the game!", username, winner);

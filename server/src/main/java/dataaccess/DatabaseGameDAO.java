@@ -17,9 +17,10 @@ public class DatabaseGameDAO implements GameDAO {
     @Override
     public Collection<GameData> listGames() throws DatabaseAccessException {
         Gson gson = new Gson();
-        String getString = "SELECT gameID, white_username, black_username, game_name, chess_game FROM gamedatabase";
+        String getString = "SELECT gameID, white_username, black_username, game_name, chess_game FROM gamedatabase WHERE status = 'active'";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(getString)) {
+            DatabaseManager.printTableContents("gamedatabase");
             try (var gameQuery = statement.executeQuery()) {
                 HashSet<GameData> activeGames = new HashSet<>();
                 while (gameQuery.next()) {
@@ -34,6 +35,7 @@ public class DatabaseGameDAO implements GameDAO {
                 return activeGames;
             }
         } catch (SQLException | DataAccessException e) {
+            System.out.println("Error logged in listGames method of DatabaseGameDAO: " + e.getMessage());
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
@@ -43,14 +45,16 @@ public class DatabaseGameDAO implements GameDAO {
         Gson gson = new Gson();
         ChessGame newChessGame = new ChessGame();
         String chessGameString = gson.toJson(newChessGame);
+        String status = (newChessGame.getGameState() == ChessGame.Game_State.ONGOING) ? "active" : "inactive";
 
-        String insertString = "INSERT INTO gamedatabase (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?)";
+        String insertString = "INSERT INTO gamedatabase (white_username, black_username, game_name, chess_game, status) VALUES (?, ?, ?, ?, ?)";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS)) {
             statement.setNull(1, java.sql.Types.VARCHAR);
             statement.setNull(2, java.sql.Types.VARCHAR);
             statement.setString(3, gameName);
             statement.setString(4, chessGameString);
+            statement.setString(5, status);
 
             statement.executeUpdate();
 
@@ -64,6 +68,7 @@ public class DatabaseGameDAO implements GameDAO {
             return new GameData(generatedGameID, null, null, gameName, newChessGame);
 
         } catch (SQLException | DataAccessException e) {
+            System.out.println("Error logged in createGame method of DatabaseGameDAO: " + e.getMessage());
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
@@ -88,6 +93,7 @@ public class DatabaseGameDAO implements GameDAO {
             }
             return null;
         } catch (SQLException | DataAccessException e) {
+            System.out.println("Error logged in getGame method of DatabaseGameDAO: " + e.getMessage());
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
@@ -101,15 +107,17 @@ public class DatabaseGameDAO implements GameDAO {
         String blackUsername = updatedGameData.blackUsername();
         String gameName = updatedGameData.gameName();
         String chessGame = gson.toJson(updatedGameData.game());
+        String status = (updatedGameData.game().getGameState() == ChessGame.Game_State.ONGOING) ? "active" : "inactive";
 
-        String updateString = "UPDATE gamedatabase SET white_username = ?, black_username = ?, game_name = ?, chess_game = ? WHERE gameID = ?";
+        String updateString = "UPDATE gamedatabase SET white_username = ?, black_username = ?, game_name = ?, chess_game = ?, status = ? WHERE gameID = ?";
 
         try (var conn = DatabaseManager.getConnection(); var statement = conn.prepareStatement(updateString)) {
             statement.setString(1, whiteUsername);
             statement.setString(2, blackUsername);
             statement.setString(3, gameName);
             statement.setString(4, chessGame);
-            statement.setInt(5, gameId);
+            statement.setString(5, status);
+            statement.setInt(6, gameId);
 
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected == 0) {
@@ -118,6 +126,7 @@ public class DatabaseGameDAO implements GameDAO {
 
 
         } catch (SQLException | DataAccessException e) {
+            System.out.println("Error logged in updateGame method of DatabaseGameDAO: " + e.getMessage());
             throw new DatabaseAccessException("Error: Database Access Failed", e);
         }
     }
@@ -131,6 +140,7 @@ public class DatabaseGameDAO implements GameDAO {
             statement.executeUpdate();
 
         } catch (SQLException | DataAccessException e) {
+            System.out.println("Error logged in clearDB method of DatabaseGameDAO: " + e.getMessage());
             throw new DatabaseAccessException("Error: Database access failed", e);
         }
     }
@@ -144,6 +154,7 @@ public class DatabaseGameDAO implements GameDAO {
                         black_username VARCHAR(50),
                         game_name VARCHAR(100),
                         chess_game TEXT NOT NULL,
+                        status TEXT NOT NULL,
                         FOREIGN KEY (white_username) REFERENCES userdatabase(username) ON DELETE SET NULL,
                         FOREIGN KEY (black_username) REFERENCES userdatabase(username) ON DELETE SET NULL
                         );

@@ -71,6 +71,10 @@ public class WebSocketHandler {
         // return current game board
         try {
             GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                throw new DatabaseAccessException("Error: game does not exist.");
+            }
+
             ServerMessage updatedGameData = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(updatedGameData));
         } catch (DatabaseAccessException e) {

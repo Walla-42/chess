@@ -20,6 +20,8 @@ public class Server {
 
     //use this to toggle in memory or Database usage;
     private final boolean useMemory = false;
+
+    // setting this flag to true will reset the database after every run
     private final boolean manualTestMode = false;
 
     private final UserDAO userDAO;
@@ -59,7 +61,7 @@ public class Server {
         Spark.port(desiredPort);
 
         WebSocketHandler.initialize(authDAO, gameDAO);
-        
+
         // websocket endpoint
         Spark.webSocket("/ws", WebSocketHandler.class);
 
@@ -111,7 +113,7 @@ public class Server {
             System.out.println("Complete GameDatTable setup!");
 
         } catch (DataAccessException e) {
-            throw new RuntimeException("Error: failed to create database", e);
+            throw new RuntimeException("Error: failed to create database: " + e.getMessage());
         }
     }
 }

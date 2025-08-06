@@ -14,6 +14,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
+import server.Server;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -110,6 +111,10 @@ public class WebSocketHandler {
         try {
             GameData userGame = gameDAO.getGame(gameID);
             ChessGame game = userGame.game();
+            if (game.getGameState() != ChessGame.Game_State.ONGOING) {
+                sendErrorMessage(session, "Error: The game has already ended. Type 'leave' to leave the game.");
+                return;
+            }
             ChessGame.TeamColor userColor;
             if (userGame.blackUsername().equals(username)) {
                 userColor = ChessGame.TeamColor.BLACK;
@@ -200,6 +205,11 @@ public class WebSocketHandler {
             ChessGame.Game_State gameState = currentGame.game().getGameState();
             boolean gameOver = gameState != ChessGame.Game_State.ONGOING;
 
+            if (gameOver) {
+                var message = "Error: The game has ended. Player movement is now disabled. Type 'leave' to exit the game";
+                sendErrorMessage(session, message);
+                return;
+            }
 
             if (currentGame.blackUsername() != null && currentGame.blackUsername().equals(username) && !gameOver) {
                 currentGame.game().setGameState(ChessGame.Game_State.WHITE_WON);
@@ -214,10 +224,6 @@ public class WebSocketHandler {
             gameDAO.updateGame(currentGame);
 
             String winner = (currentGame.game().getGameState() == ChessGame.Game_State.WHITE_WON) ? "White" : "Black";
-
-            // Send updated game state (includes resigned state) to everyone
-            ServerMessage updateGame = new LoadGameMessage(currentGame);
-            connection.broadcast(null, gameID, updateGame);
 
             // Notify everyone in the game (except the one resigning)
             var message = String.format("%s has resigned from the game. %s won the game!", username, winner);

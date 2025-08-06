@@ -175,18 +175,19 @@ public class WebSocketHandler {
 
     private void checkIfInCheck(GameData gameData, int gameID) throws IOException, DatabaseAccessException {
         ChessGame game = gameData.game();
-        String teamTurn = (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "White" : "Black");
-        String opponentTurn = (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "Black" : "White");
+        String teamTurn = game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "White" : "Black";
+        String username = game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
+        String opponentTurn = game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "Black" : "White";
 
         if (game.isInCheckmate(game.getTeamTurn())) {
-            String checkmateMessage = String.format("%s is in checkmate. Game Over. %s won the game!", teamTurn, opponentTurn);
+            String checkmateMessage = String.format("%s is in checkmate. Game Over. %s won the game!", username, opponentTurn);
             ServerMessage checkmate = new NotificationMessage(checkmateMessage);
             connection.broadcast(null, gameID, checkmate);
             game.setGameState((opponentTurn.equals("White") ? ChessGame.Game_State.WHITE_WON : ChessGame.Game_State.BLACK_WON));
             gameDAO.updateGame(gameData);
 
         } else if (game.isInCheck(game.getTeamTurn())) {
-            String checkMessage = String.format("%s is in check.", teamTurn);
+            String checkMessage = String.format("%s is in check.", username);
             ServerMessage check = new NotificationMessage(checkMessage);
             connection.broadcast(null, gameID, check);
         }

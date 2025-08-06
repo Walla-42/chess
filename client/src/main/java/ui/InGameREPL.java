@@ -74,7 +74,12 @@ public class InGameREPL implements NotificationHandler {
         System.out.print(ERASE_SCREEN);
         System.out.flush();
 
-        printWelcome();
+        if (clientSession.getUserRole() == ClientSession.User_Role.PLAYER) {
+            printWelcome();
+        } else {
+            System.out.println(BLUE + "You have joined " + GREEN + gameName + BLUE + " as " + GREEN +
+                    "observer" + BLUE + "!" + " type " + GREEN + "'help'" + BLUE + " for more commands." + RESET);
+        }
 
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     }
@@ -103,7 +108,7 @@ public class InGameREPL implements NotificationHandler {
                 case "move" -> makeMove(userInput);
                 case "resign" -> {
                     if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
-                        System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game.");
+                        System.out.println(RED + "Error: Observer cannot resign. Type 'leave' to leave game." + RESET);
                         break;
                     }
                     resignPlayer(scanner);
@@ -153,8 +158,6 @@ public class InGameREPL implements NotificationHandler {
         clientSession.removeCurrentGame();
         System.out.print(ERASE_SCREEN);
         System.out.flush();
-        printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
-                " for list of available commands.");
         inGame = false;
     }
 

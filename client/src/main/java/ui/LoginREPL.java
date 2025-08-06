@@ -155,7 +155,10 @@ public class LoginREPL {
             session.setUserRole(ClientSession.User_Role.PLAYER);
 
             new InGameREPL(server, session, chessGame, playerColor).run();
-            
+
+            printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",
+                    " for list of available commands.");
+
         } catch (NumberFormatException e) {
             printBasicMessage(RED, "Error: Invalid Game ID: ", " 'list' ", "to view available games.");
 
@@ -186,6 +189,11 @@ public class LoginREPL {
             }
 
             // Enter inGame REPL
+            session.setCurrentGame(gameID);
+
+            System.out.println(YELLOW + "Joining game " + GREEN + userFacingGameID + YELLOW +
+                    " as " + GREEN + "observer" + RESET);
+
             session.setUserRole(ClientSession.User_Role.OBSERVER);
             new InGameREPL(server, session, chessGame, "white").run();
             printBasicMessage(YELLOW, "You have successfully exited game view. ", "'help'",

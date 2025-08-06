@@ -1,9 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,6 +22,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 @WebSocket
@@ -122,12 +120,19 @@ public class WebSocketHandler {
                 return;
             }
 
+            // check that it is their turn
             if (game.getTeamTurn() != userColor) {
                 sendErrorMessage(session, "Error: it is not your turn.");
+                return;
             }
 
-            game.makeMove(move);
+            // make move and update gameboard in database
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+            ChessPiece.PieceType pieceType = ChessPiece.PieceType.valueOf(piece.getPieceType().toString());
+            String endPosition = makeClientCoordinate(move.getEndPosition());
+            String nextTurn = (userColor.equals(ChessGame.TeamColor.WHITE)) ? "White" : "Black";
+
+            game.makeMove(move);
             gameDAO.updateGame(userGame);
 
             // update game participant gameboards
@@ -135,7 +140,7 @@ public class WebSocketHandler {
             connection.broadcast(null, gameID, updateGame);
 
             // notify game participants
-            var message = String.format(username, " moved ", piece.toString(), " to ", move.getEndPosition().toString());
+            var message = String.format("%s moved %s to %s. It is now %s's turn.", username, pieceType, endPosition, nextTurn);
             ServerMessage serverMessage = new NotificationMessage(message);
             connection.broadcast(username, gameID, serverMessage);
 
@@ -144,6 +149,23 @@ public class WebSocketHandler {
         }
 
 
+    }
+
+    private String makeClientCoordinate(ChessPosition endPosition) {
+        Map<Integer, String> intToNumber = Map.of(
+                1, "a",
+                2, "b",
+                3, "c",
+                4, "d",
+                5, "e",
+                6, "f",
+                7, "g",
+                8, "h"
+        );
+        int row = endPosition.getRow();
+        int col = endPosition.getColumn();
+        String colChar = intToNumber.get(col);
+        return colChar + row;
     }
 
     private void leaveGame(int gameID, Session session, String username) throws IOException {

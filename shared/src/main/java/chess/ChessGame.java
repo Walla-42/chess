@@ -154,12 +154,12 @@ public class ChessGame {
         ChessBoard chessBoard = getBoard();
         ChessPiece piece = chessBoard.getPiece(start);
         if (piece == null) {
-            throw new InvalidMoveException("Must select a valid piece");
+            throw new InvalidMoveException("Error: You must select a valid piece");
         }
 
         TeamColor team = piece.getTeamColor();
         if (team != turn) {
-            throw new InvalidMoveException("Not Your Turn");
+            throw new InvalidMoveException("Error: You cannot move this piece");
         }
         Collection<ChessMove> validMoves = validMoves(start);
 
@@ -173,7 +173,7 @@ public class ChessGame {
 
             updateTurn();
         } else {
-            throw new InvalidMoveException("That move is not allowed for this piece.");
+            throw new InvalidMoveException("Error: That move is not allowed for this piece.");
         }
     }
 

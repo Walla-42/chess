@@ -50,7 +50,6 @@ public class InGameREPL implements NotificationHandler {
             'h', 8
     );
 
-
     private static final String ERASE_SCREEN = EscapeSequences.ERASE_SCREEN;
 
 
@@ -165,6 +164,11 @@ public class InGameREPL implements NotificationHandler {
     }
 
     private void makeMove(String[] userInput) {
+        if (!clientSession.getGameBoard().getGameState().equals(ChessGame.Game_State.ONGOING)) {
+            System.out.println(RED + "Error: Game has already ended.");
+            return;
+        }
+
         if (clientSession.getUserRole() != ClientSession.User_Role.PLAYER) {
             System.out.println(RED + "Error: You cannot make a move as an observer." + RESET);
             return;

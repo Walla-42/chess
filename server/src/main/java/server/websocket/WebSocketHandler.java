@@ -82,7 +82,7 @@ public class WebSocketHandler {
     }
 
 
-    private void connect(Session session, String username, int gameID) throws IOException {
+    private void connect(Session session, String username, int gameID) throws IOException, DatabaseAccessException {
         // return current game board
         try {
             GameData gameData = gameDAO.getGame(gameID);
@@ -96,11 +96,25 @@ public class WebSocketHandler {
             throw new IOException(e);
         }
 
+        String playerPosition = getPlayerPosition(gameID, username);
+
         // add user to websocket connection and notify game participants
         connection.add(gameID, username, session);
-        var message = String.format("%s has joined the game", username);
+        var message = String.format("%s has joined the game as %s", username, playerPosition);
         ServerMessage serverMessage = new NotificationMessage(message);
         connection.broadcast(username, gameID, serverMessage);
+    }
+
+    private String getPlayerPosition(int gameID, String username) throws DatabaseAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData.whiteUsername().equals(username)) {
+            return "White";
+        } else if (gameData.blackUsername().equals(username)) {
+            return "Black";
+        } else {
+            return "Observer";
+        }
+
     }
 
     private void makeMove(int gameID, Session session, String username, ChessMove move) throws IOException, DatabaseAccessException {
@@ -108,6 +122,7 @@ public class WebSocketHandler {
             sendErrorMessage(session, "Error: Invalid move received.");
             return;
         }
+
         try {
             GameData userGame = gameDAO.getGame(gameID);
             ChessGame game = userGame.game();
@@ -149,11 +164,32 @@ public class WebSocketHandler {
             ServerMessage serverMessage = new NotificationMessage(message);
             connection.broadcast(username, gameID, serverMessage);
 
+            checkIfInCheck(userGame, gameID);
+
         } catch (DatabaseAccessException | InvalidMoveException e) {
             sendErrorMessage(session, e.getMessage());
         }
 
 
+    }
+
+    private void checkIfInCheck(GameData gameData, int gameID) throws IOException, DatabaseAccessException {
+        ChessGame game = gameData.game();
+        String teamTurn = (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "White" : "Black");
+        String opponentTurn = (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE) ? "Black" : "White");
+
+        if (game.isInCheckmate(game.getTeamTurn())) {
+            String checkmateMessage = String.format("%s is in checkmate. Game Over. %s won the game!", teamTurn, opponentTurn);
+            ServerMessage checkmate = new NotificationMessage(checkmateMessage);
+            connection.broadcast(null, gameID, checkmate);
+            game.setGameState((opponentTurn.equals("White") ? ChessGame.Game_State.WHITE_WON : ChessGame.Game_State.BLACK_WON));
+            gameDAO.updateGame(gameData);
+
+        } else if (game.isInCheck(game.getTeamTurn())) {
+            String checkMessage = String.format("%s is in check.", teamTurn);
+            ServerMessage check = new NotificationMessage(checkMessage);
+            connection.broadcast(null, gameID, check);
+        }
     }
 
     private String makeClientCoordinate(ChessPosition endPosition) {

@@ -6,7 +6,7 @@ This project demonstrates mastery of proper software design, client/server archi
 
 The application implements a multiplayer chess server and a command line chess client.
 
-![Sequence Diagram](/shared/project_images/10k-architecture.png)
+![Sequence Diagram](shared/project_images/10k-architecture.png)
 
 ## Modules
 
@@ -57,22 +57,22 @@ This terminal-based chess application supports real-time multiplayer games with 
 
 ### Game Listing and Creation
 After logging in, users can view all active games and create new ones.
-<p align="center"> <img src="/shared/project_images/ListGames.png" alt="List Games"> </p>
+<p> <img src="shared/project_images/ListGames.png" alt="List Games"> </p>
 
 ### Join as White or Black
 Players can choose to join a game as either white or black. The board orientation reflects the player's perspective.
-<p align="center"> <img src="/shared/project_images/JoinGameWhite.jpg" width="400" alt="Join Game as White"> <img src="/shared/project_images/JoinGameBlack.jpg" width="400" alt="Join Game as Black"> </p>
+<p> <img src="shared/project_images/PlayerBoardBlackWhite.png" alt="Join Game as White"></p>
 
 ### Observer Mode  
 Users may observe any in-progress game in real time.
-<p align="center"> <img src="/shared/project_images/JoinAsObserver.png"  alt="Observer Mode"> </p>
+<p> <img src="shared/project_images/JoinAsObserver.png"  alt="Observer Mode"> </p>
 
 ### Highlight Moves
 Players can highlight a piece to view its legal moves, threats, and type.
-<p align="center"> <img src="/shared/project_images/HighlightPieceMoves.png" alt="Highlight Moves"> </p>
+<p> <img src="shared/project_images/HighlightPieceMoves.png" alt="Highlight Moves"> </p>
 
 ### In-Game Notifications
 Real-time WebSocket notifications inform players of events such as new moves, resignations, and connections.
-<p align="center"> <img src="/shared/project_images/InGameNotifications.png" alt="In-Game Notifications"> </p>
+<p> <img src="shared/project_images/InGameNotifications.png" alt="In-Game Notifications"> </p>
 
 

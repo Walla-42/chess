@@ -113,7 +113,6 @@ public class WebSocketHandler {
         } else {
             return "Observer";
         }
-
     }
 
     private void makeMove(int gameID, Session session, String username, ChessMove move) throws IOException, DatabaseAccessException {

@@ -101,7 +101,7 @@ public class LoginREPL {
     private void listGamesSequence() {
         ListGamesResponseBody response = server.listGamesCall(session.getAuthToken());
 
-        System.out.printf("\t%s%-8s%-25s%-20s%-20s%s%n", YELLOW, "Game ID",
+        System.out.printf("\t%s%-12s%-25s%-20s%-20s%s%n", YELLOW, "Game ID",
                 "Game Name", "White Username", "Black Username", RESET);
 
         session.clearMap();
@@ -109,12 +109,12 @@ public class LoginREPL {
         for (GameData gameData : response.games()) {
             gameID += 1;
             String gameName = gameData.gameName();
-            String blackUsername = gameData.blackUsername();
-            String whiteUsername = gameData.whiteUsername();
+            String blackUsername = gameData.blackUsername() == null ? "None" : gameData.blackUsername();
+            String whiteUsername = gameData.whiteUsername() == null ? "None" : gameData.whiteUsername();
 
             session.addGameDataMapValue(gameID, gameData);
             session.addLookupMapValue(gameID, gameData.gameID());
-            System.out.printf("\t%s%-8d%s%-25s%-20s%-20s%s%n", YELLOW, gameID,
+            System.out.printf("\t%s%-12d%s%-25s%-20s%-20s%s%n", YELLOW, gameID,
                     BLUE, gameName, whiteUsername, blackUsername, RESET);
         }
     }

@@ -124,6 +124,10 @@ public class WebSocketHandler {
 
         try {
             GameData userGame = gameDAO.getGame(gameID);
+            if (userGame.blackUsername() == null || userGame.whiteUsername() == null) {
+                sendErrorMessage(session, "Error: you must wait for another player to join before making a move.");
+                return;
+            }
             ChessGame game = userGame.game();
             if (game.getGameState() != ChessGame.GameState.ONGOING) {
                 sendErrorMessage(session, "Error: The game has already ended. Type 'leave' to leave the game.");

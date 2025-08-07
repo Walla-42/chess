@@ -32,6 +32,7 @@ public class GameBoardPrinter {
     public static void printGameBoard(ChessGame game, String color, PrintStream out,
                                       Collection<ChessPosition> highlight, ChessPosition startPosition) {
         ChessBoard board = game.getBoard();
+        ChessGame.TeamColor turn = game.getTeamTurn();
         highlight = highlight != null ? highlight : new ArrayList<>();
 
         boolean whitePerspective = color != null && color.equalsIgnoreCase("white");
@@ -45,7 +46,6 @@ public class GameBoardPrinter {
         int colStep = whitePerspective ? 1 : -1;
 
         printLetters(out, whitePerspective);
-        out.println();
 
         for (int row = rowStart; row != rowEnd; row += rowStep) {
             for (int line = 0; line < SQUARE_HEIGHT; line++) {
@@ -54,10 +54,15 @@ public class GameBoardPrinter {
                 for (int col = colStart; col != colEnd; col += colStep) {
                     boolean isDarkSquare = (row + col) % 2 == 0;
                     String bgColor = isDarkSquare ? BLACK_BACKGROUND : WHITE_BACKGROUND;
-                    String symbolColor = SET_TEXT_COLOR_WHITE;
                     ChessPosition position = new ChessPosition(row, col + 1);
 
                     ChessPiece piece = board.getPiece(position);
+                    String symbolColor = SET_TEXT_COLOR_WHITE;
+                    if (piece != null) {
+                        symbolColor = piece.getTeamColor() == ChessGame.TeamColor.WHITE ?
+                                SET_TEXT_COLOR_WHITE : SET_TEXT_COLOR_BLACK;
+                    }
+
                     ChessPiece startPiece = startPosition != null ? board.getPiece(startPosition) : null;
                     String symbol = getPieceSymbol(piece);
 
@@ -68,7 +73,7 @@ public class GameBoardPrinter {
 
                     if (isStart) {
                         bgColor = SET_BG_COLOR_YELLOW;
-                        symbolColor = SET_TEXT_COLOR_BLACK;
+                        symbolColor = SET_TEXT_COLOR_RED;
                     } else if (isCapture) {
                         bgColor = SET_BG_COLOR_ORANGE;
                         symbolColor = SET_TEXT_COLOR_BLACK;
@@ -93,7 +98,25 @@ public class GameBoardPrinter {
         }
 
         printLetters(out, whitePerspective);
+
+        printTurnInfo(out, turn);
         out.println("\n");
+    }
+
+    /**
+     * Method for printing out the turn info label at the bottom of the chessboard.
+     *
+     * @param out  print stream to print to
+     * @param turn the turn which the game is on
+     */
+    private static void printTurnInfo(PrintStream out, ChessGame.TeamColor turn) {
+        out.print(BORDER_BACKGROUND + BORDER_TEXT + " ".repeat(SQUARE_WIDTH * 2));
+        if (turn == ChessGame.TeamColor.WHITE) {
+            out.print(SET_TEXT_COLOR_WHITE + "Player Turn: White");
+        } else {
+            out.print(SET_TEXT_COLOR_BLACK + "Player Turn: Black");
+        }
+        out.print(BORDER_BACKGROUND + " ".repeat(SQUARE_WIDTH * 2) + RESET);
     }
 
     /**
@@ -115,9 +138,9 @@ public class GameBoardPrinter {
                 out.print((char) ('h' - col));
                 out.print(" ".repeat(SQUARE_WIDTH - padding - 2));
             }
-
         }
         out.print("    " + RESET);
+        out.println();
     }
 
     /**
